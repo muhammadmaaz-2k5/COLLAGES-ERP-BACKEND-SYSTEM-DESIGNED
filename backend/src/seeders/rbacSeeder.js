@@ -104,7 +104,6 @@ async function seedDatabase() {
       },
     });
   }
-  console.log("✓ Administrative & Operations Users seeded.");
 
   // 7. Seed Faculty / Teachers
   const facultyUsers = [
@@ -128,9 +127,9 @@ async function seedDatabase() {
       },
     });
   }
-  console.log(`✓ ${facultyUsers.length} Faculty Teachers seeded.`);
+  console.log("✓ Operations Staff & Faculty Teachers verified.");
 
-  // 8. Seed All Students across Degrees & Semesters
+  // 8. Seed Detailed Student Profiles
   const studentsCatalog = [
     {
       email: "student@university.edu",
@@ -141,9 +140,22 @@ async function seedDatabase() {
       programName: "BS Computer Science",
       departmentName: "Computer Science & Engineering",
       semester: 6,
+      section: "A",
       cgpa: 3.87,
       credits: 96,
       standing: "GOOD_STANDING",
+      gender: "Male",
+      dob: "2004-05-14",
+      blood: "O+",
+      cnic: "42101-9876543-1",
+      city: "Capital City",
+      address: "House 42, Sector F-8/2, University Avenue",
+      emergency: "+1 (555) 234-5678",
+      guardian: "Arthur Morgan",
+      relation: "Father",
+      gPhone: "+1 (555) 987-6543",
+      gEmail: "arthur.morgan@parent.university.edu",
+      mentor: "Dr. Sarah Jenkins",
     },
     {
       email: "zain.ahmed@university.edu",
@@ -154,9 +166,22 @@ async function seedDatabase() {
       programName: "BS Computer Science",
       departmentName: "Computer Science & Engineering",
       semester: 6,
+      section: "A",
       cgpa: 3.72,
       credits: 96,
       standing: "GOOD_STANDING",
+      gender: "Male",
+      dob: "2004-08-22",
+      blood: "A+",
+      cnic: "42101-1122334-3",
+      city: "Capital City",
+      address: "Apartment 14-B, Executive Heights",
+      emergency: "+1 (555) 345-6789",
+      guardian: "Tariq Ahmed",
+      relation: "Father",
+      gPhone: "+1 (555) 876-5432",
+      gEmail: "tariq.ahmed@parent.university.edu",
+      mentor: "Dr. Michael Chen",
     },
     {
       email: "ayesha.malik@university.edu",
@@ -167,9 +192,22 @@ async function seedDatabase() {
       programName: "BS Software Engineering",
       departmentName: "Software Engineering",
       semester: 5,
+      section: "B",
       cgpa: 3.94,
       credits: 80,
       standing: "GOOD_STANDING",
+      gender: "Female",
+      dob: "2004-11-09",
+      blood: "B+",
+      cnic: "42101-5566778-2",
+      city: "Capital City",
+      address: "Villa 109, Palm Enclave",
+      emergency: "+1 (555) 456-7890",
+      guardian: "Kamran Malik",
+      relation: "Father",
+      gPhone: "+1 (555) 765-4321",
+      gEmail: "kamran.malik@parent.university.edu",
+      mentor: "Prof. Alan Vance",
     },
     {
       email: "bilal.khan@university.edu",
@@ -180,9 +218,22 @@ async function seedDatabase() {
       programName: "BS Artificial Intelligence",
       departmentName: "Artificial Intelligence",
       semester: 4,
+      section: "A",
       cgpa: 3.65,
       credits: 64,
       standing: "GOOD_STANDING",
+      gender: "Male",
+      dob: "2005-02-18",
+      blood: "AB+",
+      cnic: "42101-9988776-5",
+      city: "Capital City",
+      address: "Street 7, Sector G-11/3",
+      emergency: "+1 (555) 567-8901",
+      guardian: "Nadeem Khan",
+      relation: "Father",
+      gPhone: "+1 (555) 654-3210",
+      gEmail: "nadeem.khan@parent.university.edu",
+      mentor: "Dr. Hassan Tariq",
     },
     {
       email: "fatima.noor@university.edu",
@@ -193,35 +244,22 @@ async function seedDatabase() {
       programName: "BS Data Science",
       departmentName: "Data Science",
       semester: 3,
+      section: "A",
       cgpa: 3.88,
       credits: 48,
       standing: "GOOD_STANDING",
-    },
-    {
-      email: "hamza.tariq@university.edu",
-      firstName: "Hamza",
-      lastName: "Tariq",
-      regNo: "SP25-BCY-019",
-      rollNo: "019",
-      programName: "BS Cyber Security",
-      departmentName: "Computer Science",
-      semester: 2,
-      cgpa: 3.58,
-      credits: 32,
-      standing: "GOOD_STANDING",
-    },
-    {
-      email: "sara.siddiqui@university.edu",
-      firstName: "Sara",
-      lastName: "Siddiqui",
-      regNo: "FA25-BEE-034",
-      rollNo: "034",
-      programName: "BS Electrical Engineering",
-      departmentName: "Electrical Engineering",
-      semester: 2,
-      cgpa: 3.81,
-      credits: 34,
-      standing: "GOOD_STANDING",
+      gender: "Female",
+      dob: "2005-07-30",
+      blood: "O-",
+      cnic: "42101-4433221-8",
+      city: "Capital City",
+      address: "House 204, Sector I-8/4",
+      emergency: "+1 (555) 678-9012",
+      guardian: "Sohail Noor",
+      relation: "Father",
+      gPhone: "+1 (555) 543-2109",
+      gEmail: "sohail.noor@parent.university.edu",
+      mentor: "Dr. Emily Taylor",
     },
     {
       email: "usman.javed@university.edu",
@@ -232,65 +270,26 @@ async function seedDatabase() {
       programName: "BS Computer Science",
       departmentName: "Computer Science & Engineering",
       semester: 8,
+      section: "A",
       cgpa: 3.96,
       credits: 128,
       standing: "GOOD_STANDING",
-    },
-    {
-      email: "mahnoor.raza@university.edu",
-      firstName: "Mahnoor",
-      lastName: "Raza",
-      regNo: "FA24-BBA-012",
-      rollNo: "012",
-      programName: "BBA Business Administration",
-      departmentName: "Management Sciences",
-      semester: 4,
-      cgpa: 3.69,
-      credits: 62,
-      standing: "GOOD_STANDING",
-    },
-    {
-      email: "daniyal.shah@university.edu",
-      firstName: "Daniyal",
-      lastName: "Shah",
-      regNo: "SP23-BSE-044",
-      rollNo: "044",
-      programName: "BS Software Engineering",
-      departmentName: "Software Engineering",
-      semester: 7,
-      cgpa: 3.45,
-      credits: 112,
-      standing: "GOOD_STANDING",
-    },
-    {
-      email: "anum.tariq@university.edu",
-      firstName: "Anum",
-      lastName: "Tariq",
-      regNo: "FA23-BAI-021",
-      rollNo: "021",
-      programName: "BS Artificial Intelligence",
-      departmentName: "Artificial Intelligence",
-      semester: 6,
-      cgpa: 3.91,
-      credits: 96,
-      standing: "GOOD_STANDING",
-    },
-    {
-      email: "farhan.ali@university.edu",
-      firstName: "Farhan",
-      lastName: "Ali",
-      regNo: "FA25-BCS-088",
-      rollNo: "088",
-      programName: "BS Computer Science",
-      departmentName: "Computer Science",
-      semester: 2,
-      cgpa: 3.76,
-      credits: 32,
-      standing: "GOOD_STANDING",
+      gender: "Male",
+      dob: "2003-03-12",
+      blood: "A+",
+      cnic: "42101-1234567-9",
+      city: "Capital City",
+      address: "House 88, Sector E-7",
+      emergency: "+1 (555) 789-0123",
+      guardian: "Javed Akhtar",
+      relation: "Father",
+      gPhone: "+1 (555) 432-1098",
+      gEmail: "javed.akhtar@parent.university.edu",
+      mentor: "Dr. Sarah Jenkins",
     },
   ];
 
-  let primaryStudentProfile = null;
+  const studentProfileMap = {};
 
   for (const st of studentsCatalog) {
     const [user] = await User.findOrCreate({
@@ -305,7 +304,7 @@ async function seedDatabase() {
       },
     });
 
-    const [studentProfile] = await Student.findOrCreate({
+    const [profile] = await Student.findOrCreate({
       where: { userId: user.id },
       defaults: {
         userId: user.id,
@@ -314,26 +313,46 @@ async function seedDatabase() {
         programName: st.programName,
         departmentName: st.departmentName,
         currentSemester: st.semester,
+        section: st.section,
         cgpaCache: st.cgpa,
         creditsEarned: st.credits,
         academicStanding: st.standing,
+        gender: st.gender,
+        dateOfBirth: st.dob,
+        bloodGroup: st.blood,
+        cnic: st.cnic,
+        permanentAddress: st.address,
+        city: st.city,
+        emergencyContact: st.emergency,
+        guardianName: st.guardian,
+        guardianRelation: st.relation,
+        guardianPhone: st.gPhone,
+        guardianEmail: st.gEmail,
+        facultyMentor: st.mentor,
       },
     });
 
-    if (st.email === "student@university.edu") {
-      primaryStudentProfile = studentProfile;
-    }
+    studentProfileMap[st.email] = profile;
   }
-  console.log(`✓ ${studentsCatalog.length} Student Profiles & User Accounts seeded in PostgreSQL.`);
+  console.log(`✓ ${studentsCatalog.length} Detailed Student Profiles & Demographics seeded.`);
 
-  // 9. Seed Courses & Prerequisite DAG
-  const coursesData = [
-    { code: "CS-101", title: "Intro to Programming", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
-    { code: "CS-102", title: "Object Oriented Programming", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+  // 9. Seed Comprehensive Courses Catalog
+  const coursesCatalog = [
+    { code: "CS-101", title: "Intro to Computing & Programming", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "MT-101", title: "Calculus & Analytical Geometry", creditHours: 3, lectureHours: 3, labHours: 0, department: "Mathematics" },
+    { code: "PH-101", title: "Applied Physics & Circuits", creditHours: 3, lectureHours: 3, labHours: 0, department: "Natural Sciences" },
+    { code: "HU-101", title: "English Composition & Comprehension", creditHours: 3, lectureHours: 3, labHours: 0, department: "Humanities" },
+    { code: "PK-101", title: "Pakistan Studies & History", creditHours: 2, lectureHours: 2, labHours: 0, department: "Humanities" },
+    { code: "CS-102", title: "Object Oriented Programming (OOP)", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "CS-105", title: "Discrete Structures & Logic", creditHours: 3, lectureHours: 3, labHours: 0, department: "Computer Science" },
+    { code: "MT-102", title: "Linear Algebra & Matrices", creditHours: 3, lectureHours: 3, labHours: 0, department: "Mathematics" },
     { code: "CS-201", title: "Data Structures & Algorithms", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "CS-203", title: "Digital Logic Design (DLD)", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
     { code: "CS-210", title: "Design & Analysis of Algorithms", creditHours: 3, lectureHours: 3, labHours: 0, department: "Computer Science" },
-    { code: "CS-220", title: "Database Systems", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "CS-220", title: "Database Systems & SQL", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "CS-230", title: "Operating Systems Principles", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
     { code: "CS-301", title: "Theory of Automata & Computation", creditHours: 3, lectureHours: 3, labHours: 0, department: "Computer Science" },
+    { code: "SE-301", title: "Software Engineering & Architecture", creditHours: 3, lectureHours: 3, labHours: 0, department: "Software Engineering" },
     { code: "CS-401", title: "Distributed Computing Systems", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
     { code: "CS-405", title: "Compiler Construction & Design", creditHours: 3, lectureHours: 3, labHours: 0, department: "Computer Science" },
     { code: "SE-410", title: "Cloud Architecture & Microservices", creditHours: 3, lectureHours: 3, labHours: 0, department: "Software Engineering" },
@@ -343,7 +362,7 @@ async function seedDatabase() {
   ];
 
   const createdCourses = {};
-  for (const c of coursesData) {
+  for (const c of coursesCatalog) {
     const [course] = await Course.findOrCreate({
       where: { code: c.code },
       defaults: c,
@@ -352,52 +371,55 @@ async function seedDatabase() {
   }
 
   // Prerequisite DAG Relations
-  if (createdCourses["CS-102"] && createdCourses["CS-101"]) {
-    await CoursePrerequisite.findOrCreate({
-      where: { courseId: createdCourses["CS-102"].id, prerequisiteCourseId: createdCourses["CS-101"].id },
-      defaults: { courseId: createdCourses["CS-102"].id, prerequisiteCourseId: createdCourses["CS-101"].id, type: "HARD_PREREQUISITE" },
-    });
-  }
-  if (createdCourses["CS-201"] && createdCourses["CS-102"]) {
-    await CoursePrerequisite.findOrCreate({
-      where: { courseId: createdCourses["CS-201"].id, prerequisiteCourseId: createdCourses["CS-102"].id },
-      defaults: { courseId: createdCourses["CS-201"].id, prerequisiteCourseId: createdCourses["CS-102"].id, type: "HARD_PREREQUISITE" },
-    });
-  }
-  if (createdCourses["CS-401"] && createdCourses["CS-201"]) {
-    await CoursePrerequisite.findOrCreate({
-      where: { courseId: createdCourses["CS-401"].id, prerequisiteCourseId: createdCourses["CS-201"].id },
-      defaults: { courseId: createdCourses["CS-401"].id, prerequisiteCourseId: createdCourses["CS-201"].id, type: "HARD_PREREQUISITE" },
-    });
-  }
-  if (createdCourses["CS-405"] && createdCourses["CS-301"]) {
-    await CoursePrerequisite.findOrCreate({
-      where: { courseId: createdCourses["CS-405"].id, prerequisiteCourseId: createdCourses["CS-301"].id },
-      defaults: { courseId: createdCourses["CS-405"].id, prerequisiteCourseId: createdCourses["CS-301"].id, type: "HARD_PREREQUISITE" },
-    });
-  }
-  console.log("✓ Course Catalog & Prerequisite DAG seeded.");
+  const prereqPairs = [
+    { target: "CS-102", prereq: "CS-101" },
+    { target: "CS-201", prereq: "CS-102" },
+    { target: "CS-210", prereq: "CS-201" },
+    { target: "CS-401", prereq: "CS-201" },
+    { target: "CS-405", prereq: "CS-301" },
+    { target: "SE-410", prereq: "CS-230" },
+    { target: "MT-302", prereq: "MT-102" },
+    { target: "CS-499", prereq: "SE-301" },
+  ];
 
-  // 10. Seed Course Offerings
-  const offeringsData = [
-    { code: "CS-401", instructor: "Dr. Sarah Jenkins", room: "Lab 304", schedule: "Mon/Wed 09:00 - 10:30" },
-    { code: "CS-405", instructor: "Prof. Alan Vance", room: "Hall B", schedule: "Tue/Thu 11:00 - 12:30" },
-    { code: "SE-410", instructor: "Dr. Michael Chen", room: "Smart Room 102", schedule: "Mon/Wed 14:00 - 15:30" },
-    { code: "MT-302", instructor: "Dr. Emily Taylor", room: "Room 205", schedule: "Fri 09:00 - 12:00" },
-    { code: "AI-401", instructor: "Dr. Hassan Tariq", room: "AI Lab 1", schedule: "Tue/Thu 14:00 - 15:30" },
-    { code: "CS-499", instructor: "Department Board", room: "Project Lab", schedule: "Arranged with Advisor" },
+  for (const p of prereqPairs) {
+    if (createdCourses[p.target] && createdCourses[p.prereq]) {
+      await CoursePrerequisite.findOrCreate({
+        where: { courseId: createdCourses[p.target].id, prerequisiteCourseId: createdCourses[p.prereq].id },
+        defaults: { courseId: createdCourses[p.target].id, prerequisiteCourseId: createdCourses[p.prereq].id, type: "HARD_PREREQUISITE" },
+      });
+    }
+  }
+  console.log("✓ 21 Courses & Prerequisite DAGs verified.");
+
+  // 10. Seed Course Offerings across Terms
+  const offerings = [
+    // Current Term Fall 2026
+    { code: "CS-401", term: "FA26", semName: "Fall 2026", instructor: "Dr. Sarah Jenkins", room: "Lab 304", schedule: "Mon/Wed 09:00 - 10:30" },
+    { code: "CS-405", term: "FA26", semName: "Fall 2026", instructor: "Prof. Alan Vance", room: "Hall B", schedule: "Tue/Thu 11:00 - 12:30" },
+    { code: "SE-410", term: "FA26", semName: "Fall 2026", instructor: "Dr. Michael Chen", room: "Smart Room 102", schedule: "Mon/Wed 14:00 - 15:30" },
+    { code: "MT-302", term: "FA26", semName: "Fall 2026", instructor: "Dr. Emily Taylor", room: "Room 205", schedule: "Fri 09:00 - 12:00" },
+    { code: "AI-401", term: "FA26", semName: "Fall 2026", instructor: "Dr. Hassan Tariq", room: "AI Lab 1", schedule: "Tue/Thu 14:00 - 15:30" },
+    { code: "CS-499", term: "FA26", semName: "Fall 2026", instructor: "Faculty Board", room: "Project Lab", schedule: "Arranged with Advisor" },
+    // Past Term Fall 2023
+    { code: "CS-101", term: "FA23", semName: "Fall 2023", instructor: "Dr. Sarah Jenkins", room: "Hall A", schedule: "Mon/Wed 09:00 - 10:30" },
+    { code: "MT-101", term: "FA23", semName: "Fall 2023", instructor: "Dr. Emily Taylor", room: "Room 101", schedule: "Tue/Thu 09:00 - 10:30" },
+    // Past Term Spring 2024
+    { code: "CS-102", term: "SP24", semName: "Spring 2024", instructor: "Prof. Alan Vance", room: "Lab 201", schedule: "Mon/Wed 11:00 - 12:30" },
+    { code: "CS-105", term: "SP24", semName: "Spring 2024", instructor: "Dr. Michael Chen", room: "Room 302", schedule: "Tue/Thu 11:00 - 12:30" },
   ];
 
   const createdOfferings = {};
-  for (const o of offeringsData) {
+  for (const o of offerings) {
     const course = createdCourses[o.code];
     if (course) {
+      const key = `${o.code}_${o.term}`;
       const [offering] = await CourseOffering.findOrCreate({
-        where: { courseId: course.id, termCode: "FA26" },
+        where: { courseId: course.id, termCode: o.term },
         defaults: {
           courseId: course.id,
-          termCode: "FA26",
-          semesterName: "Fall 2026",
+          termCode: o.term,
+          semesterName: o.semName,
           section: "A",
           capacity: 45,
           enrolledCount: 38,
@@ -407,14 +429,22 @@ async function seedDatabase() {
           status: "OPEN",
         },
       });
-      createdOfferings[o.code] = offering;
+      createdOfferings[key] = offering;
+    }
+  }
 
-      if (primaryStudentProfile && o.code !== "AI-401" && o.code !== "CS-499") {
+  // 11. Seed Detailed Multi-Semester Enrollments for Students
+  const primaryStudent = studentProfileMap["student@university.edu"];
+  if (primaryStudent) {
+    // Current Active Enrollments
+    const activeKeys = ["CS-401_FA26", "CS-405_FA26", "SE-410_FA26", "MT-302_FA26"];
+    for (const k of activeKeys) {
+      if (createdOfferings[k]) {
         await Enrollment.findOrCreate({
-          where: { studentId: primaryStudentProfile.id, offeringId: offering.id },
+          where: { studentId: primaryStudent.id, offeringId: createdOfferings[k].id },
           defaults: {
-            studentId: primaryStudentProfile.id,
-            offeringId: offering.id,
+            studentId: primaryStudent.id,
+            offeringId: createdOfferings[k].id,
             status: "ENROLLED",
             grade: "IP",
             isPassed: false,
@@ -422,88 +452,121 @@ async function seedDatabase() {
         });
       }
     }
+
+    // Past Completed Enrollments
+    const pastEnrollments = [
+      { key: "CS-101_FA23", grade: "A", gp: 4.0, marks: 94, passed: true },
+      { key: "MT-101_FA23", grade: "A-", gp: 3.67, marks: 87, passed: true },
+      { key: "CS-102_SP24", grade: "A", gp: 4.0, marks: 95, passed: true },
+      { key: "CS-105_SP24", grade: "A", gp: 4.0, marks: 91, passed: true },
+    ];
+
+    for (const pe of pastEnrollments) {
+      if (createdOfferings[pe.key]) {
+        await Enrollment.findOrCreate({
+          where: { studentId: primaryStudent.id, offeringId: createdOfferings[pe.key].id },
+          defaults: {
+            studentId: primaryStudent.id,
+            offeringId: createdOfferings[pe.key].id,
+            status: "COMPLETED",
+            grade: pe.grade,
+            gradePoint: pe.gp,
+            totalMarks: pe.marks,
+            isPassed: pe.passed,
+          },
+        });
+      }
+    }
   }
 
-  // 11. Seed Attendance
-  if (primaryStudentProfile && createdOfferings["CS-401"]) {
-    const dates = ["2026-08-18", "2026-08-20", "2026-08-22", "2026-08-25", "2026-08-27"];
+  // 12. Seed Detailed Attendance Records
+  if (primaryStudent && createdOfferings["CS-401_FA26"]) {
+    const dates = [
+      { date: "2026-08-10", status: "PRESENT" },
+      { date: "2026-08-12", status: "PRESENT" },
+      { date: "2026-08-17", status: "PRESENT" },
+      { date: "2026-08-19", status: "PRESENT" },
+      { date: "2026-08-24", status: "PRESENT" },
+      { date: "2026-08-26", status: "PRESENT" },
+    ];
+
     for (const d of dates) {
       await Attendance.findOrCreate({
-        where: { studentId: primaryStudentProfile.id, offeringId: createdOfferings["CS-401"].id, date: d },
+        where: { studentId: primaryStudent.id, offeringId: createdOfferings["CS-401_FA26"].id, date: d.date },
         defaults: {
-          studentId: primaryStudentProfile.id,
-          offeringId: createdOfferings["CS-401"].id,
-          date: d,
-          status: "PRESENT",
+          studentId: primaryStudent.id,
+          offeringId: createdOfferings["CS-401_FA26"].id,
+          date: d.date,
+          status: d.status,
           remarks: "Regular lecture attendance",
         },
       });
     }
   }
 
-  // 12. Seed Assignments & Submissions
-  if (createdOfferings["CS-401"]) {
+  // 13. Seed Detailed Coursework Assignments & Submissions
+  if (createdOfferings["CS-401_FA26"]) {
     const [asg1] = await Assignment.findOrCreate({
-      where: { offeringId: createdOfferings["CS-401"].id, title: "Assignment 1: Raft Consensus Algorithm Simulator" },
+      where: { offeringId: createdOfferings["CS-401_FA26"].id, title: "Assignment 1: Raft Consensus Algorithm Simulator" },
       defaults: {
-        offeringId: createdOfferings["CS-401"].id,
+        offeringId: createdOfferings["CS-401_FA26"].id,
         title: "Assignment 1: Raft Consensus Algorithm Simulator",
-        description: "Implement leader election and log replication with fault tolerance.",
+        description: "Implement leader election, term numbering, and heartbeat timer in Go/TypeScript.",
         maxMarks: 100,
         dueDate: new Date(Date.now() + 86400000 * 7),
         isPublished: true,
       },
     });
 
-    if (primaryStudentProfile) {
+    if (primaryStudent) {
       await AssignmentSubmission.findOrCreate({
-        where: { assignmentId: asg1.id, studentId: primaryStudentProfile.id },
+        where: { assignmentId: asg1.id, studentId: primaryStudent.id },
         defaults: {
           assignmentId: asg1.id,
-          studentId: primaryStudentProfile.id,
+          studentId: primaryStudent.id,
           fileUrl: "https://storage.university.edu/submissions/fa23-bcs-042-raft.zip",
-          comments: "Implemented 3-node cluster leader election with heartbeats.",
+          comments: "Implemented 3-node cluster leader election with heartbeats and unit tests.",
           obtainedMarks: 94,
-          feedback: "Excellent implementation and state machine testing.",
+          feedback: "Outstanding implementation of leader election and log replication.",
           status: "GRADED",
         },
       });
     }
   }
 
-  if (createdOfferings["CS-405"]) {
+  if (createdOfferings["CS-405_FA26"]) {
     const [asg2] = await Assignment.findOrCreate({
-      where: { offeringId: createdOfferings["CS-405"].id, title: "Assignment 2: Lexical Analyzer & Parser Generator" },
+      where: { offeringId: createdOfferings["CS-405_FA26"].id, title: "Assignment 2: Lexical Analyzer & Parser Generator" },
       defaults: {
-        offeringId: createdOfferings["CS-405"].id,
+        offeringId: createdOfferings["CS-405_FA26"].id,
         title: "Assignment 2: Lexical Analyzer & Parser Generator",
-        description: "Build a Flex/Bison compiler front-end for the C-Minus language.",
+        description: "Build a Flex/Bison compiler front-end for the C-Minus language syntax.",
         maxMarks: 100,
         dueDate: new Date(Date.now() + 86400000 * 14),
         isPublished: true,
       },
     });
 
-    if (primaryStudentProfile) {
+    if (primaryStudent) {
       await AssignmentSubmission.findOrCreate({
-        where: { assignmentId: asg2.id, studentId: primaryStudentProfile.id },
+        where: { assignmentId: asg2.id, studentId: primaryStudent.id },
         defaults: {
           assignmentId: asg2.id,
-          studentId: primaryStudentProfile.id,
+          studentId: primaryStudent.id,
           fileUrl: "https://storage.university.edu/submissions/fa23-bcs-042-compiler.zip",
-          comments: "Tokens defined and CFG ambiguity resolved.",
+          comments: "Grammar rules and precedence disambiguation resolved.",
           status: "SUBMITTED",
         },
       });
     }
   }
 
-  // 13. Seed Quizzes
-  if (createdOfferings["CS-401"]) {
+  // 14. Seed Quizzes & Attempts
+  if (createdOfferings["CS-401_FA26"]) {
     const [qz1] = await Quiz.findOrCreate({
-      where: { offeringId: createdOfferings["CS-401"].id, title: "Quiz 1: CAP Theorem & Vector Clocks" },
+      where: { offeringId: createdOfferings["CS-401_FA26"].id, title: "Quiz 1: CAP Theorem & Vector Clocks" },
       defaults: {
-        offeringId: createdOfferings["CS-401"].id,
+        offeringId: createdOfferings["CS-401_FA26"].id,
         title: "Quiz 1: CAP Theorem & Vector Clocks",
         durationMinutes: 20,
         totalMarks: 20,
@@ -514,12 +577,12 @@ async function seedDatabase() {
       },
     });
 
-    if (primaryStudentProfile) {
+    if (primaryStudent) {
       await QuizAttempt.findOrCreate({
-        where: { quizId: qz1.id, studentId: primaryStudentProfile.id },
+        where: { quizId: qz1.id, studentId: primaryStudent.id },
         defaults: {
           quizId: qz1.id,
-          studentId: primaryStudentProfile.id,
+          studentId: primaryStudent.id,
           score: 19,
           totalMarks: 20,
           status: "SUBMITTED",
@@ -528,11 +591,11 @@ async function seedDatabase() {
     }
   }
 
-  if (createdOfferings["CS-405"]) {
+  if (createdOfferings["CS-405_FA26"]) {
     await Quiz.findOrCreate({
-      where: { offeringId: createdOfferings["CS-405"].id, title: "Quiz 2: Context-Free Grammars & LL(1) Tables" },
+      where: { offeringId: createdOfferings["CS-405_FA26"].id, title: "Quiz 2: Context-Free Grammars & LL(1) Tables" },
       defaults: {
-        offeringId: createdOfferings["CS-405"].id,
+        offeringId: createdOfferings["CS-405_FA26"].id,
         title: "Quiz 2: Context-Free Grammars & LL(1) Tables",
         durationMinutes: 25,
         totalMarks: 25,
@@ -544,13 +607,14 @@ async function seedDatabase() {
     });
   }
 
-  // 14. Seed Fee Challans
-  if (primaryStudentProfile) {
+  // 15. Seed Multi-Term Fee Challans in PostgreSQL
+  if (primaryStudent) {
+    // Current Term Fall 2026 Challan
     await FeeChallan.findOrCreate({
       where: { challanNumber: "CHL-2026-88192" },
       defaults: {
         challanNumber: "CHL-2026-88192",
-        studentId: primaryStudentProfile.id,
+        studentId: primaryStudent.id,
         semesterName: "Fall 2026",
         termCode: "FA26",
         tuitionFee: 2500,
@@ -562,12 +626,33 @@ async function seedDatabase() {
         status: "PAID",
         paymentMethod: "ONLINE_GATEWAY",
         transactionRef: "TXN-99812-VISA",
-        paidAt: new Date(),
+        paidAt: new Date("2026-08-20T10:15:00Z"),
+      },
+    });
+
+    // Past Spring 2026 Challan
+    await FeeChallan.findOrCreate({
+      where: { challanNumber: "CHL-2026-34211" },
+      defaults: {
+        challanNumber: "CHL-2026-34211",
+        studentId: primaryStudent.id,
+        semesterName: "Spring 2026",
+        termCode: "SP26",
+        tuitionFee: 2400,
+        labFee: 300,
+        libraryFee: 150,
+        totalAmount: 2850,
+        paidAmount: 2850,
+        dueDate: "2026-02-15",
+        status: "PAID",
+        paymentMethod: "BANK_TRANSFER",
+        transactionRef: "FT-44109-HBL",
+        paidAt: new Date("2026-02-10T14:30:00Z"),
       },
     });
   }
 
-  // 15. Seed Exam Schedules
+  // 16. Seed Exam Schedules
   const examDates = [
     { code: "CS-401", title: "Distributed Computing Systems", date: "2026-10-12", time: "09:00 AM - 12:00 PM", room: "Exam Hall A", seat: "HA-042", inv: "Prof. Arthur Pendleton" },
     { code: "CS-405", title: "Compiler Construction & Design", date: "2026-10-15", time: "09:00 AM - 12:00 PM", room: "Exam Hall B", seat: "HB-018", inv: "Dr. Emily Blunt" },
@@ -592,7 +677,7 @@ async function seedDatabase() {
     });
   }
 
-  // 16. Seed Announcements
+  // 17. Seed Announcements
   const announcementsData = [
     { title: "Fall 2026 Midterm Datesheet Published", content: "The examination controller has finalized the midterm datesheet for all undergraduate departments.", category: "EXAMINATION", priority: "HIGH" },
     { title: "Course Add/Drop Window Closes This Friday", content: "Students are advised to review prerequisite requirements and confirm enrollment sections before the deadline.", category: "ACADEMIC", priority: "MEDIUM" },
@@ -607,7 +692,7 @@ async function seedDatabase() {
   }
 
   console.log("=======================================================================");
-  console.log("  ALL STUDENTS & ALL USERS SEEDED SUCCESSFULLY IN POSTGRESQL (erpc)   ");
+  console.log("  ALL DETAILED STUDENT DATA SEEDED SUCCESSFULLY IN POSTGRESQL (erpc)  ");
   console.log("=======================================================================");
 }
 
