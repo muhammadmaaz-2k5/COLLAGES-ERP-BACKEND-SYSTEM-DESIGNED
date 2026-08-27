@@ -29,7 +29,6 @@ export type StudentTabKey =
   | "transcript"
   | "attendance"
   | "lms"
-  | "classroom"
   | "exams"
   | "finance"
   | "timetable"
@@ -91,17 +90,10 @@ export function StudentSidebar({
     },
     {
       key: "lms",
-      label: "LMS & Coursework",
+      label: "LMS & Sessional Marks",
       icon: CheckSquare,
-      badge: assignmentsCount,
+      badge: `${assignmentsCount} Tasks`,
       badgeVariant: "info",
-    },
-    {
-      key: "classroom",
-      label: "Google Classroom",
-      icon: Sparkles,
-      badge: "LIVE",
-      badgeVariant: "success",
     },
     {
       key: "exams",
