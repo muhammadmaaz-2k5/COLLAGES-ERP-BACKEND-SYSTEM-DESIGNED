@@ -29,6 +29,7 @@ export type StudentTabKey =
   | "transcript"
   | "attendance"
   | "lms"
+  | "classroom"
   | "exams"
   | "finance"
   | "timetable"
@@ -94,6 +95,13 @@ export function StudentSidebar({
       icon: CheckSquare,
       badge: assignmentsCount,
       badgeVariant: "info",
+    },
+    {
+      key: "classroom",
+      label: "Google Classroom",
+      icon: Sparkles,
+      badge: "LIVE",
+      badgeVariant: "success",
     },
     {
       key: "exams",

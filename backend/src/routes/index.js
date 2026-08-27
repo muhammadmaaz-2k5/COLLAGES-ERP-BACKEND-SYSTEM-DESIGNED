@@ -6,6 +6,7 @@ const rbacRoutes = require("./rbacRoutes");
 const userRoutes = require("./userRoutes");
 const studentRoutes = require("./studentRoutes");
 const academicRoutes = require("./academicRoutes");
+const googleClassroomRoutes = require("./googleClassroomRoutes");
 
 // Mount sub-routers
 router.use("/auth", authRoutes);
@@ -13,6 +14,7 @@ router.use("/rbac", rbacRoutes);
 router.use("/users", userRoutes);
 router.use("/student", studentRoutes);
 router.use("/academics", academicRoutes);
+router.use("/google-classroom", googleClassroomRoutes);
 
 // System Health endpoint
 router.get("/health", (req, res) => {
