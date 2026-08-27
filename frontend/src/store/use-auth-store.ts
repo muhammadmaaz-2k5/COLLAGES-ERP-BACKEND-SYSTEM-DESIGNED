@@ -19,32 +19,79 @@ export interface UserSession {
   email: string;
   role: SystemRole;
   name: string;
+  permissions?: string[];
   studentId?: string;
   employeeId?: string;
   avatarUrl?: string;
   departmentName?: string;
 }
 
+export const DEMO_ROLE_ACCOUNTS: Record<SystemRole, { email: string; name: string; id: string; studentId?: string; employeeId?: string }> = {
+  SUPER_ADMIN: { email: "superadmin@university.edu", name: "Super Administrator", id: "usr_superadmin" },
+  ADMIN: { email: "admin@university.edu", name: "Campus Administrator", id: "usr_admin" },
+  TEACHER: { email: "teacher@university.edu", name: "Dr. Sarah Jenkins", id: "usr_teacher", employeeId: "EMP-FAC-01" },
+  STUDENT: { email: "student@university.edu", name: "Alex Morgan", id: "usr_student", studentId: "STD-2026-042" },
+  ACCOUNTANT: { email: "accountant@university.edu", name: "Robert Sterling", id: "usr_accountant", employeeId: "EMP-FIN-01" },
+  LIBRARIAN: { email: "librarian@university.edu", name: "Emily Blunt", id: "usr_librarian", employeeId: "EMP-LIB-01" },
+  HR_MANAGER: { email: "hrmanager@university.edu", name: "David Hassel", id: "usr_hrmanager", employeeId: "EMP-HR-01" },
+  WARDEN: { email: "warden@university.edu", name: "Marcus Vance", id: "usr_warden", employeeId: "EMP-HST-01" },
+  DRIVER: { email: "driver@university.edu", name: "James Miller", id: "usr_driver", employeeId: "EMP-DRV-01" },
+  ADMISSIONS_OFFICER: { email: "admissions@university.edu", name: "Clara Oswald", id: "usr_admissions", employeeId: "EMP-ADM-01" },
+  EXAM_CONTROLLER: { email: "examcontroller@university.edu", name: "Arthur Pendleton", id: "usr_examcontroller", employeeId: "EMP-EXM-01" },
+  STAFF: { email: "staff@university.edu", name: "Hannah Abbott", id: "usr_staff", employeeId: "EMP-STF-01" },
+};
+
 interface AuthState {
   user: UserSession | null;
   isAuthenticated: boolean;
   token: string | null;
   setUser: (user: UserSession, token: string) => void;
+  switchRole: (role: SystemRole) => void;
+  hasRole: (roles: SystemRole | SystemRole[]) => boolean;
+  hasPermission: (permission: string) => boolean;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: {
-    id: "usr_student_01",
-    email: "student@university.edu",
-    role: "STUDENT",
-    name: "Alex Morgan",
-    studentId: "std_2026_042",
+    id: "usr_superadmin",
+    email: "superadmin@university.edu",
+    role: "SUPER_ADMIN",
+    name: "Super Administrator",
+    permissions: ["*"],
     avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    departmentName: "Computer Science",
   },
   isAuthenticated: true,
-  token: "mock-jwt-token-for-preview",
+  token: "mock-jwt-token-rbac-ready",
   setUser: (user, token) => set({ user, token, isAuthenticated: true }),
+  switchRole: (role: SystemRole) => {
+    const demo = DEMO_ROLE_ACCOUNTS[role];
+    set({
+      user: {
+        id: demo.id,
+        email: demo.email,
+        role,
+        name: demo.name,
+        studentId: demo.studentId,
+        employeeId: demo.employeeId,
+        avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      },
+      isAuthenticated: true,
+    });
+  },
+  hasRole: (roles: SystemRole | SystemRole[]) => {
+    const { user } = get();
+    if (!user) return false;
+    if (user.role === "SUPER_ADMIN") return true;
+    const allowed = Array.isArray(roles) ? roles : [roles];
+    return allowed.includes(user.role);
+  },
+  hasPermission: (permission: string) => {
+    const { user } = get();
+    if (!user) return false;
+    if (user.role === "SUPER_ADMIN") return true;
+    if (!user.permissions) return false;
+    return user.permissions.includes(permission) || user.permissions.includes("*");
+  },
   logout: () => set({ user: null, token: null, isAuthenticated: false }),
 }));

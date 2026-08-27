@@ -20,6 +20,7 @@ import {
   Lock,
   Compass,
   ArrowUpRight,
+  KeyRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -153,13 +154,22 @@ const portalsList = [
     ctaText: "Launch Student Portal Demo",
   },
   {
+    id: "rbac",
+    title: "🛡️ RBAC & IAM Admin Console",
+    badge: "Live Interactive",
+    description: "Centralized identity and access management console for role assignments, live permission matrix toggling, and security audit logs.",
+    highlights: ["12 Standard System Roles Support", "Live Role-Permission Matrix Editor", "Immutable Audit Logging Records", "Active Persona Simulator"],
+    ctaLink: "/admin/rbac",
+    ctaText: "Open RBAC Console",
+  },
+  {
     id: "teacher",
     title: "👨‍🏫 Faculty & Teacher Portal",
     badge: "Milestone 2",
     description: "Empowers professors and instructors to mark daily lecture attendance, create question banks, publish assignments, and submit provisional grades.",
     highlights: ["Course Section Attendance Marker", "Timed Quiz Builder with Auto-Grading", "Assignment Rubric Evaluator", "Provisional Grade Submission to Controller"],
-    ctaLink: "#",
-    ctaText: "Explore Faculty Specs",
+    ctaLink: "/login",
+    ctaText: "Login as Faculty",
   },
   {
     id: "controller",
@@ -167,8 +177,8 @@ const portalsList = [
     badge: "Milestone 2",
     description: "Centralized examination controller console for term datesheet generation, hall ticket authorization, invigilator assignments, and immutable grade locking.",
     highlights: ["Exam Term & Datesheet Publisher", "Invigilator Roster & Hall Allocations", "Grade Distribution Curves & Lock Verification", "Official Transcript Generation Engine"],
-    ctaLink: "#",
-    ctaText: "Explore Controller Specs",
+    ctaLink: "/login",
+    ctaText: "Login as Controller",
   },
   {
     id: "accountant",
@@ -176,8 +186,8 @@ const portalsList = [
     badge: "Milestone 3",
     description: "End-to-end billing and financial accounting platform with itemized fee templates, batch challan generator, online gateway reconciliation, and General Ledger.",
     highlights: ["Batch Term Challan Generator", "Online & Offline Bank Receipt Reconciliation", "Need & Merit Scholarship Disbursement", "Double-Entry Chart of Accounts Ledger"],
-    ctaLink: "#",
-    ctaText: "Explore Finance Specs",
+    ctaLink: "/login",
+    ctaText: "Login as Accountant",
   },
 ];
 
@@ -207,13 +217,22 @@ export default function UniversityLandingPage() {
             <a href="#features" className="hover:text-indigo-600 transition-colors">Core Pillars</a>
             <a href="#modules" className="hover:text-indigo-600 transition-colors">12 Bounded Modules</a>
             <a href="#portals" className="hover:text-indigo-600 transition-colors">Role Portals</a>
-            <a href="#architecture" className="hover:text-indigo-600 transition-colors">System Architecture</a>
+            <Link href="/admin/rbac" className="hover:text-indigo-600 transition-colors flex items-center gap-1 font-bold text-indigo-600">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              <span>RBAC Console</span>
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
+            <Link href="/login">
+              <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-300">
+                <KeyRound className="h-3.5 w-3.5" />
+                <span>Sign In</span>
+              </Button>
+            </Link>
             <Link href="/student/dashboard">
               <Button size="sm" className="gap-2 text-xs bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-600/20">
-                <span>Launch Student Portal</span>
+                <span>Student Portal</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </Link>
@@ -244,16 +263,16 @@ export default function UniversityLandingPage() {
             <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
               <Link href="/student/dashboard">
                 <Button size="lg" className="gap-2 bg-slate-950 hover:bg-slate-900 text-white shadow-xl shadow-slate-900/10 font-semibold text-sm">
-                  <span>Explore Student Portal (Module 1)</span>
+                  <span>Explore Student Portal</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <a href="#modules">
-                <Button variant="outline" size="lg" className="gap-2 border-slate-300 font-semibold text-sm">
-                  <span>Explore 12 Modules</span>
-                  <Layers className="h-4 w-4 text-slate-500" />
+              <Link href="/admin/rbac">
+                <Button variant="outline" size="lg" className="gap-2 border-indigo-300 bg-indigo-50/50 text-indigo-900 font-semibold text-sm hover:bg-indigo-100">
+                  <ShieldCheck className="h-4 w-4 text-indigo-600" />
+                  <span>Open RBAC Matrix Console</span>
                 </Button>
-              </a>
+              </Link>
             </div>
 
             {/* Micro Highlights */}
@@ -264,7 +283,7 @@ export default function UniversityLandingPage() {
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                <span>Unified HR & Employee Spine</span>
+                <span>12 RBAC Personas & Token Guards</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
@@ -459,7 +478,7 @@ export default function UniversityLandingPage() {
                       </div>
 
                       <div className="pt-2">
-                        {p.id === "student" ? (
+                        {p.ctaLink.startsWith("/") ? (
                           <Link href={p.ctaLink}>
                             <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md text-xs font-semibold">
                               <span>{p.ctaText}</span>
@@ -494,7 +513,7 @@ export default function UniversityLandingPage() {
             <div className="space-y-1">
               <p className="text-3xl sm:text-4xl font-extrabold text-indigo-400 font-mono">12</p>
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-                Bounded Sub-Systems
+                RBAC System Roles
               </p>
             </div>
             <div className="space-y-1">
@@ -520,9 +539,11 @@ export default function UniversityLandingPage() {
             <GraduationCap className="h-5 w-5 text-indigo-600" />
             <span className="font-bold text-slate-900">Apex University ERP System Design</span>
           </div>
-          <p className="text-slate-500">
-            Engineered with Next.js 15, Tailwind CSS, TanStack Query, Zustand, and Prisma PostgreSQL.
-          </p>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="hover:text-indigo-600 font-semibold">Sign In</Link>
+            <Link href="/student/dashboard" className="hover:text-indigo-600 font-semibold">Student Portal</Link>
+            <Link href="/admin/rbac" className="hover:text-indigo-600 font-semibold">RBAC Console</Link>
+          </div>
         </div>
       </footer>
     </div>
