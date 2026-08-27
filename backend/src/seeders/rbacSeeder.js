@@ -11,6 +11,10 @@ const {
   CoursePrerequisite,
   Enrollment,
   Attendance,
+  Assignment,
+  AssignmentSubmission,
+  Quiz,
+  QuizAttempt,
   FeeChallan,
   ExamSchedule,
   Announcement,
@@ -131,17 +135,18 @@ async function seedDatabase() {
 
   // 6. Seed Courses & Prerequisite DAG
   const coursesData = [
-    { code: "CS-101", title: "Intro to Programming", creditHours: 4 },
-    { code: "CS-102", title: "Object Oriented Programming", creditHours: 4 },
-    { code: "CS-201", title: "Data Structures & Algorithms", creditHours: 4 },
-    { code: "CS-210", title: "Design & Analysis of Algorithms", creditHours: 3 },
-    { code: "CS-220", title: "Database Systems", creditHours: 4 },
-    { code: "CS-401", title: "Distributed Computing Systems", creditHours: 4 },
-    { code: "CS-405", title: "Compiler Construction & Design", creditHours: 3 },
-    { code: "SE-410", title: "Cloud Architecture & Microservices", creditHours: 3 },
-    { code: "MT-302", title: "Stochastic Processes & Analytics", creditHours: 3 },
-    { code: "AI-401", title: "Deep Learning & Neural Architectures", creditHours: 3 },
-    { code: "CS-499", title: "Senior Capstone Project", creditHours: 6 },
+    { code: "CS-101", title: "Intro to Programming", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "CS-102", title: "Object Oriented Programming", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "CS-201", title: "Data Structures & Algorithms", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "CS-210", title: "Design & Analysis of Algorithms", creditHours: 3, lectureHours: 3, labHours: 0, department: "Computer Science" },
+    { code: "CS-220", title: "Database Systems", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "CS-301", title: "Theory of Automata & Computation", creditHours: 3, lectureHours: 3, labHours: 0, department: "Computer Science" },
+    { code: "CS-401", title: "Distributed Computing Systems", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
+    { code: "CS-405", title: "Compiler Construction & Design", creditHours: 3, lectureHours: 3, labHours: 0, department: "Computer Science" },
+    { code: "SE-410", title: "Cloud Architecture & Microservices", creditHours: 3, lectureHours: 3, labHours: 0, department: "Software Engineering" },
+    { code: "MT-302", title: "Stochastic Processes & Analytics", creditHours: 3, lectureHours: 3, labHours: 0, department: "Mathematics" },
+    { code: "AI-401", title: "Deep Learning & Neural Architectures", creditHours: 3, lectureHours: 3, labHours: 0, department: "Artificial Intelligence" },
+    { code: "CS-499", title: "Senior Capstone Project", creditHours: 6, lectureHours: 0, labHours: 6, department: "Computer Science" },
   ];
 
   const createdCourses = {};
@@ -153,7 +158,7 @@ async function seedDatabase() {
     createdCourses[c.code] = course;
   }
 
-  // Prerequisites DAG
+  // Prerequisites DAG in PostgreSQL
   if (createdCourses["CS-102"] && createdCourses["CS-101"]) {
     await CoursePrerequisite.findOrCreate({
       where: { courseId: createdCourses["CS-102"].id, prerequisiteCourseId: createdCourses["CS-101"].id },
@@ -172,6 +177,12 @@ async function seedDatabase() {
       defaults: { courseId: createdCourses["CS-401"].id, prerequisiteCourseId: createdCourses["CS-201"].id, type: "HARD_PREREQUISITE" },
     });
   }
+  if (createdCourses["CS-405"] && createdCourses["CS-301"]) {
+    await CoursePrerequisite.findOrCreate({
+      where: { courseId: createdCourses["CS-405"].id, prerequisiteCourseId: createdCourses["CS-301"].id },
+      defaults: { courseId: createdCourses["CS-405"].id, prerequisiteCourseId: createdCourses["CS-301"].id, type: "HARD_PREREQUISITE" },
+    });
+  }
 
   // 7. Seed Offerings
   const offeringsData = [
@@ -180,8 +191,10 @@ async function seedDatabase() {
     { code: "SE-410", instructor: "Dr. Michael Chen", room: "Smart Room 102", schedule: "Mon/Wed 14:00 - 15:30" },
     { code: "MT-302", instructor: "Dr. Emily Taylor", room: "Room 205", schedule: "Fri 09:00 - 12:00" },
     { code: "AI-401", instructor: "Dr. Hassan Tariq", room: "AI Lab 1", schedule: "Tue/Thu 14:00 - 15:30" },
+    { code: "CS-499", instructor: "Department Board", room: "Project Lab", schedule: "Arranged with Advisor" },
   ];
 
+  const createdOfferings = {};
   for (const o of offeringsData) {
     const course = createdCourses[o.code];
     if (course) {
@@ -197,10 +210,12 @@ async function seedDatabase() {
           instructorName: o.instructor,
           room: o.room,
           schedule: o.schedule,
+          status: "OPEN",
         },
       });
+      createdOfferings[o.code] = offering;
 
-      if (studentProfile && o.code !== "AI-401") {
+      if (studentProfile && o.code !== "AI-401" && o.code !== "CS-499") {
         await Enrollment.findOrCreate({
           where: { studentId: studentProfile.id, offeringId: offering.id },
           defaults: {
@@ -215,7 +230,127 @@ async function seedDatabase() {
     }
   }
 
-  // 8. Seed Fee Challan
+  // 8. Seed Real Attendance Records in PostgreSQL
+  if (studentProfile && createdOfferings["CS-401"]) {
+    const dates = ["2026-08-18", "2026-08-20", "2026-08-22", "2026-08-25", "2026-08-27"];
+    for (const d of dates) {
+      await Attendance.findOrCreate({
+        where: { studentId: studentProfile.id, offeringId: createdOfferings["CS-401"].id, date: d },
+        defaults: {
+          studentId: studentProfile.id,
+          offeringId: createdOfferings["CS-401"].id,
+          date: d,
+          status: "PRESENT",
+          remarks: "Regular lecture attendance",
+        },
+      });
+    }
+  }
+
+  // 9. Seed Assignments & Submissions in PostgreSQL
+  if (createdOfferings["CS-401"]) {
+    const [asg1] = await Assignment.findOrCreate({
+      where: { offeringId: createdOfferings["CS-401"].id, title: "Assignment 1: Raft Consensus Algorithm Simulator" },
+      defaults: {
+        offeringId: createdOfferings["CS-401"].id,
+        title: "Assignment 1: Raft Consensus Algorithm Simulator",
+        description: "Implement leader election and log replication with fault tolerance.",
+        maxMarks: 100,
+        dueDate: new Date(Date.now() + 86400000 * 7),
+        isPublished: true,
+      },
+    });
+
+    if (studentProfile) {
+      await AssignmentSubmission.findOrCreate({
+        where: { assignmentId: asg1.id, studentId: studentProfile.id },
+        defaults: {
+          assignmentId: asg1.id,
+          studentId: studentProfile.id,
+          fileUrl: "https://storage.university.edu/submissions/fa23-bcs-042-raft.zip",
+          comments: "Implemented 3-node cluster leader election with heartbeats.",
+          obtainedMarks: 94,
+          feedback: "Excellent implementation and state machine testing.",
+          status: "GRADED",
+        },
+      });
+    }
+  }
+
+  if (createdOfferings["CS-405"]) {
+    const [asg2] = await Assignment.findOrCreate({
+      where: { offeringId: createdOfferings["CS-405"].id, title: "Assignment 2: Lexical Analyzer & Parser Generator" },
+      defaults: {
+        offeringId: createdOfferings["CS-405"].id,
+        title: "Assignment 2: Lexical Analyzer & Parser Generator",
+        description: "Build a Flex/Bison compiler front-end for the C-Minus language.",
+        maxMarks: 100,
+        dueDate: new Date(Date.now() + 86400000 * 14),
+        isPublished: true,
+      },
+    });
+
+    if (studentProfile) {
+      await AssignmentSubmission.findOrCreate({
+        where: { assignmentId: asg2.id, studentId: studentProfile.id },
+        defaults: {
+          assignmentId: asg2.id,
+          studentId: studentProfile.id,
+          fileUrl: "https://storage.university.edu/submissions/fa23-bcs-042-compiler.zip",
+          comments: "Tokens defined and CFG ambiguity resolved.",
+          status: "SUBMITTED",
+        },
+      });
+    }
+  }
+
+  // 10. Seed Quizzes & Attempts in PostgreSQL
+  if (createdOfferings["CS-401"]) {
+    const [qz1] = await Quiz.findOrCreate({
+      where: { offeringId: createdOfferings["CS-401"].id, title: "Quiz 1: CAP Theorem & Vector Clocks" },
+      defaults: {
+        offeringId: createdOfferings["CS-401"].id,
+        title: "Quiz 1: CAP Theorem & Vector Clocks",
+        durationMinutes: 20,
+        totalMarks: 20,
+        totalQuestions: 10,
+        startTime: new Date(Date.now() - 86400000 * 3),
+        endTime: new Date(Date.now() + 86400000 * 5),
+        isPublished: true,
+      },
+    });
+
+    if (studentProfile) {
+      await QuizAttempt.findOrCreate({
+        where: { quizId: qz1.id, studentId: studentProfile.id },
+        defaults: {
+          quizId: qz1.id,
+          studentId: studentProfile.id,
+          score: 19,
+          totalMarks: 20,
+          status: "SUBMITTED",
+        },
+      });
+    }
+  }
+
+  if (createdOfferings["CS-405"]) {
+    await Quiz.findOrCreate({
+      where: { offeringId: createdOfferings["CS-405"].id, title: "Quiz 2: Context-Free Grammars & LL(1) Tables" },
+      defaults: {
+        offeringId: createdOfferings["CS-405"].id,
+        title: "Quiz 2: Context-Free Grammars & LL(1) Tables",
+        durationMinutes: 25,
+        totalMarks: 25,
+        totalQuestions: 12,
+        startTime: new Date(Date.now() - 86400000),
+        endTime: new Date(Date.now() + 86400000 * 10),
+        isPublished: true,
+      },
+    });
+  }
+
+  // 11. Seed Fee Challans in PostgreSQL
   if (studentProfile) {
     await FeeChallan.findOrCreate({
       where: { challanNumber: "CHL-2026-88192" },
@@ -238,7 +373,32 @@ async function seedDatabase() {
     });
   }
 
-  // 9. Seed Announcements
+  // 12. Seed Exam Schedules in PostgreSQL
+  const examDates = [
+    { code: "CS-401", title: "Distributed Computing Systems", date: "2026-10-12", time: "09:00 AM - 12:00 PM", room: "Exam Hall A", seat: "HA-042", inv: "Prof. Arthur Pendleton" },
+    { code: "CS-405", title: "Compiler Construction & Design", date: "2026-10-15", time: "09:00 AM - 12:00 PM", room: "Exam Hall B", seat: "HB-018", inv: "Dr. Emily Blunt" },
+    { code: "SE-410", title: "Cloud Architecture & Microservices", date: "2026-10-18", time: "02:00 PM - 05:00 PM", room: "Exam Hall A", seat: "HA-042", inv: "Dr. Sarah Jenkins" },
+    { code: "MT-302", title: "Stochastic Processes & Analytics", date: "2026-10-21", time: "09:00 AM - 12:00 PM", room: "Room 205", seat: "R2-009", inv: "Prof. Marcus Vance" },
+  ];
+
+  for (const ex of examDates) {
+    await ExamSchedule.findOrCreate({
+      where: { courseCode: ex.code, termName: "Fall 2026 Midterm Examination" },
+      defaults: {
+        termName: "Fall 2026 Midterm Examination",
+        courseCode: ex.code,
+        courseName: ex.title,
+        examDate: ex.date,
+        startTime: ex.time.split(" - ")[0],
+        endTime: ex.time.split(" - ")[1],
+        room: ex.room,
+        seatNumber: ex.seat,
+        invigilator: ex.inv,
+      },
+    });
+  }
+
+  // 13. Seed Announcements in PostgreSQL
   const announcementsData = [
     { title: "Fall 2026 Midterm Datesheet Published", content: "The examination controller has finalized the midterm datesheet for all undergraduate departments.", category: "EXAMINATION", priority: "HIGH" },
     { title: "Course Add/Drop Window Closes This Friday", content: "Students are advised to review prerequisite requirements and confirm enrollment sections before the deadline.", category: "ACADEMIC", priority: "MEDIUM" },
