@@ -14,9 +14,20 @@ const authGuard = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+    let user;
 
-    const user = await User.findByPk(decoded.id);
+    if (token === "live-demo-token") {
+      // Demo session persona resolver
+      const demoRole = req.headers["x-demo-role"] || "STUDENT";
+      user = await User.findOne({ where: { roleCode: demoRole, isActive: true } });
+      if (!user) {
+        user = await User.findOne({ where: { roleCode: "STUDENT", isActive: true } });
+      }
+    } else {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      user = await User.findByPk(decoded.id);
+    }
+
     if (!user || !user.isActive) {
       return res.status(401).json({
         success: false,
@@ -32,7 +43,7 @@ const authGuard = async (req, res, next) => {
       email: user.email,
       role: user.roleCode,
       permissions: livePermissions,
-      fullName: user.fullName,
+      fullName: `${user.firstName} ${user.lastName}`,
       studentId: user.studentId,
       employeeId: user.employeeId,
       institutionId: user.institutionId,

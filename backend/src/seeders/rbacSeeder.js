@@ -23,15 +23,16 @@ const { SystemRoles, RoleHierarchyWeight } = require("../constants/roles");
 const { PermissionCatalog, DefaultRolePermissions } = require("../constants/permissions");
 
 async function seedDatabase() {
-  console.log("[Seeder] Starting PostgreSQL database sync & seed for 'erpc'...");
+  console.log("[Seeder] Starting Comprehensive PostgreSQL Database Seeding for 'erpc'...");
 
-  // Ensure DB exists first
+  // 1. Ensure PostgreSQL database exists
   await ensureDatabaseExists();
 
+  // 2. Synchronize database tables
   await sequelize.sync({ force: false, alter: true });
   console.log("✓ Database schema synchronized on PostgreSQL (erpc).");
 
-  // 1. Seed Roles
+  // 3. Seed Roles
   for (const [code, weight] of Object.entries(RoleHierarchyWeight)) {
     await Role.findOrCreate({
       where: { code },
@@ -46,7 +47,7 @@ async function seedDatabase() {
   }
   console.log("✓ 12 Standard Roles verified.");
 
-  // 2. Seed Permissions
+  // 4. Seed Permissions
   for (const p of PermissionCatalog) {
     await Permission.findOrCreate({
       where: { code: p.code },
@@ -59,7 +60,7 @@ async function seedDatabase() {
   }
   console.log(`✓ ${PermissionCatalog.length} Granular Permissions verified.`);
 
-  // 3. Seed Role-Permission Matrix
+  // 5. Seed Role-Permission Matrix
   for (const [roleCode, permCodes] of Object.entries(DefaultRolePermissions)) {
     const role = await Role.findOne({ where: { code: roleCode } });
     if (!role) continue;
@@ -76,64 +77,256 @@ async function seedDatabase() {
   }
   console.log("✓ Role-Permission Matrix linked.");
 
-  // 4. Seed Demo Users
-  const demoUsers = [
+  // 6. Seed Administrative & Faculty Staff Users
+  const staffUsers = [
     { email: "superadmin@university.edu", firstName: "Super", lastName: "Administrator", roleCode: SystemRoles.SUPER_ADMIN },
     { email: "admin@university.edu", firstName: "Campus", lastName: "Admin", roleCode: SystemRoles.ADMIN },
-    { email: "teacher@university.edu", firstName: "Sarah", lastName: "Jenkins", roleCode: SystemRoles.TEACHER, employeeId: "EMP-FAC-01" },
-    { email: "student@university.edu", firstName: "Alex", lastName: "Morgan", roleCode: SystemRoles.STUDENT, studentId: "STD-2026-042" },
+    { email: "examcontroller@university.edu", firstName: "Arthur", lastName: "Pendleton", roleCode: SystemRoles.EXAM_CONTROLLER, employeeId: "EMP-EXM-01" },
     { email: "accountant@university.edu", firstName: "Robert", lastName: "Sterling", roleCode: SystemRoles.ACCOUNTANT, employeeId: "EMP-FIN-01" },
     { email: "librarian@university.edu", firstName: "Emily", lastName: "Blunt", roleCode: SystemRoles.LIBRARIAN, employeeId: "EMP-LIB-01" },
     { email: "hrmanager@university.edu", firstName: "David", lastName: "Hassel", roleCode: SystemRoles.HR_MANAGER, employeeId: "EMP-HR-01" },
     { email: "warden@university.edu", firstName: "Marcus", lastName: "Vance", roleCode: SystemRoles.WARDEN, employeeId: "EMP-HST-01" },
     { email: "driver@university.edu", firstName: "James", lastName: "Miller", roleCode: SystemRoles.DRIVER, employeeId: "EMP-DRV-01" },
     { email: "admissions@university.edu", firstName: "Clara", lastName: "Oswald", roleCode: SystemRoles.ADMISSIONS_OFFICER, employeeId: "EMP-ADM-01" },
-    { email: "examcontroller@university.edu", firstName: "Arthur", lastName: "Pendleton", roleCode: SystemRoles.EXAM_CONTROLLER, employeeId: "EMP-EXM-01" },
     { email: "staff@university.edu", firstName: "Hannah", lastName: "Abbott", roleCode: SystemRoles.STAFF, employeeId: "EMP-STF-01" },
   ];
 
-  let studentUserRecord = null;
-
-  for (const u of demoUsers) {
-    let [user] = await User.findOrCreate({
-      where: { email: u.email },
+  for (const s of staffUsers) {
+    await User.findOrCreate({
+      where: { email: s.email },
       defaults: {
-        email: u.email,
+        email: s.email,
         passwordHash: "Password123!",
-        firstName: u.firstName,
-        lastName: u.lastName,
-        roleCode: u.roleCode,
-        studentId: u.studentId,
-        employeeId: u.employeeId,
+        firstName: s.firstName,
+        lastName: s.lastName,
+        roleCode: s.roleCode,
+        employeeId: s.employeeId,
+      },
+    });
+  }
+  console.log("✓ Administrative & Operations Users seeded.");
+
+  // 7. Seed Faculty / Teachers
+  const facultyUsers = [
+    { email: "teacher@university.edu", firstName: "Sarah", lastName: "Jenkins", department: "Computer Science", employeeId: "EMP-FAC-01" },
+    { email: "alan.vance@university.edu", firstName: "Alan", lastName: "Vance", department: "Software Engineering", employeeId: "EMP-FAC-02" },
+    { email: "michael.chen@university.edu", firstName: "Michael", lastName: "Chen", department: "Computer Science", employeeId: "EMP-FAC-03" },
+    { email: "emily.taylor@university.edu", firstName: "Emily", lastName: "Taylor", department: "Mathematics", employeeId: "EMP-FAC-04" },
+    { email: "hassan.tariq@university.edu", firstName: "Hassan", lastName: "Tariq", department: "Artificial Intelligence", employeeId: "EMP-FAC-05" },
+  ];
+
+  for (const f of facultyUsers) {
+    await User.findOrCreate({
+      where: { email: f.email },
+      defaults: {
+        email: f.email,
+        passwordHash: "Password123!",
+        firstName: f.firstName,
+        lastName: f.lastName,
+        roleCode: SystemRoles.TEACHER,
+        employeeId: f.employeeId,
+      },
+    });
+  }
+  console.log(`✓ ${facultyUsers.length} Faculty Teachers seeded.`);
+
+  // 8. Seed All Students across Degrees & Semesters
+  const studentsCatalog = [
+    {
+      email: "student@university.edu",
+      firstName: "Alex",
+      lastName: "Morgan",
+      regNo: "FA23-BCS-042",
+      rollNo: "042",
+      programName: "BS Computer Science",
+      departmentName: "Computer Science & Engineering",
+      semester: 6,
+      cgpa: 3.87,
+      credits: 96,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "zain.ahmed@university.edu",
+      firstName: "Zain",
+      lastName: "Ahmed",
+      regNo: "FA23-BCS-015",
+      rollNo: "015",
+      programName: "BS Computer Science",
+      departmentName: "Computer Science & Engineering",
+      semester: 6,
+      cgpa: 3.72,
+      credits: 96,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "ayesha.malik@university.edu",
+      firstName: "Ayesha",
+      lastName: "Malik",
+      regNo: "SP24-BSE-028",
+      rollNo: "028",
+      programName: "BS Software Engineering",
+      departmentName: "Software Engineering",
+      semester: 5,
+      cgpa: 3.94,
+      credits: 80,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "bilal.khan@university.edu",
+      firstName: "Bilal",
+      lastName: "Khan",
+      regNo: "FA24-BAI-009",
+      rollNo: "009",
+      programName: "BS Artificial Intelligence",
+      departmentName: "Artificial Intelligence",
+      semester: 4,
+      cgpa: 3.65,
+      credits: 64,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "fatima.noor@university.edu",
+      firstName: "Fatima",
+      lastName: "Noor",
+      regNo: "FA25-BDS-051",
+      rollNo: "051",
+      programName: "BS Data Science",
+      departmentName: "Data Science",
+      semester: 3,
+      cgpa: 3.88,
+      credits: 48,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "hamza.tariq@university.edu",
+      firstName: "Hamza",
+      lastName: "Tariq",
+      regNo: "SP25-BCY-019",
+      rollNo: "019",
+      programName: "BS Cyber Security",
+      departmentName: "Computer Science",
+      semester: 2,
+      cgpa: 3.58,
+      credits: 32,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "sara.siddiqui@university.edu",
+      firstName: "Sara",
+      lastName: "Siddiqui",
+      regNo: "FA25-BEE-034",
+      rollNo: "034",
+      programName: "BS Electrical Engineering",
+      departmentName: "Electrical Engineering",
+      semester: 2,
+      cgpa: 3.81,
+      credits: 34,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "usman.javed@university.edu",
+      firstName: "Usman",
+      lastName: "Javed",
+      regNo: "FA22-BCS-003",
+      rollNo: "003",
+      programName: "BS Computer Science",
+      departmentName: "Computer Science & Engineering",
+      semester: 8,
+      cgpa: 3.96,
+      credits: 128,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "mahnoor.raza@university.edu",
+      firstName: "Mahnoor",
+      lastName: "Raza",
+      regNo: "FA24-BBA-012",
+      rollNo: "012",
+      programName: "BBA Business Administration",
+      departmentName: "Management Sciences",
+      semester: 4,
+      cgpa: 3.69,
+      credits: 62,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "daniyal.shah@university.edu",
+      firstName: "Daniyal",
+      lastName: "Shah",
+      regNo: "SP23-BSE-044",
+      rollNo: "044",
+      programName: "BS Software Engineering",
+      departmentName: "Software Engineering",
+      semester: 7,
+      cgpa: 3.45,
+      credits: 112,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "anum.tariq@university.edu",
+      firstName: "Anum",
+      lastName: "Tariq",
+      regNo: "FA23-BAI-021",
+      rollNo: "021",
+      programName: "BS Artificial Intelligence",
+      departmentName: "Artificial Intelligence",
+      semester: 6,
+      cgpa: 3.91,
+      credits: 96,
+      standing: "GOOD_STANDING",
+    },
+    {
+      email: "farhan.ali@university.edu",
+      firstName: "Farhan",
+      lastName: "Ali",
+      regNo: "FA25-BCS-088",
+      rollNo: "088",
+      programName: "BS Computer Science",
+      departmentName: "Computer Science",
+      semester: 2,
+      cgpa: 3.76,
+      credits: 32,
+      standing: "GOOD_STANDING",
+    },
+  ];
+
+  let primaryStudentProfile = null;
+
+  for (const st of studentsCatalog) {
+    const [user] = await User.findOrCreate({
+      where: { email: st.email },
+      defaults: {
+        email: st.email,
+        passwordHash: "Password123!",
+        firstName: st.firstName,
+        lastName: st.lastName,
+        roleCode: SystemRoles.STUDENT,
+        studentId: st.regNo,
       },
     });
 
-    if (u.roleCode === "STUDENT") {
-      studentUserRecord = user;
+    const [studentProfile] = await Student.findOrCreate({
+      where: { userId: user.id },
+      defaults: {
+        userId: user.id,
+        regNo: st.regNo,
+        rollNo: st.rollNo,
+        programName: st.programName,
+        departmentName: st.departmentName,
+        currentSemester: st.semester,
+        cgpaCache: st.cgpa,
+        creditsEarned: st.credits,
+        academicStanding: st.standing,
+      },
+    });
+
+    if (st.email === "student@university.edu") {
+      primaryStudentProfile = studentProfile;
     }
   }
-  console.log("✓ 12 Demo Accounts verified.");
+  console.log(`✓ ${studentsCatalog.length} Student Profiles & User Accounts seeded in PostgreSQL.`);
 
-  // 5. Seed Student Master Profile
-  let studentProfile = null;
-  if (studentUserRecord) {
-    [studentProfile] = await Student.findOrCreate({
-      where: { userId: studentUserRecord.id },
-      defaults: {
-        userId: studentUserRecord.id,
-        regNo: "FA23-BCS-042",
-        rollNo: "042",
-        programName: "BS Computer Science",
-        departmentName: "Computer Science & Engineering",
-        currentSemester: 6,
-        cgpaCache: 3.87,
-        creditsEarned: 96,
-        academicStanding: "GOOD_STANDING",
-      },
-    });
-  }
-
-  // 6. Seed Courses & Prerequisite DAG
+  // 9. Seed Courses & Prerequisite DAG
   const coursesData = [
     { code: "CS-101", title: "Intro to Programming", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
     { code: "CS-102", title: "Object Oriented Programming", creditHours: 4, lectureHours: 3, labHours: 1, department: "Computer Science" },
@@ -158,7 +351,7 @@ async function seedDatabase() {
     createdCourses[c.code] = course;
   }
 
-  // Prerequisites DAG in PostgreSQL
+  // Prerequisite DAG Relations
   if (createdCourses["CS-102"] && createdCourses["CS-101"]) {
     await CoursePrerequisite.findOrCreate({
       where: { courseId: createdCourses["CS-102"].id, prerequisiteCourseId: createdCourses["CS-101"].id },
@@ -183,8 +376,9 @@ async function seedDatabase() {
       defaults: { courseId: createdCourses["CS-405"].id, prerequisiteCourseId: createdCourses["CS-301"].id, type: "HARD_PREREQUISITE" },
     });
   }
+  console.log("✓ Course Catalog & Prerequisite DAG seeded.");
 
-  // 7. Seed Offerings
+  // 10. Seed Course Offerings
   const offeringsData = [
     { code: "CS-401", instructor: "Dr. Sarah Jenkins", room: "Lab 304", schedule: "Mon/Wed 09:00 - 10:30" },
     { code: "CS-405", instructor: "Prof. Alan Vance", room: "Hall B", schedule: "Tue/Thu 11:00 - 12:30" },
@@ -215,11 +409,11 @@ async function seedDatabase() {
       });
       createdOfferings[o.code] = offering;
 
-      if (studentProfile && o.code !== "AI-401" && o.code !== "CS-499") {
+      if (primaryStudentProfile && o.code !== "AI-401" && o.code !== "CS-499") {
         await Enrollment.findOrCreate({
-          where: { studentId: studentProfile.id, offeringId: offering.id },
+          where: { studentId: primaryStudentProfile.id, offeringId: offering.id },
           defaults: {
-            studentId: studentProfile.id,
+            studentId: primaryStudentProfile.id,
             offeringId: offering.id,
             status: "ENROLLED",
             grade: "IP",
@@ -230,14 +424,14 @@ async function seedDatabase() {
     }
   }
 
-  // 8. Seed Real Attendance Records in PostgreSQL
-  if (studentProfile && createdOfferings["CS-401"]) {
+  // 11. Seed Attendance
+  if (primaryStudentProfile && createdOfferings["CS-401"]) {
     const dates = ["2026-08-18", "2026-08-20", "2026-08-22", "2026-08-25", "2026-08-27"];
     for (const d of dates) {
       await Attendance.findOrCreate({
-        where: { studentId: studentProfile.id, offeringId: createdOfferings["CS-401"].id, date: d },
+        where: { studentId: primaryStudentProfile.id, offeringId: createdOfferings["CS-401"].id, date: d },
         defaults: {
-          studentId: studentProfile.id,
+          studentId: primaryStudentProfile.id,
           offeringId: createdOfferings["CS-401"].id,
           date: d,
           status: "PRESENT",
@@ -247,7 +441,7 @@ async function seedDatabase() {
     }
   }
 
-  // 9. Seed Assignments & Submissions in PostgreSQL
+  // 12. Seed Assignments & Submissions
   if (createdOfferings["CS-401"]) {
     const [asg1] = await Assignment.findOrCreate({
       where: { offeringId: createdOfferings["CS-401"].id, title: "Assignment 1: Raft Consensus Algorithm Simulator" },
@@ -261,12 +455,12 @@ async function seedDatabase() {
       },
     });
 
-    if (studentProfile) {
+    if (primaryStudentProfile) {
       await AssignmentSubmission.findOrCreate({
-        where: { assignmentId: asg1.id, studentId: studentProfile.id },
+        where: { assignmentId: asg1.id, studentId: primaryStudentProfile.id },
         defaults: {
           assignmentId: asg1.id,
-          studentId: studentProfile.id,
+          studentId: primaryStudentProfile.id,
           fileUrl: "https://storage.university.edu/submissions/fa23-bcs-042-raft.zip",
           comments: "Implemented 3-node cluster leader election with heartbeats.",
           obtainedMarks: 94,
@@ -290,12 +484,12 @@ async function seedDatabase() {
       },
     });
 
-    if (studentProfile) {
+    if (primaryStudentProfile) {
       await AssignmentSubmission.findOrCreate({
-        where: { assignmentId: asg2.id, studentId: studentProfile.id },
+        where: { assignmentId: asg2.id, studentId: primaryStudentProfile.id },
         defaults: {
           assignmentId: asg2.id,
-          studentId: studentProfile.id,
+          studentId: primaryStudentProfile.id,
           fileUrl: "https://storage.university.edu/submissions/fa23-bcs-042-compiler.zip",
           comments: "Tokens defined and CFG ambiguity resolved.",
           status: "SUBMITTED",
@@ -304,7 +498,7 @@ async function seedDatabase() {
     }
   }
 
-  // 10. Seed Quizzes & Attempts in PostgreSQL
+  // 13. Seed Quizzes
   if (createdOfferings["CS-401"]) {
     const [qz1] = await Quiz.findOrCreate({
       where: { offeringId: createdOfferings["CS-401"].id, title: "Quiz 1: CAP Theorem & Vector Clocks" },
@@ -320,12 +514,12 @@ async function seedDatabase() {
       },
     });
 
-    if (studentProfile) {
+    if (primaryStudentProfile) {
       await QuizAttempt.findOrCreate({
-        where: { quizId: qz1.id, studentId: studentProfile.id },
+        where: { quizId: qz1.id, studentId: primaryStudentProfile.id },
         defaults: {
           quizId: qz1.id,
-          studentId: studentProfile.id,
+          studentId: primaryStudentProfile.id,
           score: 19,
           totalMarks: 20,
           status: "SUBMITTED",
@@ -350,13 +544,13 @@ async function seedDatabase() {
     });
   }
 
-  // 11. Seed Fee Challans in PostgreSQL
-  if (studentProfile) {
+  // 14. Seed Fee Challans
+  if (primaryStudentProfile) {
     await FeeChallan.findOrCreate({
       where: { challanNumber: "CHL-2026-88192" },
       defaults: {
         challanNumber: "CHL-2026-88192",
-        studentId: studentProfile.id,
+        studentId: primaryStudentProfile.id,
         semesterName: "Fall 2026",
         termCode: "FA26",
         tuitionFee: 2500,
@@ -373,7 +567,7 @@ async function seedDatabase() {
     });
   }
 
-  // 12. Seed Exam Schedules in PostgreSQL
+  // 15. Seed Exam Schedules
   const examDates = [
     { code: "CS-401", title: "Distributed Computing Systems", date: "2026-10-12", time: "09:00 AM - 12:00 PM", room: "Exam Hall A", seat: "HA-042", inv: "Prof. Arthur Pendleton" },
     { code: "CS-405", title: "Compiler Construction & Design", date: "2026-10-15", time: "09:00 AM - 12:00 PM", room: "Exam Hall B", seat: "HB-018", inv: "Dr. Emily Blunt" },
@@ -398,7 +592,7 @@ async function seedDatabase() {
     });
   }
 
-  // 13. Seed Announcements in PostgreSQL
+  // 16. Seed Announcements
   const announcementsData = [
     { title: "Fall 2026 Midterm Datesheet Published", content: "The examination controller has finalized the midterm datesheet for all undergraduate departments.", category: "EXAMINATION", priority: "HIGH" },
     { title: "Course Add/Drop Window Closes This Friday", content: "Students are advised to review prerequisite requirements and confirm enrollment sections before the deadline.", category: "ACADEMIC", priority: "MEDIUM" },
@@ -412,9 +606,9 @@ async function seedDatabase() {
     });
   }
 
-  console.log("=================================================");
-  console.log("  POSTGRESQL SEEDING COMPLETED (DATABASE: erpc)  ");
-  console.log("=================================================");
+  console.log("=======================================================================");
+  console.log("  ALL STUDENTS & ALL USERS SEEDED SUCCESSFULLY IN POSTGRESQL (erpc)   ");
+  console.log("=======================================================================");
 }
 
 if (require.main === module) {
