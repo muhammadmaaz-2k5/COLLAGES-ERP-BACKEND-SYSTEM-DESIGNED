@@ -4,11 +4,13 @@ const router = express.Router();
 const authRoutes = require("./authRoutes");
 const rbacRoutes = require("./rbacRoutes");
 const userRoutes = require("./userRoutes");
+const studentRoutes = require("./studentRoutes");
 
 // Mount sub-routers
 router.use("/auth", authRoutes);
 router.use("/rbac", rbacRoutes);
 router.use("/users", userRoutes);
+router.use("/student", studentRoutes);
 
 // System Health endpoint
 router.get("/health", (req, res) => {
@@ -17,9 +19,10 @@ router.get("/health", (req, res) => {
     data: {
       status: "UP",
       timestamp: new Date().toISOString(),
-      service: "University ERP IAM & RBAC Engine",
+      service: "University ERP Core Engine",
       version: "1.0.0",
       rolesConfigured: 12,
+      module1StudentPortal: "ENABLED",
     },
   });
 });

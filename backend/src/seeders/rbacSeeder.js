@@ -1,12 +1,27 @@
-const { sequelize, Role, Permission, RolePermission, User } = require("../models");
+const {
+  sequelize,
+  Role,
+  Permission,
+  RolePermission,
+  User,
+  Student,
+  Course,
+  CourseOffering,
+  CoursePrerequisite,
+  Enrollment,
+  Attendance,
+  FeeChallan,
+  ExamSchedule,
+  Announcement,
+} = require("../models");
 const { SystemRoles, RoleHierarchyWeight } = require("../constants/roles");
 const { PermissionCatalog, DefaultRolePermissions } = require("../constants/permissions");
 
-async function seedRBAC() {
-  console.log("[RBAC Seeder] Starting database sync & seed...");
+async function seedDatabase() {
+  console.log("[Seeder] Starting database sync & seed...");
 
   await sequelize.sync({ force: false, alter: true });
-  console.log("✓ Database synchronized.");
+  console.log("✓ Database schema synchronized.");
 
   // 1. Seed Roles
   for (const [code, weight] of Object.entries(RoleHierarchyWeight)) {
@@ -51,9 +66,9 @@ async function seedRBAC() {
       });
     }
   }
-  console.log("✓ Default Role-Permission Matrix linked.");
+  console.log("✓ Role-Permission Matrix linked.");
 
-  // 4. Seed Demo Users for each of the 12 roles
+  // 4. Seed Demo Users
   const demoUsers = [
     { email: "superadmin@university.edu", firstName: "Super", lastName: "Administrator", roleCode: SystemRoles.SUPER_ADMIN },
     { email: "admin@university.edu", firstName: "Campus", lastName: "Admin", roleCode: SystemRoles.ADMIN },
@@ -69,10 +84,12 @@ async function seedRBAC() {
     { email: "staff@university.edu", firstName: "Hannah", lastName: "Abbott", roleCode: SystemRoles.STAFF, employeeId: "EMP-STF-01" },
   ];
 
+  let studentUserRecord = null;
+
   for (const u of demoUsers) {
-    const existing = await User.findOne({ where: { email: u.email } });
-    if (!existing) {
-      await User.create({
+    let [user] = await User.findOrCreate({
+      where: { email: u.email },
+      defaults: {
         email: u.email,
         passwordHash: "Password123!",
         firstName: u.firstName,
@@ -80,18 +97,164 @@ async function seedRBAC() {
         roleCode: u.roleCode,
         studentId: u.studentId,
         employeeId: u.employeeId,
-      });
+      },
+    });
+
+    if (u.roleCode === "STUDENT") {
+      studentUserRecord = user;
     }
   }
-  console.log("✓ 12 Demo Accounts verified (password: Password123!).");
+  console.log("✓ 12 Demo Accounts verified.");
+
+  // 5. Seed Student Master Profile
+  let studentProfile = null;
+  if (studentUserRecord) {
+    [studentProfile] = await Student.findOrCreate({
+      where: { userId: studentUserRecord.id },
+      defaults: {
+        userId: studentUserRecord.id,
+        regNo: "FA23-BCS-042",
+        rollNo: "042",
+        programName: "BS Computer Science",
+        departmentName: "Computer Science & Engineering",
+        currentSemester: 6,
+        cgpaCache: 3.87,
+        creditsEarned: 96,
+        academicStanding: "GOOD_STANDING",
+      },
+    });
+  }
+
+  // 6. Seed Courses & Prerequisite DAG
+  const coursesData = [
+    { code: "CS-101", title: "Intro to Programming", creditHours: 4 },
+    { code: "CS-102", title: "Object Oriented Programming", creditHours: 4 },
+    { code: "CS-201", title: "Data Structures & Algorithms", creditHours: 4 },
+    { code: "CS-210", title: "Design & Analysis of Algorithms", creditHours: 3 },
+    { code: "CS-220", title: "Database Systems", creditHours: 4 },
+    { code: "CS-401", title: "Distributed Computing Systems", creditHours: 4 },
+    { code: "CS-405", title: "Compiler Construction & Design", creditHours: 3 },
+    { code: "SE-410", title: "Cloud Architecture & Microservices", creditHours: 3 },
+    { code: "MT-302", title: "Stochastic Processes & Analytics", creditHours: 3 },
+    { code: "AI-401", title: "Deep Learning & Neural Architectures", creditHours: 3 },
+    { code: "CS-499", title: "Senior Capstone Project", creditHours: 6 },
+  ];
+
+  const createdCourses = {};
+  for (const c of coursesData) {
+    const [course] = await Course.findOrCreate({
+      where: { code: c.code },
+      defaults: c,
+    });
+    createdCourses[c.code] = course;
+  }
+
+  // Prerequisites DAG
+  if (createdCourses["CS-102"] && createdCourses["CS-101"]) {
+    await CoursePrerequisite.findOrCreate({
+      where: { courseId: createdCourses["CS-102"].id, prerequisiteCourseId: createdCourses["CS-101"].id },
+      defaults: { courseId: createdCourses["CS-102"].id, prerequisiteCourseId: createdCourses["CS-101"].id, type: "HARD_PREREQUISITE" },
+    });
+  }
+  if (createdCourses["CS-201"] && createdCourses["CS-102"]) {
+    await CoursePrerequisite.findOrCreate({
+      where: { courseId: createdCourses["CS-201"].id, prerequisiteCourseId: createdCourses["CS-102"].id },
+      defaults: { courseId: createdCourses["CS-201"].id, prerequisiteCourseId: createdCourses["CS-102"].id, type: "HARD_PREREQUISITE" },
+    });
+  }
+  if (createdCourses["CS-401"] && createdCourses["CS-201"]) {
+    await CoursePrerequisite.findOrCreate({
+      where: { courseId: createdCourses["CS-401"].id, prerequisiteCourseId: createdCourses["CS-201"].id },
+      defaults: { courseId: createdCourses["CS-401"].id, prerequisiteCourseId: createdCourses["CS-201"].id, type: "HARD_PREREQUISITE" },
+    });
+  }
+
+  // 7. Seed Offerings
+  const offeringsData = [
+    { code: "CS-401", instructor: "Dr. Sarah Jenkins", room: "Lab 304", schedule: "Mon/Wed 09:00 - 10:30" },
+    { code: "CS-405", instructor: "Prof. Alan Vance", room: "Hall B", schedule: "Tue/Thu 11:00 - 12:30" },
+    { code: "SE-410", instructor: "Dr. Michael Chen", room: "Smart Room 102", schedule: "Mon/Wed 14:00 - 15:30" },
+    { code: "MT-302", instructor: "Dr. Emily Taylor", room: "Room 205", schedule: "Fri 09:00 - 12:00" },
+    { code: "AI-401", instructor: "Dr. Hassan Tariq", room: "AI Lab 1", schedule: "Tue/Thu 14:00 - 15:30" },
+  ];
+
+  for (const o of offeringsData) {
+    const course = createdCourses[o.code];
+    if (course) {
+      const [offering] = await CourseOffering.findOrCreate({
+        where: { courseId: course.id, termCode: "FA26" },
+        defaults: {
+          courseId: course.id,
+          termCode: "FA26",
+          semesterName: "Fall 2026",
+          section: "A",
+          capacity: 45,
+          enrolledCount: 38,
+          instructorName: o.instructor,
+          room: o.room,
+          schedule: o.schedule,
+        },
+      });
+
+      if (studentProfile && o.code !== "AI-401") {
+        await Enrollment.findOrCreate({
+          where: { studentId: studentProfile.id, offeringId: offering.id },
+          defaults: {
+            studentId: studentProfile.id,
+            offeringId: offering.id,
+            status: "ENROLLED",
+            grade: "IP",
+            isPassed: false,
+          },
+        });
+      }
+    }
+  }
+
+  // 8. Seed Fee Challan
+  if (studentProfile) {
+    await FeeChallan.findOrCreate({
+      where: { challanNumber: "CHL-2026-88192" },
+      defaults: {
+        challanNumber: "CHL-2026-88192",
+        studentId: studentProfile.id,
+        semesterName: "Fall 2026",
+        termCode: "FA26",
+        tuitionFee: 2500,
+        labFee: 300,
+        libraryFee: 150,
+        totalAmount: 2950,
+        paidAmount: 2950,
+        dueDate: "2026-09-15",
+        status: "PAID",
+        paymentMethod: "ONLINE_GATEWAY",
+        transactionRef: "TXN-99812-VISA",
+        paidAt: new Date(),
+      },
+    });
+  }
+
+  // 9. Seed Announcements
+  const announcementsData = [
+    { title: "Fall 2026 Midterm Datesheet Published", content: "The examination controller has finalized the midterm datesheet for all undergraduate departments.", category: "EXAMINATION", priority: "HIGH" },
+    { title: "Course Add/Drop Window Closes This Friday", content: "Students are advised to review prerequisite requirements and confirm enrollment sections before the deadline.", category: "ACADEMIC", priority: "MEDIUM" },
+    { title: "Campus Career Fair & Tech Showcase 2026", content: "Over 45 enterprise software and engineering companies will be conducting on-campus recruitment interviews.", category: "EVENT", priority: "LOW" },
+  ];
+
+  for (const a of announcementsData) {
+    await Announcement.findOrCreate({
+      where: { title: a.title },
+      defaults: a,
+    });
+  }
 
   console.log("=========================================");
-  console.log("  RBAC SEEDING COMPLETED SUCCESSFULLY  ");
+  console.log("  DATABASE SEEDING COMPLETED (ALL DATA) ");
   console.log("=========================================");
 }
 
 if (require.main === module) {
-  seedRBAC()
+  seedDatabase()
     .then(() => process.exit(0))
     .catch((err) => {
       console.error("[Seeder Error]:", err);
@@ -99,4 +262,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = seedRBAC;
+module.exports = seedDatabase;
