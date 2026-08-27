@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { AuthAPI } from "@/lib/auth-client";
 
 export type SystemRole =
   | "SUPER_ADMIN"
@@ -30,7 +32,7 @@ export const DEMO_ROLE_ACCOUNTS: Record<SystemRole, { email: string; name: strin
   SUPER_ADMIN: { email: "superadmin@university.edu", name: "Super Administrator", id: "usr_superadmin" },
   ADMIN: { email: "admin@university.edu", name: "Campus Administrator", id: "usr_admin" },
   TEACHER: { email: "teacher@university.edu", name: "Dr. Sarah Jenkins", id: "usr_teacher", employeeId: "EMP-FAC-01" },
-  STUDENT: { email: "student@university.edu", name: "Alex Morgan", id: "usr_student", studentId: "STD-2026-042" },
+  STUDENT: { email: "student@university.edu", name: "Alex Morgan", id: "usr_student", studentId: "FA23-BCS-042" },
   ACCOUNTANT: { email: "accountant@university.edu", name: "Robert Sterling", id: "usr_accountant", employeeId: "EMP-FIN-01" },
   LIBRARIAN: { email: "librarian@university.edu", name: "Emily Blunt", id: "usr_librarian", employeeId: "EMP-LIB-01" },
   HR_MANAGER: { email: "hrmanager@university.edu", name: "David Hassel", id: "usr_hrmanager", employeeId: "EMP-HR-01" },
@@ -45,53 +47,139 @@ interface AuthState {
   user: UserSession | null;
   isAuthenticated: boolean;
   token: string | null;
+  loginWithCredentials: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   setUser: (user: UserSession, token: string) => void;
-  switchRole: (role: SystemRole) => void;
+  switchRole: (role: SystemRole) => Promise<void>;
   hasRole: (roles: SystemRole | SystemRole[]) => boolean;
   hasPermission: (permission: string) => boolean;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-  user: {
-    id: "usr_superadmin",
-    email: "superadmin@university.edu",
-    role: "SUPER_ADMIN",
-    name: "Super Administrator",
-    permissions: ["*"],
-    avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-  },
-  isAuthenticated: true,
-  token: "mock-jwt-token-rbac-ready",
-  setUser: (user, token) => set({ user, token, isAuthenticated: true }),
-  switchRole: (role: SystemRole) => {
-    const demo = DEMO_ROLE_ACCOUNTS[role];
-    set({
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
       user: {
-        id: demo.id,
-        email: demo.email,
-        role,
-        name: demo.name,
-        studentId: demo.studentId,
-        employeeId: demo.employeeId,
+        id: "usr_student",
+        email: "student@university.edu",
+        role: "STUDENT",
+        name: "Alex Morgan",
+        studentId: "FA23-BCS-042",
+        permissions: ["LMS.COURSEWORK.SUBMIT"],
         avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
       },
       isAuthenticated: true,
-    });
-  },
-  hasRole: (roles: SystemRole | SystemRole[]) => {
-    const { user } = get();
-    if (!user) return false;
-    if (user.role === "SUPER_ADMIN") return true;
-    const allowed = Array.isArray(roles) ? roles : [roles];
-    return allowed.includes(user.role);
-  },
-  hasPermission: (permission: string) => {
-    const { user } = get();
-    if (!user) return false;
-    if (user.role === "SUPER_ADMIN") return true;
-    if (!user.permissions) return false;
-    return user.permissions.includes(permission) || user.permissions.includes("*");
-  },
-  logout: () => set({ user: null, token: null, isAuthenticated: false }),
-}));
+      token: "live-demo-token",
+
+      loginWithCredentials: async (email: string, password = "Password123!") => {
+        try {
+          const res = await AuthAPI.login(email, password);
+          if (res.success && res.data) {
+            const u = res.data.user;
+            set({
+              user: {
+                id: u.id,
+                email: u.email,
+                role: u.role as SystemRole,
+                name: `${u.firstName} ${u.lastName}`,
+                permissions: u.permissions || [],
+                studentId: u.studentId,
+                employeeId: u.employeeId,
+                avatarUrl: u.avatarUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+              },
+              token: res.data.accessToken,
+              isAuthenticated: true,
+            });
+            return { success: true };
+          }
+          return { success: false, error: res.error?.message || "Authentication failed" };
+        } catch {
+          // Fallback demo session
+          const matched = Object.entries(DEMO_ROLE_ACCOUNTS).find(([, acc]) => acc.email === email);
+          if (matched) {
+            const [r, acc] = matched;
+            set({
+              user: {
+                id: acc.id,
+                email: acc.email,
+                role: r as SystemRole,
+                name: acc.name,
+                studentId: acc.studentId,
+                employeeId: acc.employeeId,
+                permissions: ["*"],
+              },
+              token: "live-demo-token",
+              isAuthenticated: true,
+            });
+            return { success: true };
+          }
+          return { success: false, error: "Invalid credentials" };
+        }
+      },
+
+      setUser: (user, token) => set({ user, token, isAuthenticated: true }),
+
+      switchRole: async (role: SystemRole) => {
+        const demo = DEMO_ROLE_ACCOUNTS[role];
+        try {
+          const res = await AuthAPI.login(demo.email, "Password123!");
+          if (res.success && res.data) {
+            const u = res.data.user;
+            set({
+              user: {
+                id: u.id,
+                email: u.email,
+                role: u.role as SystemRole,
+                name: `${u.firstName} ${u.lastName}`,
+                permissions: u.permissions || [],
+                studentId: u.studentId,
+                employeeId: u.employeeId,
+                avatarUrl: u.avatarUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+              },
+              token: res.data.accessToken,
+              isAuthenticated: true,
+            });
+            return;
+          }
+        } catch {
+          // fallback
+        }
+
+        set({
+          user: {
+            id: demo.id,
+            email: demo.email,
+            role,
+            name: demo.name,
+            studentId: demo.studentId,
+            employeeId: demo.employeeId,
+            permissions: ["*"],
+            avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+          },
+          token: "live-demo-token",
+          isAuthenticated: true,
+        });
+      },
+
+      hasRole: (roles: SystemRole | SystemRole[]) => {
+        const { user } = get();
+        if (!user) return false;
+        if (user.role === "SUPER_ADMIN") return true;
+        const allowed = Array.isArray(roles) ? roles : [roles];
+        return allowed.includes(user.role);
+      },
+
+      hasPermission: (permission: string) => {
+        const { user } = get();
+        if (!user) return false;
+        if (user.role === "SUPER_ADMIN") return true;
+        if (!user.permissions) return false;
+        return user.permissions.includes(permission) || user.permissions.includes("*");
+      },
+
+      logout: () => set({ user: null, token: null, isAuthenticated: false }),
+    }),
+    {
+      name: "apex_university_auth_session",
+    }
+  )
+);

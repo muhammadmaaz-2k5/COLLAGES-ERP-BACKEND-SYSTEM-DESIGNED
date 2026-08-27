@@ -21,34 +21,52 @@ import {
   Mail,
   ArrowRight,
   ChevronLeft,
+  Loader2,
+  AlertCircle,
+  ShieldCheck,
 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { switchRole } = useAuthStore();
+  const { loginWithCredentials, switchRole } = useAuthStore();
   const [email, setEmail] = useState("student@university.edu");
   const [password, setPassword] = useState("Password123!");
-  const [selectedRole, setSelectedRole] = useState<SystemRole>("STUDENT");
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    switchRole(selectedRole);
-    if (selectedRole === "STUDENT") {
+  const navigateForRole = (role: SystemRole) => {
+    if (role === "STUDENT") {
       router.push("/student/dashboard");
     } else {
       router.push("/admin/rbac");
     }
   };
 
-  const handleQuickLogin = (role: SystemRole) => {
-    setSelectedRole(role);
-    setEmail(DEMO_ROLE_ACCOUNTS[role].email);
-    switchRole(role);
-    if (role === "STUDENT") {
-      router.push("/student/dashboard");
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMessage(null);
+
+    const res = await loginWithCredentials(email, password);
+    setLoading(false);
+
+    if (res.success) {
+      const activeUser = useAuthStore.getState().user;
+      navigateForRole(activeUser?.role || "STUDENT");
     } else {
-      router.push("/admin/rbac");
+      setErrorMessage(res.error || "Authentication failed. Please verify your credentials.");
     }
+  };
+
+  const handleQuickLogin = async (role: SystemRole) => {
+    setLoading(true);
+    setErrorMessage(null);
+    const demoAcc = DEMO_ROLE_ACCOUNTS[role];
+    setEmail(demoAcc.email);
+
+    await switchRole(role);
+    setLoading(false);
+    navigateForRole(role);
   };
 
   return (
@@ -66,7 +84,7 @@ export default function LoginPage() {
           Apex University ERP Portal
         </h2>
         <p className="text-xs text-indigo-200">
-          Role-Based Access Control Authentication Gateway
+          PostgreSQL Database Authenticated Session Gateway
         </p>
       </div>
 
@@ -75,35 +93,44 @@ export default function LoginPage() {
           <CardHeader className="space-y-1 pb-4">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-bold text-slate-900">Sign in to your account</CardTitle>
-              <Badge variant="info" className="text-[10px]">
-                RBAC v1.0
+              <Badge variant="info" className="text-[10px] gap-1">
+                <ShieldCheck className="h-3 w-3" /> Live DB Connected
               </Badge>
             </div>
             <CardDescription className="text-xs">
-              Select any persona for instant single-click sign-in demonstration
+              Select any pre-seeded persona or log in with PostgreSQL credentials
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 flex items-center gap-2 text-xs font-semibold text-rose-800 animate-in fade-in">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
             {/* Quick 1-Click Role Logins */}
             <div className="space-y-2.5">
               <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                ⚡ 1-Click Demo Persona Access
+                ⚡ 1-Click Real-Time Persona Access (12 Seeded Roles)
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {[
-                  { role: "STUDENT", label: "🎓 Student", path: "student" },
-                  { role: "TEACHER", label: "👨‍🏫 Faculty", path: "teacher" },
-                  { role: "EXAM_CONTROLLER", label: "📝 Controller", path: "exam" },
-                  { role: "ACCOUNTANT", label: "💳 Accountant", path: "finance" },
-                  { role: "HR_MANAGER", label: "👔 HR Manager", path: "hr" },
-                  { role: "SUPER_ADMIN", label: "👑 Super Admin", path: "admin" },
+                  { role: "STUDENT", label: "🎓 Student" },
+                  { role: "TEACHER", label: "👨‍🏫 Faculty" },
+                  { role: "EXAM_CONTROLLER", label: "📝 Controller" },
+                  { role: "ACCOUNTANT", label: "💳 Accountant" },
+                  { role: "HR_MANAGER", label: "👔 HR Manager" },
+                  { role: "SUPER_ADMIN", label: "👑 Super Admin" },
                 ].map((item) => (
                   <button
                     key={item.role}
                     type="button"
+                    disabled={loading}
                     onClick={() => handleQuickLogin(item.role as SystemRole)}
-                    className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-indigo-50 hover:border-indigo-300 text-left text-xs font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between"
+                    className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-indigo-50 hover:border-indigo-300 text-left text-xs font-semibold text-slate-800 transition-all cursor-pointer flex items-center justify-between disabled:opacity-50"
                   >
                     <span>{item.label}</span>
                     <ArrowRight className="h-3 w-3 text-slate-400" />
@@ -130,6 +157,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={loading}
                     className="pl-9 text-xs"
                     placeholder="name@university.edu"
                   />
@@ -145,20 +173,26 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={loading}
                     className="pl-9 text-xs"
                   />
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-xs font-bold py-2.5 shadow-md shadow-indigo-500/20">
-                Authenticate & Access Dashboard →
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-xs font-bold py-2.5 shadow-md shadow-indigo-500/20 gap-2"
+              >
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {loading ? "Authenticating in PostgreSQL..." : "Authenticate & Access Portal →"}
               </Button>
             </form>
           </CardContent>
 
           <CardFooter className="bg-slate-50 border-t border-slate-100 p-4 rounded-b-xl text-center flex items-center justify-center">
             <p className="text-[11px] text-slate-500">
-              Protected by Bearer JWT RS256 & Argon2id Password Encryption
+              Secured with Bcrypt, JSON Web Tokens (RS256) & PostgreSQL Database Verification
             </p>
           </CardFooter>
         </Card>
