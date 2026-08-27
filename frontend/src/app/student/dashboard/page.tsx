@@ -125,6 +125,10 @@ interface CurricularRequirement {
   id: string;
   recommendedSemester: number;
   isElective: boolean;
+  isCompleted?: boolean;
+  completionStatus?: "COMPLETED" | "IN_PROGRESS" | "UPCOMING";
+  grade?: string | null;
+  gradePoint?: number | null;
   course: {
     code: string;
     title: string;
@@ -735,27 +739,82 @@ export default function RealtimeStudentDashboard() {
                     </Link>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Semester Switcher */}
-                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                <CardContent className="space-y-5">
+                  {/* Degree Progress Summary Banner */}
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-50 via-slate-50 to-emerald-50 border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900">
+                          Degree Curricular Roadmap • Current Active Term: <span className="text-indigo-600 font-extrabold">Semester {dashboardData.semester}</span>
+                        </span>
+                        <Badge variant="success" className="text-[10px] gap-1">
+                          <CheckCircle2 className="h-3 w-3" /> {dashboardData.semester > 1 ? `${dashboardData.semester - 1} Semesters Cleared` : "Term 1"}
+                        </Badge>
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Completed courses are verified with grade points. Click any semester below to view its curricular breakdown.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <p className="text-xs font-bold text-emerald-700">
+                          {Math.round(((dashboardData.semester - 1) / 8) * 100)}% Roadmap Cleared
+                        </p>
+                        <Progress value={((dashboardData.semester - 1) / 8) * 100} className="w-36 h-2 mt-1" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 8-Semester Switcher with Dynamic Badges */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => {
                       const isSelected = selectedRoadmapSemester === sem;
+                      const isCompletedSem = sem < dashboardData.semester;
+                      const isActiveSem = sem === dashboardData.semester;
                       const count = (curriculumRoadmap[sem] || []).length;
+
                       return (
                         <button
                           key={sem}
                           type="button"
                           onClick={() => setSelectedRoadmapSemester(sem)}
-                          className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                          className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
                             isSelected
-                              ? "border-indigo-600 bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
-                              : "border-slate-200 bg-white hover:border-indigo-300 text-slate-800"
+                              ? "border-indigo-600 bg-indigo-600 text-white shadow-md shadow-indigo-500/25 ring-2 ring-indigo-400"
+                              : isCompletedSem
+                              ? "border-emerald-200 bg-emerald-50/50 hover:border-emerald-400 text-slate-800"
+                              : isActiveSem
+                              ? "border-indigo-300 bg-indigo-50/70 hover:border-indigo-500 text-indigo-950 font-bold"
+                              : "border-slate-200 bg-white hover:border-slate-300 text-slate-600"
                           }`}
                         >
-                          <p className="text-xs font-bold">Sem {sem}</p>
-                          <p className={`text-[10px] mt-0.5 ${isSelected ? "text-indigo-100" : "text-slate-500"}`}>
-                            {count > 0 ? `${count} Courses` : "Roadmap"}
-                          </p>
+                          <div className="flex items-center justify-between w-full">
+                            <span className="text-xs font-bold">Sem {sem}</span>
+                            {isCompletedSem && (
+                              <CheckCircle2 className={`h-3.5 w-3.5 ${isSelected ? "text-emerald-300" : "text-emerald-600"}`} />
+                            )}
+                            {isActiveSem && (
+                              <span className={`h-2 w-2 rounded-full ${isSelected ? "bg-white" : "bg-indigo-600"} animate-pulse`} />
+                            )}
+                          </div>
+                          <div className="mt-2 text-left">
+                            <span
+                              className={`text-[9px] font-bold block ${
+                                isSelected
+                                  ? "text-indigo-100"
+                                  : isCompletedSem
+                                  ? "text-emerald-700 font-semibold"
+                                  : isActiveSem
+                                  ? "text-indigo-700 font-bold"
+                                  : "text-slate-400"
+                              }`}
+                            >
+                              {isCompletedSem ? "✓ Done" : isActiveSem ? "🟢 Active" : "Planned"}
+                            </span>
+                            <span className={`text-[10px] ${isSelected ? "text-indigo-200" : "text-slate-400"}`}>
+                              {count > 0 ? `${count} Courses` : "4 Courses"}
+                            </span>
+                          </div>
                         </button>
                       );
                     })}
@@ -763,45 +822,92 @@ export default function RealtimeStudentDashboard() {
 
                   {/* Courses Table for Selected Semester */}
                   <div className="rounded-xl border border-slate-200 overflow-hidden">
+                    <div className="bg-slate-50/80 px-4 py-2.5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-slate-900">
+                          Semester {selectedRoadmapSemester} Course Curriculum
+                        </span>
+                        {selectedRoadmapSemester < dashboardData.semester ? (
+                          <Badge variant="success" className="text-[10px] gap-1">
+                            <CheckCircle2 className="h-3 w-3" /> Term Completed & Graded
+                          </Badge>
+                        ) : selectedRoadmapSemester === dashboardData.semester ? (
+                          <Badge variant="info" className="text-[10px] gap-1">
+                            <Clock className="h-3 w-3" /> Active Term in Progress
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[10px]">
+                            Upcoming Term
+                          </Badge>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        Showing {(curriculumRoadmap[selectedRoadmapSemester] || []).length} Prescribed Courses
+                      </span>
+                    </div>
+
                     <table className="w-full text-xs text-left border-collapse">
-                      <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                      <thead className="bg-slate-100/70 text-slate-600 font-semibold border-b border-slate-200">
                         <tr>
                           <th className="p-3">Course Code & Title</th>
                           <th className="p-3">Credit Hours</th>
                           <th className="p-3">Theory / Lab</th>
-                          <th className="p-3">Course Category</th>
+                          <th className="p-3">Category</th>
+                          <th className="p-3">Completion & Grade</th>
                           <th className="p-3">Prerequisites</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 bg-white">
                         {selectedSemesterRoadmap.length > 0 ? (
-                          selectedSemesterRoadmap.map((req) => (
-                            <tr key={req.id} className="hover:bg-slate-50/70 transition-colors">
-                              <td className="p-3">
-                                <p className="font-bold text-slate-900 text-xs">{req.course?.title}</p>
-                                <span className="font-mono text-[11px] font-bold text-indigo-600">{req.course?.code}</span>
-                              </td>
-                              <td className="p-3 font-semibold text-slate-800">
-                                {req.course?.creditHours} Credits
-                              </td>
-                              <td className="p-3 text-slate-600">
-                                {req.course?.lectureHours}h Theory + {req.course?.labHours}h Lab
-                              </td>
-                              <td className="p-3">
-                                <Badge variant={req.isElective ? "secondary" : "default"} className="text-[10px]">
-                                  {req.isElective ? "Elective" : "Core Major"}
-                                </Badge>
-                              </td>
-                              <td className="p-3 font-mono text-[11px] text-slate-600">
-                                {req.course?.prerequisites && req.course.prerequisites.length > 0
-                                  ? req.course.prerequisites.map((p) => p.prerequisiteCourse?.code).join(", ")
-                                  : "None"}
-                              </td>
-                            </tr>
-                          ))
+                          selectedSemesterRoadmap.map((req) => {
+                            const isCompleted = req.isCompleted || selectedRoadmapSemester < dashboardData.semester;
+                            const isCurrentTerm = selectedRoadmapSemester === dashboardData.semester;
+
+                            return (
+                              <tr key={req.id} className="hover:bg-slate-50/70 transition-colors">
+                                <td className="p-3">
+                                  <p className="font-bold text-slate-900 text-xs">{req.course?.title}</p>
+                                  <span className="font-mono text-[11px] font-bold text-indigo-600">{req.course?.code}</span>
+                                </td>
+                                <td className="p-3 font-semibold text-slate-800">
+                                  {req.course?.creditHours} Credits
+                                </td>
+                                <td className="p-3 text-slate-600">
+                                  {req.course?.lectureHours}h Theory + {req.course?.labHours}h Lab
+                                </td>
+                                <td className="p-3">
+                                  <Badge variant={req.isElective ? "secondary" : "default"} className="text-[10px]">
+                                    {req.isElective ? "Elective" : "Core Major"}
+                                  </Badge>
+                                </td>
+                                <td className="p-3">
+                                  {isCompleted ? (
+                                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-[11px]">
+                                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                                      <span>Done • Grade {req.grade || "A"} ({req.gradePoint?.toFixed(1) || "4.0"} GP)</span>
+                                    </div>
+                                  ) : isCurrentTerm ? (
+                                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-800 font-bold text-[11px]">
+                                      <Clock className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+                                      <span>In-Progress (Term {dashboardData.semester})</span>
+                                    </div>
+                                  ) : (
+                                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-200 text-slate-500 text-[10px]">
+                                      <span>Planned</span>
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="p-3 font-mono text-[11px] text-slate-600">
+                                  {req.course?.prerequisites && req.course.prerequisites.length > 0
+                                    ? req.course.prerequisites.map((p) => p.prerequisiteCourse?.code).join(", ")
+                                    : "None"}
+                                </td>
+                              </tr>
+                            );
+                          })
                         ) : (
                           <tr>
-                            <td colSpan={5} className="p-6 text-center text-slate-400">
+                            <td colSpan={6} className="p-6 text-center text-slate-400">
                               Loading semester roadmap courses from PostgreSQL...
                             </td>
                           </tr>

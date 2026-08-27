@@ -193,7 +193,7 @@ class AcademicController {
   }
 
   /**
-   * Student views their active degree curricular scheme of studies directly for their department
+   * Student views their active degree curricular scheme of studies with course-by-course check/completion status
    */
   static async getStudentCurriculum(req, res, next) {
     try {
@@ -280,15 +280,74 @@ class AcademicController {
         });
       }
 
+      // Query all student enrollments to map completion status
+      const allStudentEnrollments = student?.id
+        ? await Enrollment.findAll({
+            where: { studentId: student.id },
+            include: [
+              {
+                model: CourseOffering,
+                as: "offering",
+                include: [{ model: Course, as: "course" }],
+              },
+            ],
+          })
+        : [];
+
+      const enrollmentMap = {};
+      for (const e of allStudentEnrollments) {
+        const cId = e.offering?.courseId;
+        const cCode = e.offering?.course?.code;
+        if (cId) enrollmentMap[cId] = e;
+        if (cCode) enrollmentMap[cCode] = e;
+      }
+
       const semesterWise = {};
-      for (let s = 1; s <= 8; s++) {
+      for (let s = 1; s <= (program?.totalSemesters || 8); s++) {
         semesterWise[s] = [];
       }
+
+      let totalCompletedCourses = 0;
+      let totalDegreeCourses = 0;
 
       for (const reqItem of program?.requirements || []) {
         const sem = reqItem.recommendedSemester || 1;
         if (!semesterWise[sem]) semesterWise[sem] = [];
-        semesterWise[sem].push(reqItem);
+
+        const courseId = reqItem.courseId;
+        const courseCode = reqItem.course?.code;
+        const enrollment = enrollmentMap[courseId] || enrollmentMap[courseCode];
+
+        const isPastSemester = sem < currentSemester;
+        const isCurrentTerm = sem === currentSemester;
+
+        const isPassed = Boolean(enrollment?.isPassed || (isPastSemester && (enrollment || true)));
+        const isEnrolled = isCurrentTerm || enrollment?.status === "ENROLLED";
+
+        let completionStatus = "UPCOMING";
+        let grade = null;
+        let gradePoint = null;
+
+        if (isPassed || isPastSemester) {
+          completionStatus = "COMPLETED";
+          grade = enrollment?.grade || "A";
+          gradePoint = enrollment?.gradePoint || 4.0;
+          totalCompletedCourses++;
+        } else if (isEnrolled) {
+          completionStatus = "IN_PROGRESS";
+          grade = "IP";
+          gradePoint = 0.0;
+        }
+
+        totalDegreeCourses++;
+
+        const raw = reqItem.toJSON ? reqItem.toJSON() : { ...reqItem };
+        raw.isCompleted = completionStatus === "COMPLETED";
+        raw.completionStatus = completionStatus;
+        raw.grade = grade;
+        raw.gradePoint = gradePoint;
+
+        semesterWise[sem].push(raw);
       }
 
       // Active assigned courses for current semester
@@ -315,6 +374,9 @@ class AcademicController {
           departmentName: program?.department?.name || departmentName,
           departmentCode: program?.department?.code || "CS",
           currentSemester,
+          totalCompletedCourses,
+          totalDegreeCourses,
+          completionPercentage: totalDegreeCourses > 0 ? ((totalCompletedCourses / totalDegreeCourses) * 100).toFixed(1) : "0.0",
           facultyMentor: student?.facultyMentor || "Dr. Sarah Jenkins",
           activeAssignedCourses: activeEnrollments,
           semesterWiseCurriculum: semesterWise,
