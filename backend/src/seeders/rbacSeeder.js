@@ -1,3 +1,4 @@
+const ensureDatabaseExists = require("../config/ensureDatabase");
 const {
   sequelize,
   Role,
@@ -18,10 +19,13 @@ const { SystemRoles, RoleHierarchyWeight } = require("../constants/roles");
 const { PermissionCatalog, DefaultRolePermissions } = require("../constants/permissions");
 
 async function seedDatabase() {
-  console.log("[Seeder] Starting database sync & seed...");
+  console.log("[Seeder] Starting PostgreSQL database sync & seed for 'erpc'...");
+
+  // Ensure DB exists first
+  await ensureDatabaseExists();
 
   await sequelize.sync({ force: false, alter: true });
-  console.log("✓ Database schema synchronized.");
+  console.log("✓ Database schema synchronized on PostgreSQL (erpc).");
 
   // 1. Seed Roles
   for (const [code, weight] of Object.entries(RoleHierarchyWeight)) {
@@ -248,9 +252,9 @@ async function seedDatabase() {
     });
   }
 
-  console.log("=========================================");
-  console.log("  DATABASE SEEDING COMPLETED (ALL DATA) ");
-  console.log("=========================================");
+  console.log("=================================================");
+  console.log("  POSTGRESQL SEEDING COMPLETED (DATABASE: erpc)  ");
+  console.log("=================================================");
 }
 
 if (require.main === module) {

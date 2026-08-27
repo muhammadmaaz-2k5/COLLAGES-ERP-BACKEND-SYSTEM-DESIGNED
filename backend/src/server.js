@@ -3,6 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 require("dotenv").config();
 
+const ensureDatabaseExists = require("./config/ensureDatabase");
 const { sequelize } = require("./models");
 const routes = require("./routes");
 const errorHandler = require("./middleware/errorHandler");
@@ -37,10 +38,14 @@ app.use(errorHandler);
 // Database initialization & server boot
 async function bootstrap() {
   try {
-    await sequelize.authenticate();
-    console.log("✓ Database connection established successfully.");
+    // 1. Ensure PostgreSQL database 'erpc' exists
+    await ensureDatabaseExists();
 
-    // Sync database and seed standard roles/permissions
+    // 2. Authenticate Sequelize with PostgreSQL
+    await sequelize.authenticate();
+    console.log("✓ PostgreSQL database connection ('erpc') established successfully.");
+
+    // 3. Sync database models and seed initial standard data
     await seedRBAC();
 
     app.listen(PORT, () => {
