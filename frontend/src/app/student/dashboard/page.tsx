@@ -147,6 +147,9 @@ export default function RealtimeStudentDashboard() {
     name: "Alex Morgan",
     regNo: "FA23-BCS-042",
     program: "Bachelor of Science in Computer Science",
+    departmentName: "Department of Computer Science",
+    facultyMentor: "Dr. Sarah Jenkins",
+    section: "A",
     semester: 6,
     cgpa: 3.87,
     creditsEarned: 96,
@@ -320,17 +323,25 @@ export default function RealtimeStudentDashboard() {
 
       if (dashRes?.data) {
         const p = dashRes.data.profile || dashRes.data;
+        const curr = currRes?.data;
         setDashboardData({
           name: p.user ? `${p.user.firstName} ${p.user.lastName}` : (p.name || "Alex Morgan"),
           regNo: p.regNo || "FA23-BCS-042",
-          program: p.programName || p.program || "Bachelor of Science in Computer Science",
-          semester: p.currentSemester || p.semester || 6,
+          program: curr?.programName || p.programName || p.program || "Bachelor of Science in Computer Science",
+          departmentName: curr?.departmentName || p.departmentName || "Department of Computer Science",
+          facultyMentor: curr?.facultyMentor || p.facultyMentor || "Dr. Sarah Jenkins",
+          section: p.section || "A",
+          semester: curr?.currentSemester || p.currentSemester || p.semester || 6,
           cgpa: Number(p.cgpaCache ?? p.cgpa ?? 3.87),
           creditsEarned: Number(p.creditsEarned ?? 96),
           totalCreditsRequired: Number(p.totalCreditsRequired ?? 134),
           academicStanding: p.academicStanding || "GOOD_STANDING",
           attendancePercentage: Number(dashRes.data.attendancePercentage ?? 91.4),
         });
+
+        if (curr?.currentSemester) {
+          setSelectedRoadmapSemester(curr.currentSemester);
+        }
       }
       if (coursesRes?.data) setAvailableOfferings(coursesRes.data);
       if (asgRes?.data) setAssignments(asgRes.data);
@@ -494,12 +505,20 @@ export default function RealtimeStudentDashboard() {
                       {(dashboardData.academicStanding || "GOOD_STANDING").replace(/_/g, " ")}
                     </Badge>
                   </div>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 font-medium">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 font-medium">
                     <span>Reg: <strong className="font-mono text-slate-700">{user?.studentId || dashboardData.regNo}</strong></span>
                     <span>•</span>
-                    <span>{dashboardData.program}</span>
+                    <span className="font-semibold text-slate-800 flex items-center gap-1">
+                      <GraduationCap className="h-3.5 w-3.5 text-indigo-600" /> {dashboardData.program}
+                    </span>
+                    <span>•</span>
+                    <span className="text-slate-600 flex items-center gap-1">
+                      <Building2 className="h-3.5 w-3.5 text-slate-400" /> {dashboardData.departmentName}
+                    </span>
                     <span>•</span>
                     <span className="font-semibold text-indigo-600">Semester {dashboardData.semester} (Fall 2026)</span>
+                    <span>•</span>
+                    <span className="text-slate-500">Advisor: <strong className="text-slate-700">{dashboardData.facultyMentor}</strong></span>
                   </div>
                 </div>
               </div>

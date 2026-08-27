@@ -26,7 +26,7 @@ const { SystemRoles, RoleHierarchyWeight } = require("../constants/roles");
 const { PermissionCatalog, DefaultRolePermissions } = require("../constants/permissions");
 
 async function seedDatabase() {
-  console.log("[Seeder] Starting Department Curricular Schemes & PostgreSQL Database Seeding for 'erpc'...");
+  console.log("[Seeder] Starting Multi-Department Curricular Schemes & Database Seeding for 'erpc'...");
 
   // 1. Ensure PostgreSQL database exists
   await ensureDatabaseExists();
@@ -80,12 +80,12 @@ async function seedDatabase() {
 
   // 6. Seed Departments
   const departmentsData = [
-    { code: "CS", name: "Department of Computer Science", description: "Computing, Algorithms, AI and Systems" },
-    { code: "SE", name: "Department of Software Engineering", description: "Large Scale Software Architecture & DevOps" },
-    { code: "AI", name: "Department of Artificial Intelligence", description: "Machine Learning, Robotics and Autonomous Systems" },
-    { code: "DS", name: "Department of Data Science", description: "Big Data Analytics, Statistics & Mining" },
-    { code: "EE", name: "Department of Electrical Engineering", description: "Circuits, Signal Processing & Embedded Systems" },
-    { code: "MS", name: "Department of Management Sciences", description: "Business Administration & Analytics" },
+    { code: "CS", name: "Department of Computer Science", description: "Computing, Algorithms, Systems and Networking" },
+    { code: "SE", name: "Department of Software Engineering", description: "Software Architecture, Cloud & Agile Engineering" },
+    { code: "AI", name: "Department of Artificial Intelligence", description: "Deep Learning, Neural Systems & Autonomous Robotics" },
+    { code: "DS", name: "Department of Data Science", description: "Big Data Analytics, Mining & Statistical Modeling" },
+    { code: "EE", name: "Department of Electrical Engineering", description: "Circuits, Embedded Systems & Signal Processing" },
+    { code: "MS", name: "Department of Management Sciences", description: "Business Administration, Finance & Marketing" },
   ];
 
   const deptMap = {};
@@ -103,6 +103,7 @@ async function seedDatabase() {
     { deptCode: "CS", code: "BSCS", name: "Bachelor of Science in Computer Science", totalSemesters: 8, totalCreditsRequired: 134 },
     { deptCode: "SE", code: "BSSE", name: "Bachelor of Science in Software Engineering", totalSemesters: 8, totalCreditsRequired: 136 },
     { deptCode: "AI", code: "BSAI", name: "Bachelor of Science in Artificial Intelligence", totalSemesters: 8, totalCreditsRequired: 134 },
+    { deptCode: "DS", code: "BSDS", name: "Bachelor of Science in Data Science", totalSemesters: 8, totalCreditsRequired: 134 },
     { deptCode: "MS", code: "BBA", name: "Bachelor of Business Administration", totalSemesters: 8, totalCreditsRequired: 130 },
   ];
 
@@ -124,51 +125,51 @@ async function seedDatabase() {
       progMap[pr.code] = prog;
     }
   }
-  console.log("✓ Degree Programs verified.");
+  console.log("✓ Degree Programs across Departments verified.");
 
-  // 8. Seed Complete 8-Semester Course Catalog
+  // 8. Seed Comprehensive Course Catalog
   const comprehensiveCourses = [
-    // Semester 1
-    { code: "CS-101", title: "Intro to Computing & Programming", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 1 },
-    { code: "MT-101", title: "Calculus & Analytical Geometry", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 1 },
-    { code: "PH-101", title: "Applied Physics & Circuit Theory", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 1 },
-    { code: "HU-101", title: "English Composition & Comprehension", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 1 },
-    { code: "PK-101", title: "Pakistan Studies & History", creditHours: 2, lectureHours: 2, labHours: 0, deptCode: "CS", sem: 1 },
+    // Core Computing (CS, SE, AI, DS)
+    { code: "CS-101", title: "Intro to Computing & Programming", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 1, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "MT-101", title: "Calculus & Analytical Geometry", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 1, programs: ["BSCS", "BSSE", "BSAI", "BSDS", "BBA"] },
+    { code: "PH-101", title: "Applied Physics & Circuits", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 1, programs: ["BSCS", "BSSE", "BSAI"] },
+    { code: "HU-101", title: "English Composition & Comprehension", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 1, programs: ["BSCS", "BSSE", "BSAI", "BSDS", "BBA"] },
+    { code: "PK-101", title: "Pakistan Studies & History", creditHours: 2, lectureHours: 2, labHours: 0, deptCode: "CS", sem: 1, programs: ["BSCS", "BSSE", "BSAI", "BSDS", "BBA"] },
     // Semester 2
-    { code: "CS-102", title: "Object Oriented Programming (OOP)", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 2 },
-    { code: "CS-105", title: "Discrete Structures & Logic", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 2 },
-    { code: "MT-102", title: "Linear Algebra & Matrix Analysis", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 2 },
-    { code: "HU-102", title: "Technical Report Writing", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 2 },
-    { code: "IS-101", title: "Islamic Studies & Universal Ethics", creditHours: 2, lectureHours: 2, labHours: 0, deptCode: "CS", sem: 2 },
+    { code: "CS-102", title: "Object Oriented Programming (OOP)", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 2, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "CS-105", title: "Discrete Structures & Logic", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 2, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "MT-102", title: "Linear Algebra & Matrix Analysis", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 2, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "HU-102", title: "Technical Report Writing", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 2, programs: ["BSCS", "BSSE", "BSAI", "BSDS", "BBA"] },
+    { code: "IS-101", title: "Islamic Studies & Universal Ethics", creditHours: 2, lectureHours: 2, labHours: 0, deptCode: "CS", sem: 2, programs: ["BSCS", "BSSE", "BSAI", "BSDS", "BBA"] },
     // Semester 3
-    { code: "CS-201", title: "Data Structures & Algorithms", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 3 },
-    { code: "CS-203", title: "Digital Logic Design (DLD)", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 3 },
-    { code: "MT-201", title: "Multivariable Calculus", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 3 },
-    { code: "HU-201", title: "Professional & Academic Ethics", creditHours: 2, lectureHours: 2, labHours: 0, deptCode: "CS", sem: 3 },
+    { code: "CS-201", title: "Data Structures & Algorithms", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 3, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "CS-203", title: "Digital Logic Design (DLD)", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 3, programs: ["BSCS", "BSSE", "BSAI"] },
+    { code: "MT-201", title: "Multivariable Calculus", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 3, programs: ["BSCS", "BSAI", "BSDS"] },
+    { code: "HU-201", title: "Professional & Academic Ethics", creditHours: 2, lectureHours: 2, labHours: 0, deptCode: "CS", sem: 3, programs: ["BSCS", "BSSE", "BSAI", "BSDS", "BBA"] },
     // Semester 4
-    { code: "CS-210", title: "Design & Analysis of Algorithms", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 4 },
-    { code: "CS-220", title: "Database Systems & SQL Modeling", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 4 },
-    { code: "CS-230", title: "Operating Systems Principles", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 4 },
-    { code: "MT-202", title: "Probability & Statistical Inference", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 4 },
+    { code: "CS-210", title: "Design & Analysis of Algorithms", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 4, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "CS-220", title: "Database Systems & SQL Modeling", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 4, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "CS-230", title: "Operating Systems Principles", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 4, programs: ["BSCS", "BSSE", "BSAI"] },
+    { code: "MT-202", title: "Probability & Statistical Inference", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 4, programs: ["BSCS", "BSSE", "BSAI", "BSDS", "BBA"] },
     // Semester 5
-    { code: "CS-301", title: "Theory of Automata & Computation", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 5 },
-    { code: "SE-301", title: "Software Engineering & Architecture", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "SE", sem: 5 },
-    { code: "CS-320", title: "Computer Networks & Protocols", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 5 },
-    { code: "CS-330", title: "Artificial Intelligence Fundamentals", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "AI", sem: 5 },
+    { code: "CS-301", title: "Theory of Automata & Computation", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 5, programs: ["BSCS", "BSAI"] },
+    { code: "SE-301", title: "Software Engineering & Architecture", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "SE", sem: 5, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "CS-320", title: "Computer Networks & Protocols", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 5, programs: ["BSCS", "BSSE"] },
+    { code: "CS-330", title: "Artificial Intelligence Fundamentals", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "AI", sem: 5, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
     // Semester 6 (Current Active Term)
-    { code: "CS-401", title: "Distributed Computing Systems", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 6 },
-    { code: "CS-405", title: "Compiler Construction & Design", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 6 },
-    { code: "SE-410", title: "Cloud Architecture & Microservices", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "SE", sem: 6 },
-    { code: "MT-302", title: "Stochastic Processes & Analytics", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 6 },
+    { code: "CS-401", title: "Distributed Computing Systems", creditHours: 4, lectureHours: 3, labHours: 1, deptCode: "CS", sem: 6, programs: ["BSCS", "BSSE"] },
+    { code: "CS-405", title: "Compiler Construction & Design", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 6, programs: ["BSCS"] },
+    { code: "SE-410", title: "Cloud Architecture & Microservices", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "SE", sem: 6, programs: ["BSCS", "BSSE"] },
+    { code: "MT-302", title: "Stochastic Processes & Analytics", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 6, programs: ["BSCS", "BSDS", "BSAI"] },
     // Semester 7
-    { code: "AI-401", title: "Deep Learning & Neural Architectures", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "AI", sem: 7 },
-    { code: "CS-420", title: "Cyber Security & Cryptography", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 7 },
-    { code: "CS-499A", title: "Senior Capstone Project Part I", creditHours: 3, lectureHours: 0, labHours: 3, deptCode: "CS", sem: 7 },
-    { code: "CS-430", title: "Big Data Technologies & Hadoop", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "DS", sem: 7 },
+    { code: "AI-401", title: "Deep Learning & Neural Architectures", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "AI", sem: 7, programs: ["BSCS", "BSAI", "BSDS"] },
+    { code: "CS-420", title: "Cyber Security & Cryptography", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 7, programs: ["BSCS", "BSSE"] },
+    { code: "CS-499A", title: "Senior Capstone Project Part I", creditHours: 3, lectureHours: 0, labHours: 3, deptCode: "CS", sem: 7, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "CS-430", title: "Big Data Technologies & Hadoop", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "DS", sem: 7, programs: ["BSCS", "BSDS", "BSAI"] },
     // Semester 8
-    { code: "CS-499B", title: "Senior Capstone Project Part II", creditHours: 3, lectureHours: 0, labHours: 3, deptCode: "CS", sem: 8 },
-    { code: "CS-480", title: "High Performance Computing", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 8 },
-    { code: "MG-401", title: "Technology Entrepreneurship", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "MS", sem: 8 },
+    { code: "CS-499B", title: "Senior Capstone Project Part II", creditHours: 3, lectureHours: 0, labHours: 3, deptCode: "CS", sem: 8, programs: ["BSCS", "BSSE", "BSAI", "BSDS"] },
+    { code: "CS-480", title: "High Performance Computing", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "CS", sem: 8, programs: ["BSCS"] },
+    { code: "MG-401", title: "Technology Entrepreneurship", creditHours: 3, lectureHours: 3, labHours: 0, deptCode: "MS", sem: 8, programs: ["BSCS", "BSSE", "BSAI", "BSDS", "BBA"] },
   ];
 
   const courseObjMap = {};
@@ -187,22 +188,24 @@ async function seedDatabase() {
     });
     courseObjMap[c.code] = course;
 
-    // Link into Program 8-Semester Degree Requirements
-    const bscs = progMap["BSCS"];
-    if (bscs) {
-      await DegreeRequirement.findOrCreate({
-        where: { programId: bscs.id, courseId: course.id },
-        defaults: {
-          programId: bscs.id,
-          courseId: course.id,
-          recommendedSemester: c.sem,
-          isElective: c.sem >= 7,
-          minGradeRequired: "D",
-        },
-      });
+    // Link course into each associated Degree Program's scheme of studies
+    for (const progCode of c.programs || ["BSCS"]) {
+      const prog = progMap[progCode];
+      if (prog) {
+        await DegreeRequirement.findOrCreate({
+          where: { programId: prog.id, courseId: course.id },
+          defaults: {
+            programId: prog.id,
+            courseId: course.id,
+            recommendedSemester: c.sem,
+            isElective: c.sem >= 7,
+            minGradeRequired: "D",
+          },
+        });
+      }
     }
   }
-  console.log(`✓ ${comprehensiveCourses.length} Courses mapped into 8-Semester Scheme of Studies.`);
+  console.log(`✓ ${comprehensiveCourses.length} Courses mapped into Department Schemes of Studies.`);
 
   // 9. Prerequisite DAG Links
   const prereqPairs = [
@@ -281,14 +284,14 @@ async function seedDatabase() {
     });
   }
 
-  // 12. Seed Students
+  // 12. Seed Real Students across Departments & Degree Programs
   const studentsCatalog = [
-    { email: "student@university.edu", firstName: "Alex", lastName: "Morgan", regNo: "FA23-BCS-042", rollNo: "042", programName: "BS Computer Science", departmentName: "Computer Science", semester: 6, cgpa: 3.87, credits: 96, standing: "GOOD_STANDING" },
-    { email: "zain.ahmed@university.edu", firstName: "Zain", lastName: "Ahmed", regNo: "FA23-BCS-015", rollNo: "015", programName: "BS Computer Science", departmentName: "Computer Science", semester: 6, cgpa: 3.72, credits: 96, standing: "GOOD_STANDING" },
-    { email: "ayesha.malik@university.edu", firstName: "Ayesha", lastName: "Malik", regNo: "SP24-BSE-028", rollNo: "028", programName: "BS Software Engineering", departmentName: "Software Engineering", semester: 5, cgpa: 3.94, credits: 80, standing: "GOOD_STANDING" },
-    { email: "bilal.khan@university.edu", firstName: "Bilal", lastName: "Khan", regNo: "FA24-BAI-009", rollNo: "009", programName: "BS Artificial Intelligence", departmentName: "Artificial Intelligence", semester: 4, cgpa: 3.65, credits: 64, standing: "GOOD_STANDING" },
-    { email: "fatima.noor@university.edu", firstName: "Fatima", lastName: "Noor", regNo: "FA25-BDS-051", rollNo: "051", programName: "BS Data Science", departmentName: "Data Science", semester: 3, cgpa: 3.88, credits: 48, standing: "GOOD_STANDING" },
-    { email: "usman.javed@university.edu", firstName: "Usman", lastName: "Javed", regNo: "FA22-BCS-003", rollNo: "003", programName: "BS Computer Science", departmentName: "Computer Science", semester: 8, cgpa: 3.96, credits: 128, standing: "GOOD_STANDING" },
+    { email: "student@university.edu", firstName: "Alex", lastName: "Morgan", regNo: "FA23-BCS-042", rollNo: "042", programName: "Bachelor of Science in Computer Science", departmentName: "Department of Computer Science", semester: 6, cgpa: 3.87, credits: 96, standing: "GOOD_STANDING", mentor: "Dr. Sarah Jenkins" },
+    { email: "ayesha.malik@university.edu", firstName: "Ayesha", lastName: "Malik", regNo: "SP24-BSE-028", rollNo: "028", programName: "Bachelor of Science in Software Engineering", departmentName: "Department of Software Engineering", semester: 5, cgpa: 3.94, credits: 80, standing: "GOOD_STANDING", mentor: "Prof. Alan Vance" },
+    { email: "bilal.khan@university.edu", firstName: "Bilal", lastName: "Khan", regNo: "FA24-BAI-009", rollNo: "009", programName: "Bachelor of Science in Artificial Intelligence", departmentName: "Department of Artificial Intelligence", semester: 4, cgpa: 3.65, credits: 64, standing: "GOOD_STANDING", mentor: "Dr. Hassan Tariq" },
+    { email: "fatima.noor@university.edu", firstName: "Fatima", lastName: "Noor", regNo: "FA25-BDS-051", rollNo: "051", programName: "Bachelor of Science in Data Science", departmentName: "Department of Data Science", semester: 3, cgpa: 3.88, credits: 48, standing: "GOOD_STANDING", mentor: "Dr. Emily Taylor" },
+    { email: "mahnoor.raza@university.edu", firstName: "Mahnoor", lastName: "Raza", regNo: "FA24-BBA-012", rollNo: "012", programName: "Bachelor of Business Administration", departmentName: "Department of Management Sciences", semester: 4, cgpa: 3.69, credits: 62, standing: "GOOD_STANDING", mentor: "Dr. Michael Chen" },
+    { email: "usman.javed@university.edu", firstName: "Usman", lastName: "Javed", regNo: "FA22-BCS-003", rollNo: "003", programName: "Bachelor of Science in Computer Science", departmentName: "Department of Computer Science", semester: 8, cgpa: 3.96, credits: 128, standing: "GOOD_STANDING", mentor: "Dr. Sarah Jenkins" },
   ];
 
   let primaryStudentProfile = null;
@@ -318,24 +321,36 @@ async function seedDatabase() {
         cgpaCache: st.cgpa,
         creditsEarned: st.credits,
         academicStanding: st.standing,
+        facultyMentor: st.mentor,
       },
+    });
+
+    // Update fields to guarantee exact department & program match
+    await profile.update({
+      programName: st.programName,
+      departmentName: st.departmentName,
+      currentSemester: st.semester,
+      facultyMentor: st.mentor,
     });
 
     if (st.email === "student@university.edu") {
       primaryStudentProfile = profile;
     }
   }
+  console.log(`✓ ${studentsCatalog.length} Department-Specific Student Profiles verified.`);
 
-  // 13. Seed Course Offerings for Current Semester 6 (FA26)
-  const sem6Offerings = [
+  // 13. Seed Course Offerings for Current Semester
+  const semOfferings = [
     { code: "CS-401", instructor: "Dr. Sarah Jenkins", room: "Lab 304", schedule: "Mon/Wed 09:00 - 10:30" },
     { code: "CS-405", instructor: "Prof. Alan Vance", room: "Hall B", schedule: "Tue/Thu 11:00 - 12:30" },
     { code: "SE-410", instructor: "Dr. Michael Chen", room: "Smart Room 102", schedule: "Mon/Wed 14:00 - 15:30" },
     { code: "MT-302", instructor: "Dr. Emily Taylor", room: "Room 205", schedule: "Fri 09:00 - 12:00" },
+    { code: "SE-301", instructor: "Prof. Alan Vance", room: "Lab 102", schedule: "Mon/Wed 11:00 - 12:30" },
+    { code: "AI-401", instructor: "Dr. Hassan Tariq", room: "AI Lab 1", schedule: "Tue/Thu 14:00 - 15:30" },
   ];
 
   const createdOfferings = {};
-  for (const o of sem6Offerings) {
+  for (const o of semOfferings) {
     const course = courseObjMap[o.code];
     if (course) {
       const [offering] = await CourseOffering.findOrCreate({
@@ -355,7 +370,7 @@ async function seedDatabase() {
       });
       createdOfferings[o.code] = offering;
 
-      if (primaryStudentProfile) {
+      if (primaryStudentProfile && (o.code === "CS-401" || o.code === "CS-405" || o.code === "SE-410" || o.code === "MT-302")) {
         await Enrollment.findOrCreate({
           where: { studentId: primaryStudentProfile.id, offeringId: offering.id },
           defaults: {
@@ -484,7 +499,7 @@ async function seedDatabase() {
 
   // 16. Seed Announcements
   const announcementsData = [
-    { title: "Fall 2026 Curricular Course Allocations Finalized", content: "The Academic Department Coordinator has published the semester 1-8 course schemes of studies and instructor assignments.", category: "ACADEMIC", priority: "HIGH" },
+    { title: "Fall 2026 Departmental Schemes Finalized", content: "The Academic Department Coordinator has published the 8-semester course schemes of studies and instructor assignments.", category: "ACADEMIC", priority: "HIGH" },
     { title: "Fall 2026 Midterm Datesheet Published", content: "The examination controller has finalized the midterm datesheet for all undergraduate departments.", category: "EXAMINATION", priority: "HIGH" },
     { title: "Campus Career Fair & Tech Showcase 2026", content: "Over 45 enterprise software and engineering companies will be conducting on-campus recruitment interviews.", category: "EVENT", priority: "LOW" },
   ];
@@ -497,7 +512,7 @@ async function seedDatabase() {
   }
 
   console.log("=======================================================================");
-  console.log("  8-SEMESTER SCHEME OF STUDIES & ACADEMIC DATA SEEDED SUCCESSFULLY    ");
+  console.log("  MULTI-DEPARTMENT SCHEMES & REAL STUDENT DATA SEEDED IN POSTGRESQL  ");
   console.log("=======================================================================");
 }
 
