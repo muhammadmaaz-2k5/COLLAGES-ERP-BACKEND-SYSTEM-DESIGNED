@@ -1,0 +1,63 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 09: LIBRARY AUTOMATION SYSTEM
+    %% ============================================================
+
+    BOOK ||--o{ BOOK_COPY : "cataloged as"
+    BOOK_COPY ||--o{ BOOK_ISSUE : "borrowed as"
+    LIBRARY_MEMBER ||--o{ BOOK_ISSUE : "borrows"
+    BOOK_ISSUE ||--o| FINE : "incurs"
+
+    BOOK {
+        string id PK
+        string isbn UK
+        string title
+        string author
+        string publisher
+        string edition
+        int publicationYear
+        string category
+        string callNumber
+        datetime createdAt
+    }
+
+    BOOK_COPY {
+        string id PK
+        string bookId FK
+        string copyBarcode UK
+        string shelfLocation
+        enum status
+        float price
+    }
+
+    LIBRARY_MEMBER {
+        string id PK
+        string studentId FK_UK
+        string employeeId FK_UK
+        string membershipNumber UK
+        string memberType
+        int maxBooksAllowed
+        datetime expiryDate
+        enum status
+    }
+
+    BOOK_ISSUE {
+        string id PK
+        string bookCopyId FK
+        string libraryMemberId FK
+        datetime issueDate
+        datetime dueDate
+        datetime returnDate
+        enum status
+        string issuedById FK
+    }
+
+    FINE {
+        string id PK
+        string bookIssueId FK_UK
+        float amount
+        int daysOverdue
+        boolean isPaid
+        datetime paidDate
+        string receiptNumber
+    }

@@ -1,0 +1,65 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 06: ADMISSIONS & MERIT SELECTION
+    %% ============================================================
+
+    APPLICANT ||--o{ APPLICATION : "submits"
+    APPLICATION ||--o| ADMISSION_TEST_RESULT : "scored in"
+    APPLICATION ||--o| MERIT_LIST_ENTRY : "ranked via"
+    ADMISSION_TEST ||--o{ ADMISSION_TEST_RESULT : "grades"
+
+    APPLICANT {
+        string id PK
+        string firstName
+        string lastName
+        string email
+        string phone
+        string nationalId
+        datetime dateOfBirth
+        enum gender
+        string address
+        datetime createdAt
+    }
+
+    APPLICATION {
+        string id PK
+        string applicantId FK
+        string programId FK
+        string applicationNumber UK
+        enum status
+        datetime appliedAt
+        json previousEducation
+        json documents
+    }
+
+    ADMISSION_TEST {
+        string id PK
+        string name
+        string testCode UK
+        datetime testDate
+        string venue
+        float totalMarks
+        float passingMarks
+    }
+
+    ADMISSION_TEST_RESULT {
+        string id PK
+        string admissionTestId FK
+        string applicationId FK_UK
+        float marksObtained
+        float percentile
+        boolean isPassed
+        datetime testDate
+    }
+
+    MERIT_LIST_ENTRY {
+        string id PK
+        string applicationId FK_UK
+        string programId FK
+        int rank
+        float matricMarksPercentage
+        float interMarksPercentage
+        float testMarksPercentage
+        float aggregateScore
+        enum status
+    }

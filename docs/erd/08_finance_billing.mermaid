@@ -1,0 +1,108 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 08: FINANCE, BILLING & GENERAL LEDGER
+    %% ============================================================
+
+    FEE_STRUCTURE ||--o{ FEE_STRUCTURE_ITEM : "itemizes"
+    FEE_STRUCTURE ||--o{ FEE_CHALLAN : "bases"
+    FEE_CHALLAN ||--o{ FEE_CHALLAN_ITEM : "bills item"
+    FEE_CHALLAN ||--o{ PAYMENT : "settled through"
+    SCHOLARSHIP_PROGRAM ||--o{ SCHOLARSHIP_AWARD : "grants"
+    ACCOUNT ||--o{ TRANSACTION : "audits entry"
+
+    FEE_STRUCTURE {
+        string id PK
+        string programId FK
+        string semesterId FK
+        float totalAmount
+        string academicYear
+    }
+
+    FEE_STRUCTURE_ITEM {
+        string id PK
+        string feeStructureId FK
+        string feeHead
+        float amount
+        boolean isOptional
+    }
+
+    FEE_CHALLAN {
+        string id PK
+        string challanNumber UK
+        string studentId FK
+        string semesterId FK
+        string feeStructureId FK
+        float totalAmount
+        float discountAmount
+        float lateFee
+        float paidAmount
+        float balanceAmount
+        datetime issueDate
+        datetime dueDate
+        enum status
+    }
+
+    FEE_CHALLAN_ITEM {
+        string id PK
+        string feeChallanId FK
+        string feeHead
+        float amount
+    }
+
+    PAYMENT {
+        string id PK
+        string challanId FK
+        float amountPaid
+        datetime paymentDate
+        enum method
+        string transactionRef
+        string receiptUrl
+        string verifiedById FK
+        boolean isVerified
+        string notes
+    }
+
+    SCHOLARSHIP_PROGRAM {
+        string id PK
+        string code UK
+        string name
+        string description
+        string type
+        float coveragePercentage
+        float fixedAmount
+        string criteria
+    }
+
+    SCHOLARSHIP_AWARD {
+        string id PK
+        string scholarshipProgramId FK
+        string studentId FK
+        float percentageAwarded
+        float amountAwarded
+        int semesterFrom
+        int semesterTo
+        datetime awardDate
+        string status
+    }
+
+    ACCOUNT {
+        string id PK
+        string accountCode UK
+        string name
+        enum type
+        enum category
+        float balance
+        string description
+    }
+
+    TRANSACTION {
+        string id PK
+        string accountId FK
+        float amount
+        enum type
+        string category
+        string description
+        datetime date
+        string referenceNumber
+        string paymentReferenceId
+    }

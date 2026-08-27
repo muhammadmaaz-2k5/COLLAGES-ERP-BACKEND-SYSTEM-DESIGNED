@@ -1,0 +1,40 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 10: HOSTEL & RESIDENTIAL MANAGEMENT
+    %% ============================================================
+
+    HOSTEL ||--o{ HOSTEL_ROOM : "accommodates"
+    HOSTEL_ROOM ||--o{ HOSTEL_ALLOCATION : "assigned to"
+
+    HOSTEL {
+        string id PK
+        string code UK
+        string name
+        enum gender
+        int capacity
+        string address
+        string wardenId FK
+    }
+
+    HOSTEL_ROOM {
+        string id PK
+        string hostelId FK
+        string roomId FK_UK
+        string roomNumber
+        int floorNumber
+        enum roomType
+        int capacity
+        float monthlyRent
+    }
+
+    HOSTEL_ALLOCATION {
+        string id PK
+        string hostelRoomId FK
+        string studentId FK
+        string bedNumber
+        datetime checkInDate
+        datetime checkOutDate
+        float monthlyFee
+        enum status
+        datetime createdAt
+    }

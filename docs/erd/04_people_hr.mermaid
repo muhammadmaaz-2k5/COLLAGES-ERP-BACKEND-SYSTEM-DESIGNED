@@ -1,0 +1,121 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 04: HR & FACULTY WORKFORCE
+    %% ============================================================
+
+    EMPLOYEE ||--o| TEACHER : "specializes as"
+    EMPLOYEE ||--o| STAFF : "specializes as"
+    EMPLOYEE ||--o| DRIVER : "specializes as"
+    EMPLOYEE ||--o{ LEAVE_BALANCE : "allocated"
+    EMPLOYEE ||--o{ LEAVE_REQUEST : "submits"
+    EMPLOYEE ||--o{ LEAVE_REQUEST : "approves (manager)"
+    EMPLOYEE ||--o{ STAFF_ATTENDANCE : "logs attendance"
+    EMPLOYEE ||--o{ SALARY_SLIP : "remunerated via"
+    LEAVE_TYPE ||--o{ LEAVE_BALANCE : "defines quota"
+    LEAVE_TYPE ||--o{ LEAVE_REQUEST : "categorizes"
+
+    EMPLOYEE {
+        string id PK
+        string userId FK_UK
+        string employeeCode UK
+        string firstName
+        string lastName
+        datetime dateOfBirth
+        enum gender
+        string phone
+        string address
+        string profileImageUrl
+        string departmentId FK
+        string designation
+        enum employmentType
+        string qualifications
+        int experienceYears
+        datetime joiningDate
+        enum status
+        float baseSalary
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    TEACHER {
+        string id PK
+        string employeeId FK_UK
+        string specialty
+        enum academicRank
+        int maxWorkloadHours
+    }
+
+    STAFF {
+        string id PK
+        string employeeId FK_UK
+        string staffRole
+    }
+
+    DRIVER {
+        string id PK
+        string employeeId FK_UK
+        string licenseNumber UK
+        string licenseType
+        datetime licenseExpiry
+    }
+
+    LEAVE_TYPE {
+        string id PK
+        string name UK
+        string code UK
+        int daysPerYear
+        boolean isPaid
+    }
+
+    LEAVE_BALANCE {
+        string id PK
+        string employeeId FK
+        string leaveTypeId FK
+        int year
+        int totalDays
+        int usedDays
+        int remainingDays
+    }
+
+    LEAVE_REQUEST {
+        string id PK
+        string employeeId FK
+        string leaveTypeId FK
+        datetime startDate
+        datetime endDate
+        int totalDays
+        string reason
+        enum status
+        datetime appliedAt
+        string approvedById FK
+        datetime approvedAt
+        string rejectionReason
+    }
+
+    STAFF_ATTENDANCE {
+        string id PK
+        string employeeId FK
+        datetime date
+        enum status
+        datetime checkIn
+        datetime checkOut
+        float workHours
+        string remarks
+    }
+
+    SALARY_SLIP {
+        string id PK
+        string employeeId FK
+        int month
+        int year
+        float basicSalary
+        float allowances
+        float deductions
+        float netSalary
+        enum paymentStatus
+        datetime paidAt
+        enum paymentMethod
+        string transactionRef
+        string payslipUrl
+        datetime generatedAt
+    }

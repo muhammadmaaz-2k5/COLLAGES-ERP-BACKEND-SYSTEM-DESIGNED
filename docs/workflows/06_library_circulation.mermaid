@@ -1,0 +1,41 @@
+sequenceDiagram
+    autonumber
+    actor Member as 📖 Student / Faculty Member
+    actor Librarian as 📚 Librarian
+    participant Desk as 🖥️ Circulation Desk UI
+    participant LibService as ⚙️ Library Service
+    participant DB as 🗄️ Database
+
+    Member->>Librarian: Presents Library ID & Book Copy Barcode
+    Librarian->>Desk: Scans Member Card (MEM-2026-042)
+    Desk->>LibService: GET /api/v1/library/members/:id
+    LibService->>DB: Check Member status & current active BookIssues count
+    
+    alt Max Books Limit Reached (e.g. already has 3 books checked out)
+        LibService-->>Desk: 403 Forbidden: Max books limit reached
+        Desk-->>Librarian: Block Checkout (Show active issued titles)
+    else Limit Available
+        Librarian->>Desk: Scans Book Barcode (BC-98421)
+        Desk->>LibService: POST /api/v1/library/issues/checkout { memberId, copyBarcode }
+        LibService->>DB: Atomic Tx [Create BookIssue (dueDate = now + 14 days), BookCopy.status = ISSUED]
+        LibService-->>Desk: Checkout Confirmed (Due: 14 days)
+        Desk-->>Member: Print Checkout Slip / Mobile Notification
+
+        Note over Member, Librarian: Return & Overdue Fine Settlement
+        Member->>Librarian: Returns Book Copy
+        Librarian->>Desk: Scans Return Barcode
+        Desk->>LibService: POST /api/v1/library/issues/return { bookCopyId }
+        
+        alt Returned On Time (Return Date <= Due Date)
+            LibService->>DB: Atomic Tx [BookIssue.status = RETURNED, BookCopy.status = AVAILABLE]
+            LibService-->>Desk: Return Processed (Zero Fine)
+        else Returned Overdue (Late by N Days)
+            LibService->>DB: Calculate Overdue Days & Rate ($1.00 / day)
+            LibService->>DB: Atomic Tx [BookIssue.status = RETURNED, BookCopy.status = AVAILABLE, Create Fine]
+            LibService-->>Desk: Alert: Overdue Fine Incurred
+            Librarian->>Desk: Settles Fine via Cash / Challan
+            Desk->>LibService: POST /api/v1/library/fines/:id/pay
+            LibService->>DB: Update Fine isPaid = true
+            LibService-->>Member: Fine Cleared Receipt
+        end
+    end

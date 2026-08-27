@@ -1,0 +1,43 @@
+sequenceDiagram
+    autonumber
+    actor Accountant as 🧑‍💼 Accountant
+    actor Student as 🎓 Student
+    participant Portal as 💻 Student / Staff Portal
+    participant FinEngine as 💳 Finance Service
+    participant BankGateway as 🏦 Payment Gateway / Bank
+    participant Ledger as 📑 General Ledger
+    participant DB as 🗄️ Database
+
+    Accountant->>Portal: Triggers Term Fee Generation for Semester
+    Portal->>FinEngine: POST /api/v1/finance/challans/generate-batch
+    FinEngine->>DB: Query FeeStructure for each enrolled student's program
+    FinEngine->>DB: Check ScholarshipAward (deduct percentage/amount)
+    FinEngine->>DB: Bulk insert FeeChallan & FeeChallanItem (status = UNPAID)
+    FinEngine-->>Portal: Challans Generated Notification Sent to Students
+
+    Student->>Portal: Views Fee Invoice & Downloads Challan Voucher
+    Portal->>FinEngine: GET /api/v1/finance/challans/my
+    FinEngine->>DB: Fetch FeeChallan with itemized breakdown
+    DB-->>Portal: Itemized Challan (Tuition, Lab, Exam, Library)
+
+    alt Online Card / Gateway Payment
+        Student->>Portal: Clicks "Pay Online via Card/Online Gateway"
+        Portal->>BankGateway: Initialize Checkout Session { amount: totalAmount }
+        BankGateway-->>Student: Enter Card / OTP Details
+        Student->>BankGateway: Authorizes Transaction
+        BankGateway-->>FinEngine: Webhook: PAYMENT_SUCCESS { transactionRef, amount }
+        FinEngine->>DB: Atomic Tx [Create Payment, update FeeChallan status = PAID, balanceAmount = 0]
+        FinEngine->>Ledger: Record Transaction (Credit: Tuition Revenue, Debit: Main Bank Account)
+        FinEngine-->>Portal: Real-time Payment Confirmation
+        Portal-->>Student: Display Digital Receipt & Unlock Services
+    else Offline Bank Deposit
+        Student->>BankGateway: Deposits Cash/Draft at Bank Branch
+        Student->>Portal: Uploads Bank Deposit Receipt & Scanned Voucher
+        Portal->>FinEngine: POST /api/v1/finance/payments { challanId, transactionRef, receiptUrl }
+        FinEngine->>DB: Create Payment (isVerified = false)
+        Accountant->>Portal: Verifies Bank Deposit against Bank Statement
+        Portal->>FinEngine: PATCH /api/v1/finance/payments/:id/verify
+        FinEngine->>DB: Update Payment isVerified = true, update FeeChallan status = PAID
+        FinEngine->>Ledger: Record Transaction in General Ledger
+        FinEngine-->>Student: SMS/Email Receipt & Status: PAID
+    end

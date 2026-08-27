@@ -1,0 +1,170 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 07: ASSESSMENTS, LMS & EXAMINATIONS
+    %% ============================================================
+
+    COURSE_OFFERING ||--o{ ENROLLMENT : "enrolls"
+    COURSE_OFFERING ||--o{ ATTENDANCE : "tracks"
+    COURSE_OFFERING ||--o{ ASSIGNMENT : "assigns"
+    COURSE_OFFERING ||--o{ QUIZ : "publishes"
+    COURSE_OFFERING ||--o{ EXAM : "tests via"
+
+    ASSIGNMENT ||--o{ ASSIGNMENT_SUBMISSION : "receives"
+    QUIZ ||--o{ QUIZ_QUESTION : "contains"
+    QUIZ ||--o{ QUIZ_ATTEMPT : "logged as"
+    QUIZ_QUESTION ||--o{ QUIZ_OPTION : "provides"
+    QUIZ_QUESTION ||--o{ QUIZ_ANSWER : "answered as"
+    QUIZ_OPTION ||--o{ QUIZ_ANSWER : "selected as"
+    QUIZ_ATTEMPT ||--o{ QUIZ_ANSWER : "contains"
+    EXAM_TERM ||--o{ EXAM : "schedules"
+    EXAM ||--o{ EXAM_RESULT : "produces"
+    EXAM ||--o{ EXAM_INVIGILATOR : "supervised by"
+
+    ENROLLMENT {
+        string id PK
+        string studentId FK
+        string courseOfferingId FK
+        enum status
+        int attemptNumber
+        float quizMarksCache
+        float assignmentMarksCache
+        float midtermMarksCache
+        float finalMarksCache
+        float practicalMarksCache
+        float totalMarksCache
+        string grade
+        float gradePoint
+        boolean isPassed
+        datetime enrolledAt
+        datetime updatedAt
+    }
+
+    ATTENDANCE {
+        string id PK
+        string studentId FK
+        string courseOfferingId FK
+        datetime date
+        enum status
+        enum sessionType
+        int lateMinutes
+        string remarks
+        string markedById
+    }
+
+    ASSIGNMENT {
+        string id PK
+        string courseOfferingId FK
+        string title
+        string description
+        string instructions
+        datetime dueDate
+        float maxMarks
+        float weightagePercentage
+        string attachmentUrl
+        datetime createdAt
+    }
+
+    ASSIGNMENT_SUBMISSION {
+        string id PK
+        string assignmentId FK
+        string studentId FK
+        string submissionText
+        string fileUrl
+        datetime submittedAt
+        float marksObtained
+        string feedback
+        boolean isGraded
+    }
+
+    QUIZ {
+        string id PK
+        string courseOfferingId FK
+        string createdById FK
+        string title
+        string description
+        datetime date
+        int durationMinutes
+        float totalMarks
+        float passingMarks
+        float weightagePercentage
+        boolean isPublished
+        datetime createdAt
+    }
+
+    QUIZ_QUESTION {
+        string id PK
+        string quizId FK
+        int questionNumber
+        enum type
+        string questionText
+        float marks
+        string explanation
+    }
+
+    QUIZ_OPTION {
+        string id PK
+        string questionId FK
+        string optionLetter
+        string optionText
+        boolean isCorrect
+    }
+
+    QUIZ_ATTEMPT {
+        string id PK
+        string quizId FK
+        string studentId FK
+        datetime startedAt
+        datetime submittedAt
+        float totalScore
+        boolean isGraded
+    }
+
+    QUIZ_ANSWER {
+        string id PK
+        string quizAttemptId FK
+        string questionId FK
+        string selectedOptionId FK
+        string answerText
+        float marksAwarded
+        string feedback
+    }
+
+    EXAM_TERM {
+        string id PK
+        string semesterId FK
+        string name
+        enum type
+        datetime startDate
+        datetime endDate
+    }
+
+    EXAM {
+        string id PK
+        string examTermId FK
+        string courseOfferingId FK
+        enum type
+        datetime examDate
+        string startTime
+        string endTime
+        string roomId FK
+        float totalMarks
+        float passingMarks
+        float weightagePercentage
+    }
+
+    EXAM_RESULT {
+        string id PK
+        string examId FK
+        string studentId FK
+        float marksObtained
+        string grade
+        string remarks
+        boolean isAbsent
+    }
+
+    EXAM_INVIGILATOR {
+        string id PK
+        string examId FK
+        string employeeId FK
+        string role
+    }

@@ -1,0 +1,77 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 02: CAMPUS INFRASTRUCTURE & FACILITIES
+    %% ============================================================
+
+    CAMPUS ||--o{ BUILDING : "contains"
+    BUILDING ||--o{ ROOM : "contains"
+    ROOM ||--o{ ROOM_BOOKING : "booked for"
+    ROOM ||--o{ ASSET : "locates"
+    ROOM ||--o{ MAINTENANCE_REQUEST : "needs maintenance"
+    ASSET ||--o{ MAINTENANCE_REQUEST : "requires repair"
+
+    CAMPUS {
+        string id PK
+        string institutionId FK
+        string name
+        string code UK
+        string address
+        string city
+        string state
+    }
+
+    BUILDING {
+        string id PK
+        string campusId FK
+        string name
+        string code
+        int totalFloors
+        datetime createdAt
+    }
+
+    ROOM {
+        string id PK
+        string buildingId FK
+        string roomNumber
+        int floorNumber
+        int capacity
+        enum type
+        json facilities
+    }
+
+    ROOM_BOOKING {
+        string id PK
+        string roomId FK
+        string bookedFor
+        datetime startTime
+        datetime endTime
+        string bookedById FK
+        enum status
+        datetime createdAt
+    }
+
+    ASSET {
+        string id PK
+        string assetCode UK
+        string name
+        string category
+        string locationRoomId FK
+        datetime purchaseDate
+        float purchaseCost
+        enum status
+        datetime createdAt
+    }
+
+    MAINTENANCE_REQUEST {
+        string id PK
+        string assetId FK
+        string roomId FK
+        string title
+        string description
+        enum priority
+        enum status
+        string raisedById FK
+        string assignedToId FK
+        datetime raisedAt
+        datetime resolvedAt
+    }

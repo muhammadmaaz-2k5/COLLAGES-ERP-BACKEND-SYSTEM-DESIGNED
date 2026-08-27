@@ -1,0 +1,44 @@
+sequenceDiagram
+    autonumber
+    actor Candidate as 🧑‍🎓 Applicant
+    actor Admin as 👔 Admissions Officer
+    participant PublicPortal as 🌐 Admissions Portal
+    participant AdminPortal as 🖥️ Staff Portal
+    participant AdmEngine as ⚙️ Admissions Service
+    participant MeritEngine as 🧮 Merit Computation Engine
+    participant DB as 🗄️ Database
+
+    Candidate->>PublicPortal: Submits Application Form + Transcripts
+    PublicPortal->>AdmEngine: POST /api/v1/admissions/apply
+    AdmEngine->>DB: Create Applicant & Application (status = APPLIED)
+    AdmEngine-->>PublicPortal: Application Number Generated (e.g. APP-2026-089)
+
+    Admin->>AdminPortal: Reviews candidate documents
+    AdminPortal->>AdmEngine: PATCH /api/v1/admissions/applications/:id/status { status: SHORTLISTED }
+    AdmEngine->>DB: Update Application status
+
+    Admin->>AdminPortal: Schedules Entrance Exam session
+    AdminPortal->>AdmEngine: POST /api/v1/admissions/tests/assign-slot
+    AdmEngine->>DB: Create AdmissionTest record & assign candidates
+    AdmEngine-->>Candidate: Email/SMS Entrance Exam Slip
+
+    Candidate->>PublicPortal: Appears in Entrance Exam
+    Admin->>AdminPortal: Enters exam test marks
+    AdminPortal->>AdmEngine: POST /api/v1/admissions/tests/results
+    AdmEngine->>DB: Create AdmissionTestResult
+
+    Admin->>AdminPortal: Triggers Merit List Calculation for Program
+    AdminPortal->>MeritEngine: Calculate Aggregate Scores
+    Note over MeritEngine: Aggregate = (50% Matric/Inter) + (50% Entry Test)
+    MeritEngine->>DB: Generate MeritListEntry records ranked 1..N
+    MeritEngine-->>AdminPortal: Merit List Draft Ready
+
+    Admin->>AdminPortal: Publishes Official Merit List
+    AdminPortal->>AdmEngine: POST /api/v1/admissions/merit-list/:programId/publish
+    AdmEngine->>DB: Update Application status = ADMITTED
+    AdmEngine-->>Candidate: Admission Offer Letter & Fee Challan Sent
+
+    Candidate->>PublicPortal: Uploads Paid Admission Challan
+    PublicPortal->>AdmEngine: POST /api/v1/admissions/applications/:id/admit
+    AdmEngine->>DB: Atomic Tx [Create User (STUDENT), Create Student profile, status = ENROLLED]
+    AdmEngine-->>Candidate: Welcome Email with Student Roll No & Portal Credentials

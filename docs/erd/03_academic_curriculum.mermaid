@@ -1,0 +1,109 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 03: ACADEMIC STRUCTURE & CURRICULUM
+    %% ============================================================
+
+    DEPARTMENT ||--o{ PROGRAM : "offers"
+    DEPARTMENT ||--o{ COURSE : "curates"
+    PROGRAM ||--o{ DEGREE_REQUIREMENT : "prescribes"
+    COURSE ||--o{ DEGREE_REQUIREMENT : "fulfills"
+    COURSE ||--o{ COURSE_PREREQUISITE : "requires (target)"
+    COURSE ||--o{ COURSE_PREREQUISITE : "is prerequisite of (source)"
+    COURSE ||--o{ COURSE_OFFERING : "instantiated as"
+    SEMESTER ||--o{ COURSE_OFFERING : "schedules"
+    COURSE_OFFERING ||--o{ TIMETABLE_SLOT : "timetabled in"
+    COURSE_OFFERING ||--o{ COURSE_MATERIAL : "supplies"
+
+    DEPARTMENT {
+        string id PK
+        string campusId FK
+        string name
+        string code UK
+        string description
+        datetime createdAt
+    }
+
+    PROGRAM {
+        string id PK
+        string departmentId FK
+        string name
+        string code UK
+        enum degreeLevel
+        int totalCreditsRequired
+        int totalSemesters
+        datetime createdAt
+    }
+
+    DEGREE_REQUIREMENT {
+        string id PK
+        string programId FK
+        string courseId FK
+        boolean isElective
+        int recommendedSemester
+        string minGradeRequired
+    }
+
+    COURSE {
+        string id PK
+        string departmentId FK
+        string code UK
+        string title
+        string description
+        int creditHours
+        int lectureHours
+        int labHours
+        boolean isLabRequired
+    }
+
+    COURSE_PREREQUISITE {
+        string id PK
+        string courseId FK
+        string prerequisiteCourseId FK
+        string minGrade
+        enum type
+    }
+
+    SEMESTER {
+        string id PK
+        string name
+        string code UK
+        string academicYear
+        int semesterNumber
+        enum term
+        datetime startDate
+        datetime endDate
+        datetime registrationStartDate
+        datetime registrationEndDate
+        boolean isCurrent
+        datetime createdAt
+    }
+
+    COURSE_OFFERING {
+        string id PK
+        string courseId FK
+        string semesterId FK
+        string teacherId FK
+        string section
+        int capacity
+        int enrolledCount
+        enum status
+    }
+
+    COURSE_MATERIAL {
+        string id PK
+        string courseOfferingId FK
+        string title
+        string description
+        string fileUrl
+        string fileType
+        datetime uploadedAt
+    }
+
+    TIMETABLE_SLOT {
+        string id PK
+        string courseOfferingId FK
+        string roomId FK
+        enum dayOfWeek
+        string startTime
+        string endTime
+    }

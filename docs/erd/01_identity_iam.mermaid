@@ -1,0 +1,153 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 01: IDENTITY, ACCESS & MULTI-TENANCY
+    %% ============================================================
+
+    INSTITUTION ||--o{ CAMPUS : "operates"
+    INSTITUTION ||--o{ SYSTEM_SETTING : "configures"
+    USER ||--o| NOTIFICATION_SETTING : "manages"
+    USER ||--o{ NOTIFICATION : "receives"
+    USER ||--o{ AUDIT_LOG : "triggers"
+    USER ||--o{ MESSAGE : "sends"
+    USER ||--o{ MESSAGE : "receives"
+    USER ||--o{ ANNOUNCEMENT : "publishes"
+    USER ||--o{ CUSTOM_REPORT : "creates"
+    PERMISSION ||--o{ ROLE_PERMISSION : "granted via"
+
+    INSTITUTION {
+        string id PK
+        string name
+        string code UK
+        string email
+        string phone
+        string address
+        string city
+        string state
+        string country
+        string postalCode
+        string website
+        string logoUrl
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    CAMPUS {
+        string id PK
+        string institutionId FK
+        string name
+        string code UK
+        string address
+        string city
+        string state
+        string postalCode
+        string country
+        string phone
+        string email
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    SYSTEM_SETTING {
+        string id PK
+        string institutionId FK
+        string key UK
+        json value
+        string description
+        datetime updatedAt
+    }
+
+    USER {
+        string id PK
+        string email UK
+        string passwordHash
+        enum role
+        boolean isActive
+        datetime lastLoginAt
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PERMISSION {
+        string id PK
+        string code UK
+        string label
+        string module
+    }
+
+    ROLE_PERMISSION {
+        string id PK
+        enum role
+        string permissionId FK
+    }
+
+    AUDIT_LOG {
+        string id PK
+        string userId FK
+        string action
+        string entityType
+        string entityId
+        string ipAddress
+        string userAgent
+        json metadata
+        datetime createdAt
+    }
+
+    NOTIFICATION_SETTING {
+        string id PK
+        string userId FK_UK
+        boolean emailEnabled
+        boolean smsEnabled
+        boolean pushEnabled
+        boolean examAlerts
+        boolean feeAlerts
+        boolean resultAlerts
+        boolean attendanceAlerts
+        boolean leaveAlerts
+    }
+
+    NOTIFICATION {
+        string id PK
+        string userId FK
+        string title
+        string body
+        string category
+        boolean isRead
+        string linkUrl
+        datetime createdAt
+    }
+
+    MESSAGE {
+        string id PK
+        string senderId FK
+        string receiverId FK
+        string subject
+        string body
+        boolean isRead
+        datetime sentAt
+    }
+
+    ANNOUNCEMENT {
+        string id PK
+        string title
+        string body
+        enum scope
+        string departmentId FK
+        string programId FK
+        string semesterId FK
+        string postedById FK
+        string attachmentUrl
+        datetime publishedAt
+        datetime expiresAt
+    }
+
+    CUSTOM_REPORT {
+        string id PK
+        string createdById FK
+        string name
+        string domain
+        json config
+        string chartType
+        boolean isShared
+        datetime createdAt
+        datetime updatedAt
+    }

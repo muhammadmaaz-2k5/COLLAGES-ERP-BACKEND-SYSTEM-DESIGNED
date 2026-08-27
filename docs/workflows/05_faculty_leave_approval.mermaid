@@ -1,0 +1,38 @@
+sequenceDiagram
+    autonumber
+    actor Employee as 👨‍💼 Faculty / Employee
+    actor Manager as 👔 Department HOD / HR
+    participant Portal as 💻 HR Portal
+    participant LeaveService as 🌴 Leave Management Service
+    participant DB as 🗄️ Database
+
+    Employee->>Portal: Checks Remaining Leave Quota
+    Portal->>LeaveService: GET /api/v1/leaves/balances
+    LeaveService->>DB: Query LeaveBalance (Annual: 15 left, Sick: 8 left)
+    DB-->>Portal: Render available balances
+
+    Employee->>Portal: Submits Leave Request (e.g. 3 days Annual Leave)
+    Portal->>LeaveService: POST /api/v1/leaves/requests { leaveTypeId, startDate, endDate, reason }
+    
+    LeaveService->>DB: Validate days <= remainingDays
+    alt Insufficient Quota
+        LeaveService-->>Portal: 422 Error: Requested days exceed remaining quota
+        Portal-->>Employee: Show Error: "Insufficient leave balance"
+    else Quota Available
+        LeaveService->>DB: Create LeaveRequest (status = PENDING)
+        LeaveService-->>Manager: In-App & Email Notification: "New Leave Request"
+        LeaveService-->>Employee: Request Submitted Successfully
+
+        Manager->>Portal: Reviews Leave Request
+        alt Rejected
+            Manager->>Portal: Rejects with Reason
+            Portal->>LeaveService: PATCH /api/v1/leaves/requests/:id/approve { status: REJECTED, rejectionReason }
+            LeaveService->>DB: Update LeaveRequest status = REJECTED
+            LeaveService-->>Employee: Notification: "Leave Request Rejected"
+        else Approved
+            Manager->>Portal: Approves Request
+            Portal->>LeaveService: PATCH /api/v1/leaves/requests/:id/approve { status: APPROVED }
+            LeaveService->>DB: Atomic Tx [Update status = APPROVED, increment usedDays, decrement remainingDays]
+            LeaveService-->>Employee: Notification: "Leave Request Approved"
+        end
+    end

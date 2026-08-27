@@ -1,0 +1,41 @@
+sequenceDiagram
+    autonumber
+    actor Controller as 🏛️ Exam Controller
+    actor Teacher as 👨‍🏫 Faculty Instructor
+    actor Student as 🎓 Student
+    participant Portal as 🖥️ ERP Portal
+    participant ExamService as 📝 Exam & Grading Engine
+    participant DB as 🗄️ Database
+
+    Controller->>Portal: Creates ExamTerm (e.g. "Fall 2026 Finals")
+    Portal->>ExamService: POST /api/v1/exams/terms
+    ExamService->>DB: Create ExamTerm & assign Datesheets + Room + Invigilators
+
+    Student->>Portal: Downloads Digital Exam Hall Ticket & Datesheet
+    
+    Note over Teacher, Student: Continuous LMS Assessments
+    Teacher->>Portal: Grades Assignments & Quizzes throughout semester
+    Portal->>ExamService: POST /api/v1/lms/grades
+    ExamService->>DB: Updates quizMarksCache, assignmentMarksCache on Enrollment
+
+    Note over Teacher, Controller: Final Term Examination
+    Student->>Teacher: Takes Final Exam in Exam Hall
+    Teacher->>Portal: Inputs Final Exam Marks for Section
+    Portal->>ExamService: POST /api/v1/exams/results
+    ExamService->>DB: Create ExamResult & update Enrollment.finalMarksCache
+
+    Teacher->>Portal: Submits Provisional Grades for Section
+    Portal->>ExamService: POST /api/v1/grades/submit-draft { courseOfferingId }
+    ExamService->>DB: Calculate Total Marks = Quiz(10%) + Assign(10%) + Mid(30%) + Final(50%)
+    ExamService->>DB: Compute Grade ('A', 'B+', 'C', 'F') and GradePoint (4.0, 3.5, 2.0, 0.0)
+
+    Controller->>Portal: Reviews & Approves Grade Sheets
+    Portal->>ExamService: POST /api/v1/grades/approve-final { courseOfferingId }
+    ExamService->>DB: Lock Enrollment status = PASSED / FAILED, isPassed = true/false
+    ExamService->>DB: Recalculate Student.cgpaCache & totalCreditsEarnedCache
+    ExamService-->>Student: Push Notification: "Semester Grades Published"
+
+    Student->>Portal: Views Result Card & Official 8-Semester Transcript
+    Portal->>ExamService: GET /api/v1/grades/transcript/my
+    ExamService->>DB: Query all completed Enrollments grouped by Semester
+    DB-->>Portal: Render Transcript with Term GPA, CGPA & Academic Standing

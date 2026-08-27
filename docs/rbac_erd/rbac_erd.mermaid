@@ -1,0 +1,174 @@
+erDiagram
+    %% ============================================================
+    %% ROLE-BASED ACCESS CONTROL (RBAC) & IAM ARCHITECTURE ERD
+    %% ============================================================
+
+    INSTITUTION ||--o{ CAMPUS : "scopes"
+    INSTITUTION ||--o{ SYSTEM_SETTING : "manages"
+    
+    USER ||--o{ ROLE_PERMISSION : "inherits permissions via role"
+    USER ||--o{ AUDIT_LOG : "generates audit trail"
+    USER ||--o| NOTIFICATION_SETTING : "customizes"
+    USER ||--o{ NOTIFICATION : "receives alerts"
+    USER ||--o{ MESSAGE : "sends / receives"
+    USER ||--o{ CUSTOM_REPORT : "authors"
+
+    %% Spine Links
+    USER ||--o| STUDENT : "mapped to student record"
+    USER ||--o| EMPLOYEE : "mapped to employee record"
+
+    EMPLOYEE ||--o| TEACHER : "academic role"
+    EMPLOYEE ||--o| STAFF : "administrative role"
+    EMPLOYEE ||--o| DRIVER : "fleet role"
+
+    PERMISSION ||--o{ ROLE_PERMISSION : "mapped to role"
+
+    %% Scoped Domain Authorization Targets
+    USER }o--o{ ANNOUNCEMENT : "publishes / views"
+    TEACHER ||--o{ COURSE_OFFERING : "authorized to grade & teach"
+    STUDENT ||--o{ ENROLLMENT : "authorized to view & submit coursework"
+    STAFF ||--o{ HOSTEL : "warden authorization"
+    DRIVER ||--o{ VEHICLE : "driver authorization"
+
+    %% ============================================================
+    %% ENTITY ATTRIBUTES
+    %% ============================================================
+
+    INSTITUTION {
+        string id PK
+        string name
+        string code UK
+        string email
+        string phone
+        datetime createdAt
+    }
+
+    CAMPUS {
+        string id PK
+        string institutionId FK
+        string name
+        string code UK
+        string city
+    }
+
+    USER {
+        string id PK
+        string email UK
+        string passwordHash
+        enum role "SUPER_ADMIN | ADMIN | TEACHER | STUDENT | ACCOUNTANT | LIBRARIAN | HR_MANAGER | WARDEN | DRIVER | ADMISSIONS_OFFICER | EXAM_CONTROLLER | STAFF"
+        boolean isActive
+        datetime lastLoginAt
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PERMISSION {
+        string id PK
+        string code UK "e.g. STUDENT.CREATE, GRADE.SUBMIT, FEE.APPROVE"
+        string label
+        string module "ACADEMICS | FINANCE | HR | LMS | LIBRARY | HOSTEL | TRANSPORT | ADMISSIONS"
+    }
+
+    ROLE_PERMISSION {
+        string id PK
+        enum role "SystemRole Enum"
+        string permissionId FK
+    }
+
+    AUDIT_LOG {
+        string id PK
+        string userId FK
+        string action "e.g. GRADE_UPDATED, CHALLAN_PAID, USER_SUSPENDED"
+        string entityType "e.g. Enrollment, FeeChallan, Student"
+        string entityId
+        string ipAddress
+        string userAgent
+        json metadata
+        datetime createdAt
+    }
+
+    NOTIFICATION_SETTING {
+        string id PK
+        string userId FK_UK
+        boolean emailEnabled
+        boolean smsEnabled
+        boolean pushEnabled
+        boolean examAlerts
+        boolean feeAlerts
+        boolean resultAlerts
+        boolean attendanceAlerts
+        boolean leaveAlerts
+    }
+
+    STUDENT {
+        string id PK
+        string userId FK_UK
+        string rollNumber UK
+        string programId FK
+        string currentSemesterId FK
+        enum academicStanding
+    }
+
+    EMPLOYEE {
+        string id PK
+        string userId FK_UK
+        string employeeCode UK
+        string departmentId FK
+        string designation
+        enum status
+    }
+
+    TEACHER {
+        string id PK
+        string employeeId FK_UK
+        string specialty
+        enum academicRank
+    }
+
+    STAFF {
+        string id PK
+        string employeeId FK_UK
+        string staffRole
+    }
+
+    DRIVER {
+        string id PK
+        string employeeId FK_UK
+        string licenseNumber UK
+    }
+
+    COURSE_OFFERING {
+        string id PK
+        string courseId FK
+        string semesterId FK
+        string teacherId FK
+        string section
+    }
+
+    ENROLLMENT {
+        string id PK
+        string studentId FK
+        string courseOfferingId FK
+        enum status
+    }
+
+    HOSTEL {
+        string id PK
+        string code UK
+        string name
+        string wardenId FK
+    }
+
+    VEHICLE {
+        string id PK
+        string plateNumber UK
+        string driverId FK
+    }
+
+    ANNOUNCEMENT {
+        string id PK
+        string title
+        enum scope
+        string postedById FK
+        datetime publishedAt
+    }

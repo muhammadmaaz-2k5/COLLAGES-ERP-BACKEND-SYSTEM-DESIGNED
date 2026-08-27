@@ -1,0 +1,68 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 05: STUDENT LIFECYCLE & PROFILE
+    %% ============================================================
+
+    STUDENT ||--o| GUARDIAN_INFO : "cared by"
+    STUDENT ||--o{ EMERGENCY_CONTACT : "has emergency contact"
+    STUDENT ||--o{ DOCUMENT : "owns credentials"
+
+    STUDENT {
+        string id PK
+        string userId FK_UK
+        string rollNumber UK
+        string registrationNumber UK
+        string firstName
+        string lastName
+        datetime dateOfBirth
+        enum gender
+        enum bloodGroup
+        string phone
+        string address
+        string profileImageUrl
+        string programId FK
+        string currentSemesterId FK
+        datetime admissionDate
+        datetime graduationDate
+        enum academicStanding
+        float cgpaCache
+        int totalCreditsEarnedCache
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    GUARDIAN_INFO {
+        string id PK
+        string studentId FK_UK
+        string guardianName
+        string relation
+        string phone
+        string email
+        string occupation
+        string address
+        string nationalId
+    }
+
+    EMERGENCY_CONTACT {
+        string id PK
+        string studentId FK
+        string name
+        string relation
+        string phone
+        string address
+    }
+
+    DOCUMENT {
+        string id PK
+        string studentId FK
+        string employeeId FK
+        enum documentType
+        string documentName
+        string fileUrl
+        int fileSize
+        string mimeType
+        string verificationCode UK
+        boolean isVerified
+        datetime issuedAt
+        datetime expiresAt
+    }

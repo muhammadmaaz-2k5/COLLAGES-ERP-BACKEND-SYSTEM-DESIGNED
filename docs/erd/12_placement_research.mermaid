@@ -1,0 +1,82 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 12: CAREER PLACEMENTS & SCHOLARLY RESEARCH
+    %% ============================================================
+
+    COMPANY ||--o{ JOB_POSTING : "advertises"
+    JOB_POSTING ||--o{ PLACEMENT_APPLICATION : "receives candidate"
+    RESEARCH_PROJECT ||--o{ RESEARCH_MEMBER : "staffed by"
+    RESEARCH_PROJECT ||--o{ PUBLICATION : "publishes"
+
+    COMPANY {
+        string id PK
+        string name
+        string industry
+        string website
+        string contactPerson
+        string contactEmail
+        string contactPhone
+        string address
+        datetime createdAt
+    }
+
+    JOB_POSTING {
+        string id PK
+        string companyId FK
+        string title
+        string jobType
+        string description
+        string requirements
+        string location
+        string salaryRange
+        datetime applicationDeadline
+        datetime createdAt
+    }
+
+    PLACEMENT_APPLICATION {
+        string id PK
+        string jobPostingId FK
+        string studentId FK
+        string resumeUrl
+        string coverLetter
+        enum status
+        datetime appliedAt
+        datetime interviewDate
+        string remarks
+    }
+
+    RESEARCH_PROJECT {
+        string id PK
+        string grantCode UK
+        string title
+        string abstract
+        string fundingAgency
+        float grantAmount
+        enum status
+        datetime startDate
+        datetime endDate
+        datetime createdAt
+    }
+
+    RESEARCH_MEMBER {
+        string id PK
+        string researchProjectId FK
+        string teacherId FK
+        string studentId FK
+        string roleInProject
+        datetime joinedDate
+    }
+
+    PUBLICATION {
+        string id PK
+        string researchProjectId FK
+        string title
+        string authorsList
+        string journalOrConference
+        datetime publicationDate
+        string volume
+        string issue
+        string pages
+        string doiUrl
+        int citationCount
+    }

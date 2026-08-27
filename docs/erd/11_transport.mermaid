@@ -1,0 +1,50 @@
+erDiagram
+    %% ============================================================
+    %% BOUNDED CONTEXT 11: CAMPUS TRANSPORT FLEET
+    %% ============================================================
+
+    VEHICLE ||--o{ ROUTE : "assigned to"
+    ROUTE ||--o{ ROUTE_STOP : "navigates through"
+    ROUTE ||--o{ TRANSPORT_SUBSCRIPTION : "subscribed by"
+    ROUTE_STOP ||--o{ TRANSPORT_SUBSCRIPTION : "picked up at"
+
+    VEHICLE {
+        string id PK
+        string plateNumber UK
+        string vehicleModel
+        int capacity
+        enum vehicleType
+        string driverId FK
+        enum status
+    }
+
+    ROUTE {
+        string id PK
+        string code UK
+        string name
+        string startLocation
+        string endLocation
+        string vehicleId FK
+    }
+
+    ROUTE_STOP {
+        string id PK
+        string routeId FK
+        string stopName
+        int sequenceOrder
+        string pickupTime
+        string dropTime
+        float fareAmount
+    }
+
+    TRANSPORT_SUBSCRIPTION {
+        string id PK
+        string studentId FK
+        string employeeId FK
+        string routeId FK
+        string stopId FK
+        float fee
+        datetime startDate
+        datetime endDate
+        enum status
+    }

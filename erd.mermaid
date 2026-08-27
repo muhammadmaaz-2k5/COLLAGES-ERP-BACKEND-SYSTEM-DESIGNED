@@ -1,0 +1,1111 @@
+erDiagram
+    %% ============================================================
+    %% UNIVERSITY & COLLEGE ERP — COMPLETE SYSTEM ERD
+    %% ============================================================
+
+    %% ============ 1. IDENTITY & ACCESS MANAGEMENT ============
+    INSTITUTION ||--o{ CAMPUS : "operates"
+    INSTITUTION ||--o{ SYSTEM_SETTING : "configures"
+    USER ||--o| STUDENT : "has identity"
+    USER ||--o| EMPLOYEE : "has identity"
+    USER ||--o| NOTIFICATION_SETTING : "manages"
+    USER ||--o{ NOTIFICATION : "receives"
+    USER ||--o{ AUDIT_LOG : "triggers"
+    USER ||--o{ MESSAGE : "sends (sender)"
+    USER ||--o{ MESSAGE : "receives (receiver)"
+    USER ||--o{ ANNOUNCEMENT : "publishes"
+    USER ||--o{ CUSTOM_REPORT : "creates"
+    PERMISSION ||--o{ ROLE_PERMISSION : "granted via"
+
+    %% ============ 2. CAMPUS INFRASTRUCTURE & FACILITIES ============
+    CAMPUS ||--o{ BUILDING : "contains"
+    CAMPUS ||--o{ DEPARTMENT : "houses"
+    BUILDING ||--o{ ROOM : "contains"
+    ROOM ||--o{ TIMETABLE_SLOT : "hosts class"
+    ROOM ||--o{ EXAM : "hosts exam"
+    ROOM ||--o{ ROOM_BOOKING : "booked for"
+    ROOM ||--o| HOSTEL_ROOM : "configured as"
+    ROOM ||--o{ ASSET : "locates"
+    ROOM ||--o{ MAINTENANCE_REQUEST : "needs maintenance"
+    ASSET ||--o{ MAINTENANCE_REQUEST : "requires repair"
+
+    %% ============ 3. ACADEMIC STRUCTURE & CURRICULUM ============
+    DEPARTMENT ||--o{ PROGRAM : "offers"
+    DEPARTMENT ||--o{ COURSE : "curates"
+    DEPARTMENT ||--o{ EMPLOYEE : "employs"
+    DEPARTMENT ||--o{ ANNOUNCEMENT : "targets"
+    PROGRAM ||--o{ DEGREE_REQUIREMENT : "prescribes"
+    PROGRAM ||--o{ STUDENT : "enrolls"
+    PROGRAM ||--o{ FEE_STRUCTURE : "charges"
+    PROGRAM ||--o{ APPLICATION : "receives applications"
+    PROGRAM ||--o{ MERIT_LIST_ENTRY : "ranks applicants"
+    PROGRAM ||--o{ ANNOUNCEMENT : "targets"
+    COURSE ||--o{ DEGREE_REQUIREMENT : "fulfills"
+    COURSE ||--o{ COURSE_PREREQUISITE : "requires (target)"
+    COURSE ||--o{ COURSE_PREREQUISITE : "is prerequisite of (source)"
+    COURSE ||--o{ COURSE_OFFERING : "instantiated as"
+    SEMESTER ||--o{ STUDENT : "current term for"
+    SEMESTER ||--o{ COURSE_OFFERING : "schedules"
+    SEMESTER ||--o{ FEE_STRUCTURE : "defines fees for"
+    SEMESTER ||--o{ FEE_CHALLAN : "invoices for"
+    SEMESTER ||--o{ EXAM_TERM : "holds"
+    SEMESTER ||--o{ ANNOUNCEMENT : "targets"
+    COURSE_OFFERING ||--o{ TIMETABLE_SLOT : "timetabled in"
+    COURSE_OFFERING ||--o{ COURSE_MATERIAL : "supplies"
+    COURSE_OFFERING ||--o{ ENROLLMENT : "has enrolled"
+    COURSE_OFFERING ||--o{ ATTENDANCE : "tracks"
+    COURSE_OFFERING ||--o{ ASSIGNMENT : "assigns"
+    COURSE_OFFERING ||--o{ QUIZ : "conducts"
+    COURSE_OFFERING ||--o{ EXAM : "evaluates through"
+    COURSE_OFFERING }o--o| TEACHER : "taught by"
+
+    %% ============ 4. STUDENT & HR PEOPLE SPINE ============
+    STUDENT ||--o| GUARDIAN_INFO : "cared by"
+    STUDENT ||--o{ EMERGENCY_CONTACT : "has emergency contact"
+    STUDENT ||--o{ ENROLLMENT : "registers in"
+    STUDENT ||--o{ ATTENDANCE : "marked in"
+    STUDENT ||--o{ ASSIGNMENT_SUBMISSION : "submits"
+    STUDENT ||--o{ QUIZ_ATTEMPT : "attempts"
+    STUDENT ||--o{ EXAM_RESULT : "graded in"
+    STUDENT ||--o{ FEE_CHALLAN : "billed through"
+    STUDENT ||--o{ SCHOLARSHIP_AWARD : "awarded"
+    STUDENT ||--o{ HOSTEL_ALLOCATION : "resides via"
+    STUDENT ||--o{ TRANSPORT_SUBSCRIPTION : "commutes via"
+    STUDENT ||--o| LIBRARY_MEMBER : "registered as"
+    STUDENT ||--o{ PLACEMENT_APPLICATION : "applies for job"
+    STUDENT ||--o{ RESEARCH_MEMBER : "participates in"
+    STUDENT ||--o{ DOCUMENT : "owns credentials"
+
+    EMPLOYEE ||--o| TEACHER : "faculty role"
+    EMPLOYEE ||--o| STAFF : "admin/ops role"
+    EMPLOYEE ||--o| DRIVER : "fleet role"
+    EMPLOYEE ||--o{ LEAVE_BALANCE : "allocated"
+    EMPLOYEE ||--o{ LEAVE_REQUEST : "submits"
+    EMPLOYEE ||--o{ LEAVE_REQUEST : "approves (manager)"
+    EMPLOYEE ||--o{ STAFF_ATTENDANCE : "clocks in"
+    EMPLOYEE ||--o{ SALARY_SLIP : "remunerated via"
+    EMPLOYEE ||--o{ EXAM_INVIGILATOR : "supervises"
+    EMPLOYEE ||--o{ ROOM_BOOKING : "books"
+    EMPLOYEE ||--o{ MAINTENANCE_REQUEST : "raises"
+    EMPLOYEE ||--o{ MAINTENANCE_REQUEST : "assigned to"
+    EMPLOYEE ||--o{ DOCUMENT : "owns records"
+    EMPLOYEE ||--o| LIBRARY_MEMBER : "borrowing rights"
+    EMPLOYEE ||--o{ TRANSPORT_SUBSCRIPTION : "commutes via"
+
+    LEAVE_TYPE ||--o{ LEAVE_BALANCE : "defines quota"
+    LEAVE_TYPE ||--o{ LEAVE_REQUEST : "categorizes"
+    TEACHER ||--o{ QUIZ : "creates"
+    TEACHER ||--o{ RESEARCH_MEMBER : "leads / joins"
+    STAFF ||--o{ HOSTEL : "wardens"
+    DRIVER ||--o{ VEHICLE : "drives"
+
+    %% ============ 5. ADMISSIONS & SELECTION ============
+    APPLICANT ||--o{ APPLICATION : "files"
+    APPLICATION ||--o| ADMISSION_TEST_RESULT : "scores"
+    APPLICATION ||--o| MERIT_LIST_ENTRY : "ranked in"
+    ADMISSION_TEST ||--o{ ADMISSION_TEST_RESULT : "grades"
+
+    %% ============ 6. ACADEMIC ASSESSMENTS & GRADING ============
+    ASSIGNMENT ||--o{ ASSIGNMENT_SUBMISSION : "receives"
+    QUIZ ||--o{ QUIZ_QUESTION : "contains"
+    QUIZ ||--o{ QUIZ_ATTEMPT : "logged as"
+    QUIZ_QUESTION ||--o{ QUIZ_OPTION : "provides"
+    QUIZ_QUESTION ||--o{ QUIZ_ANSWER : "answered as"
+    QUIZ_OPTION ||--o{ QUIZ_ANSWER : "selected as"
+    QUIZ_ATTEMPT ||--o{ QUIZ_ANSWER : "records"
+    EXAM_TERM ||--o{ EXAM : "aggregates"
+    EXAM ||--o{ EXAM_RESULT : "generates"
+    EXAM ||--o{ EXAM_INVIGILATOR : "invigilated by"
+
+    %% ============ 7. FINANCE & ACCOUNTS ============
+    FEE_STRUCTURE ||--o{ FEE_STRUCTURE_ITEM : "itemizes"
+    FEE_STRUCTURE ||--o{ FEE_CHALLAN : "bases"
+    FEE_CHALLAN ||--o{ FEE_CHALLAN_ITEM : "bills item"
+    FEE_CHALLAN ||--o{ PAYMENT : "settled through"
+    SCHOLARSHIP_PROGRAM ||--o{ SCHOLARSHIP_AWARD : "grants"
+    ACCOUNT ||--o{ TRANSACTION : "audits entry"
+
+    %% ============ 8. LIBRARY MANAGEMENT ============
+    BOOK ||--o{ BOOK_COPY : "cataloged as"
+    BOOK_COPY ||--o{ BOOK_ISSUE : "borrowed as"
+    LIBRARY_MEMBER ||--o{ BOOK_ISSUE : "borrows"
+    BOOK_ISSUE ||--o| FINE : "incurs"
+
+    %% ============ 9. HOSTEL MANAGEMENT ============
+    HOSTEL ||--o{ HOSTEL_ROOM : "accommodates"
+    HOSTEL_ROOM ||--o{ HOSTEL_ALLOCATION : "assigned to"
+
+    %% ============ 10. TRANSPORT FLEET ============
+    VEHICLE ||--o{ ROUTE : "assigned to"
+    ROUTE ||--o{ ROUTE_STOP : "navigates through"
+    ROUTE ||--o{ TRANSPORT_SUBSCRIPTION : "subscribed by"
+    ROUTE_STOP ||--o{ TRANSPORT_SUBSCRIPTION : "picked up at"
+
+    %% ============ 11. CAREER & PLACEMENT ============
+    COMPANY ||--o{ JOB_POSTING : "advertises"
+    JOB_POSTING ||--o{ PLACEMENT_APPLICATION : "receives candidate"
+
+    %% ============ 12. RESEARCH & PUBLICATIONS ============
+    RESEARCH_PROJECT ||--o{ RESEARCH_MEMBER : "staffed by"
+    RESEARCH_PROJECT ||--o{ PUBLICATION : "publishes"
+
+    %% ============================================================
+    %% ENTITY DEFINITIONS WITH DATA TYPES & KEYS
+    %% ============================================================
+
+    INSTITUTION {
+        string id PK
+        string name
+        string code UK
+        string email
+        string phone
+        string address
+        string city
+        string state
+        string country
+        string postalCode
+        string website
+        string logoUrl
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    CAMPUS {
+        string id PK
+        string institutionId FK
+        string name
+        string code UK
+        string address
+        string city
+        string state
+        string postalCode
+        string country
+        string phone
+        string email
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    SYSTEM_SETTING {
+        string id PK
+        string institutionId FK
+        string key UK
+        json value
+        string description
+        datetime updatedAt
+    }
+
+    USER {
+        string id PK
+        string email UK
+        string passwordHash
+        enum role
+        boolean isActive
+        datetime lastLoginAt
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PERMISSION {
+        string id PK
+        string code UK
+        string label
+        string module
+    }
+
+    ROLE_PERMISSION {
+        string id PK
+        enum role
+        string permissionId FK
+    }
+
+    AUDIT_LOG {
+        string id PK
+        string userId FK
+        string action
+        string entityType
+        string entityId
+        string ipAddress
+        string userAgent
+        json metadata
+        datetime createdAt
+    }
+
+    NOTIFICATION_SETTING {
+        string id PK
+        string userId FK_UK
+        boolean emailEnabled
+        boolean smsEnabled
+        boolean pushEnabled
+        boolean examAlerts
+        boolean feeAlerts
+        boolean resultAlerts
+        boolean attendanceAlerts
+        boolean leaveAlerts
+    }
+
+    NOTIFICATION {
+        string id PK
+        string userId FK
+        string title
+        string body
+        string category
+        boolean isRead
+        string linkUrl
+        datetime createdAt
+    }
+
+    MESSAGE {
+        string id PK
+        string senderId FK
+        string receiverId FK
+        string subject
+        string body
+        boolean isRead
+        datetime sentAt
+    }
+
+    ANNOUNCEMENT {
+        string id PK
+        string title
+        string body
+        enum scope
+        string departmentId FK
+        string programId FK
+        string semesterId FK
+        string postedById FK
+        string attachmentUrl
+        datetime publishedAt
+        datetime expiresAt
+    }
+
+    BUILDING {
+        string id PK
+        string campusId FK
+        string name
+        string code
+        int totalFloors
+        datetime createdAt
+    }
+
+    ROOM {
+        string id PK
+        string buildingId FK
+        string roomNumber
+        int floorNumber
+        int capacity
+        enum type
+        json facilities
+    }
+
+    ROOM_BOOKING {
+        string id PK
+        string roomId FK
+        string bookedFor
+        datetime startTime
+        datetime endTime
+        string bookedById FK
+        enum status
+        datetime createdAt
+    }
+
+    ASSET {
+        string id PK
+        string assetCode UK
+        string name
+        string category
+        string locationRoomId FK
+        datetime purchaseDate
+        float purchaseCost
+        enum status
+        datetime createdAt
+    }
+
+    MAINTENANCE_REQUEST {
+        string id PK
+        string assetId FK
+        string roomId FK
+        string title
+        string description
+        enum priority
+        enum status
+        string raisedById FK
+        string assignedToId FK
+        datetime raisedAt
+        datetime resolvedAt
+    }
+
+    DEPARTMENT {
+        string id PK
+        string campusId FK
+        string name
+        string code UK
+        string description
+        datetime createdAt
+    }
+
+    PROGRAM {
+        string id PK
+        string departmentId FK
+        string name
+        string code UK
+        enum degreeLevel
+        int totalCreditsRequired
+        int totalSemesters
+        datetime createdAt
+    }
+
+    DEGREE_REQUIREMENT {
+        string id PK
+        string programId FK
+        string courseId FK
+        boolean isElective
+        int recommendedSemester
+        string minGradeRequired
+    }
+
+    COURSE {
+        string id PK
+        string departmentId FK
+        string code UK
+        string title
+        string description
+        int creditHours
+        int lectureHours
+        int labHours
+        boolean isLabRequired
+    }
+
+    COURSE_PREREQUISITE {
+        string id PK
+        string courseId FK
+        string prerequisiteCourseId FK
+        string minGrade
+        enum type
+    }
+
+    SEMESTER {
+        string id PK
+        string name
+        string code UK
+        string academicYear
+        int semesterNumber
+        enum term
+        datetime startDate
+        datetime endDate
+        datetime registrationStartDate
+        datetime registrationEndDate
+        boolean isCurrent
+        datetime createdAt
+    }
+
+    COURSE_OFFERING {
+        string id PK
+        string courseId FK
+        string semesterId FK
+        string teacherId FK
+        string section
+        int capacity
+        int enrolledCount
+        enum status
+    }
+
+    COURSE_MATERIAL {
+        string id PK
+        string courseOfferingId FK
+        string title
+        string description
+        string fileUrl
+        string fileType
+        datetime uploadedAt
+    }
+
+    TIMETABLE_SLOT {
+        string id PK
+        string courseOfferingId FK
+        string roomId FK
+        enum dayOfWeek
+        string startTime
+        string endTime
+    }
+
+    STUDENT {
+        string id PK
+        string userId FK_UK
+        string rollNumber UK
+        string registrationNumber UK
+        string firstName
+        string lastName
+        datetime dateOfBirth
+        enum gender
+        enum bloodGroup
+        string phone
+        string address
+        string profileImageUrl
+        string programId FK
+        string currentSemesterId FK
+        datetime admissionDate
+        datetime graduationDate
+        enum academicStanding
+        float cgpaCache
+        int totalCreditsEarnedCache
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    GUARDIAN_INFO {
+        string id PK
+        string studentId FK_UK
+        string guardianName
+        string relation
+        string phone
+        string email
+        string occupation
+        string address
+        string nationalId
+    }
+
+    EMERGENCY_CONTACT {
+        string id PK
+        string studentId FK
+        string name
+        string relation
+        string phone
+        string address
+    }
+
+    EMPLOYEE {
+        string id PK
+        string userId FK_UK
+        string employeeCode UK
+        string firstName
+        string lastName
+        datetime dateOfBirth
+        enum gender
+        string phone
+        string address
+        string profileImageUrl
+        string departmentId FK
+        string designation
+        enum employmentType
+        string qualifications
+        int experienceYears
+        datetime joiningDate
+        enum status
+        float baseSalary
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    TEACHER {
+        string id PK
+        string employeeId FK_UK
+        string specialty
+        enum academicRank
+        int maxWorkloadHours
+    }
+
+    STAFF {
+        string id PK
+        string employeeId FK_UK
+        string staffRole
+    }
+
+    DRIVER {
+        string id PK
+        string employeeId FK_UK
+        string licenseNumber UK
+        string licenseType
+        datetime licenseExpiry
+    }
+
+    LEAVE_TYPE {
+        string id PK
+        string name UK
+        string code UK
+        int daysPerYear
+        boolean isPaid
+    }
+
+    LEAVE_BALANCE {
+        string id PK
+        string employeeId FK
+        string leaveTypeId FK
+        int year
+        int totalDays
+        int usedDays
+        int remainingDays
+    }
+
+    LEAVE_REQUEST {
+        string id PK
+        string employeeId FK
+        string leaveTypeId FK
+        datetime startDate
+        datetime endDate
+        int totalDays
+        string reason
+        enum status
+        datetime appliedAt
+        string approvedById FK
+        datetime approvedAt
+        string rejectionReason
+    }
+
+    STAFF_ATTENDANCE {
+        string id PK
+        string employeeId FK
+        datetime date
+        enum status
+        datetime checkIn
+        datetime checkOut
+        float workHours
+        string remarks
+    }
+
+    SALARY_SLIP {
+        string id PK
+        string employeeId FK
+        int month
+        int year
+        float basicSalary
+        float allowances
+        float deductions
+        float netSalary
+        enum paymentStatus
+        datetime paidAt
+        enum paymentMethod
+        string transactionRef
+        string payslipUrl
+        datetime generatedAt
+    }
+
+    APPLICANT {
+        string id PK
+        string firstName
+        string lastName
+        string email
+        string phone
+        string nationalId
+        datetime dateOfBirth
+        enum gender
+        string address
+        datetime createdAt
+    }
+
+    APPLICATION {
+        string id PK
+        string applicantId FK
+        string programId FK
+        string applicationNumber UK
+        enum status
+        datetime appliedAt
+        json previousEducation
+        json documents
+    }
+
+    ADMISSION_TEST {
+        string id PK
+        string name
+        string testCode UK
+        datetime testDate
+        string venue
+        float totalMarks
+        float passingMarks
+    }
+
+    ADMISSION_TEST_RESULT {
+        string id PK
+        string admissionTestId FK
+        string applicationId FK_UK
+        float marksObtained
+        float percentile
+        boolean isPassed
+        datetime testDate
+    }
+
+    MERIT_LIST_ENTRY {
+        string id PK
+        string applicationId FK_UK
+        string programId FK
+        int rank
+        float matricMarksPercentage
+        float interMarksPercentage
+        float testMarksPercentage
+        float aggregateScore
+        enum status
+    }
+
+    ENROLLMENT {
+        string id PK
+        string studentId FK
+        string courseOfferingId FK
+        enum status
+        int attemptNumber
+        float quizMarksCache
+        float assignmentMarksCache
+        float midtermMarksCache
+        float finalMarksCache
+        float practicalMarksCache
+        float totalMarksCache
+        string grade
+        float gradePoint
+        boolean isPassed
+        datetime enrolledAt
+        datetime updatedAt
+    }
+
+    ATTENDANCE {
+        string id PK
+        string studentId FK
+        string courseOfferingId FK
+        datetime date
+        enum status
+        enum sessionType
+        int lateMinutes
+        string remarks
+        string markedById
+    }
+
+    ASSIGNMENT {
+        string id PK
+        string courseOfferingId FK
+        string title
+        string description
+        string instructions
+        datetime dueDate
+        float maxMarks
+        float weightagePercentage
+        string attachmentUrl
+        datetime createdAt
+    }
+
+    ASSIGNMENT_SUBMISSION {
+        string id PK
+        string assignmentId FK
+        string studentId FK
+        string submissionText
+        string fileUrl
+        datetime submittedAt
+        float marksObtained
+        string feedback
+        boolean isGraded
+    }
+
+    QUIZ {
+        string id PK
+        string courseOfferingId FK
+        string createdById FK
+        string title
+        string description
+        datetime date
+        int durationMinutes
+        float totalMarks
+        float passingMarks
+        float weightagePercentage
+        boolean isPublished
+        datetime createdAt
+    }
+
+    QUIZ_QUESTION {
+        string id PK
+        string quizId FK
+        int questionNumber
+        enum type
+        string questionText
+        float marks
+        string explanation
+    }
+
+    QUIZ_OPTION {
+        string id PK
+        string questionId FK
+        string optionLetter
+        string optionText
+        boolean isCorrect
+    }
+
+    QUIZ_ATTEMPT {
+        string id PK
+        string quizId FK
+        string studentId FK
+        datetime startedAt
+        datetime submittedAt
+        float totalScore
+        boolean isGraded
+    }
+
+    QUIZ_ANSWER {
+        string id PK
+        string quizAttemptId FK
+        string questionId FK
+        string selectedOptionId FK
+        string answerText
+        float marksAwarded
+        string feedback
+    }
+
+    EXAM_TERM {
+        string id PK
+        string semesterId FK
+        string name
+        enum type
+        datetime startDate
+        datetime endDate
+    }
+
+    EXAM {
+        string id PK
+        string examTermId FK
+        string courseOfferingId FK
+        enum type
+        datetime examDate
+        string startTime
+        string endTime
+        string roomId FK
+        float totalMarks
+        float passingMarks
+        float weightagePercentage
+    }
+
+    EXAM_RESULT {
+        string id PK
+        string examId FK
+        string studentId FK
+        float marksObtained
+        string grade
+        string remarks
+        boolean isAbsent
+    }
+
+    EXAM_INVIGILATOR {
+        string id PK
+        string examId FK
+        string employeeId FK
+        string role
+    }
+
+    FEE_STRUCTURE {
+        string id PK
+        string programId FK
+        string semesterId FK
+        float totalAmount
+        string academicYear
+    }
+
+    FEE_STRUCTURE_ITEM {
+        string id PK
+        string feeStructureId FK
+        string feeHead
+        float amount
+        boolean isOptional
+    }
+
+    FEE_CHALLAN {
+        string id PK
+        string challanNumber UK
+        string studentId FK
+        string semesterId FK
+        string feeStructureId FK
+        float totalAmount
+        float discountAmount
+        float lateFee
+        float paidAmount
+        float balanceAmount
+        datetime issueDate
+        datetime dueDate
+        enum status
+    }
+
+    FEE_CHALLAN_ITEM {
+        string id PK
+        string feeChallanId FK
+        string feeHead
+        float amount
+    }
+
+    PAYMENT {
+        string id PK
+        string challanId FK
+        float amountPaid
+        datetime paymentDate
+        enum method
+        string transactionRef
+        string receiptUrl
+        string verifiedById FK
+        boolean isVerified
+        string notes
+    }
+
+    SCHOLARSHIP_PROGRAM {
+        string id PK
+        string code UK
+        string name
+        string description
+        string type
+        float coveragePercentage
+        float fixedAmount
+        string criteria
+    }
+
+    SCHOLARSHIP_AWARD {
+        string id PK
+        string scholarshipProgramId FK
+        string studentId FK
+        float percentageAwarded
+        float amountAwarded
+        int semesterFrom
+        int semesterTo
+        datetime awardDate
+        string status
+    }
+
+    ACCOUNT {
+        string id PK
+        string accountCode UK
+        string name
+        enum type
+        enum category
+        float balance
+        string description
+    }
+
+    TRANSACTION {
+        string id PK
+        string accountId FK
+        float amount
+        enum type
+        string category
+        string description
+        datetime date
+        string referenceNumber
+        string paymentReferenceId
+    }
+
+    BOOK {
+        string id PK
+        string isbn UK
+        string title
+        string author
+        string publisher
+        string edition
+        int publicationYear
+        string category
+        string callNumber
+        datetime createdAt
+    }
+
+    BOOK_COPY {
+        string id PK
+        string bookId FK
+        string copyBarcode UK
+        string shelfLocation
+        enum status
+        float price
+    }
+
+    LIBRARY_MEMBER {
+        string id PK
+        string studentId FK_UK
+        string employeeId FK_UK
+        string membershipNumber UK
+        string memberType
+        int maxBooksAllowed
+        datetime expiryDate
+        enum status
+    }
+
+    BOOK_ISSUE {
+        string id PK
+        string bookCopyId FK
+        string libraryMemberId FK
+        datetime issueDate
+        datetime dueDate
+        datetime returnDate
+        enum status
+        string issuedById FK
+    }
+
+    FINE {
+        string id PK
+        string bookIssueId FK_UK
+        float amount
+        int daysOverdue
+        boolean isPaid
+        datetime paidDate
+        string receiptNumber
+    }
+
+    HOSTEL {
+        string id PK
+        string code UK
+        string name
+        enum gender
+        int capacity
+        string address
+        string wardenId FK
+    }
+
+    HOSTEL_ROOM {
+        string id PK
+        string hostelId FK
+        string roomId FK_UK
+        string roomNumber
+        int floorNumber
+        enum roomType
+        int capacity
+        float monthlyRent
+    }
+
+    HOSTEL_ALLOCATION {
+        string id PK
+        string hostelRoomId FK
+        string studentId FK
+        string bedNumber
+        datetime checkInDate
+        datetime checkOutDate
+        float monthlyFee
+        enum status
+        datetime createdAt
+    }
+
+    VEHICLE {
+        string id PK
+        string plateNumber UK
+        string vehicleModel
+        int capacity
+        enum vehicleType
+        string driverId FK
+        enum status
+    }
+
+    ROUTE {
+        string id PK
+        string code UK
+        string name
+        string startLocation
+        string endLocation
+        string vehicleId FK
+    }
+
+    ROUTE_STOP {
+        string id PK
+        string routeId FK
+        string stopName
+        int sequenceOrder
+        string pickupTime
+        string dropTime
+        float fareAmount
+    }
+
+    TRANSPORT_SUBSCRIPTION {
+        string id PK
+        string studentId FK
+        string employeeId FK
+        string routeId FK
+        string stopId FK
+        float fee
+        datetime startDate
+        datetime endDate
+        enum status
+    }
+
+    COMPANY {
+        string id PK
+        string name
+        string industry
+        string website
+        string contactPerson
+        string contactEmail
+        string contactPhone
+        string address
+        datetime createdAt
+    }
+
+    JOB_POSTING {
+        string id PK
+        string companyId FK
+        string title
+        string jobType
+        string description
+        string requirements
+        string location
+        string salaryRange
+        datetime applicationDeadline
+        datetime createdAt
+    }
+
+    PLACEMENT_APPLICATION {
+        string id PK
+        string jobPostingId FK
+        string studentId FK
+        string resumeUrl
+        string coverLetter
+        enum status
+        datetime appliedAt
+        datetime interviewDate
+        string remarks
+    }
+
+    RESEARCH_PROJECT {
+        string id PK
+        string grantCode UK
+        string title
+        string abstract
+        string fundingAgency
+        float grantAmount
+        enum status
+        datetime startDate
+        datetime endDate
+        datetime createdAt
+    }
+
+    RESEARCH_MEMBER {
+        string id PK
+        string researchProjectId FK
+        string teacherId FK
+        string studentId FK
+        string roleInProject
+        datetime joinedDate
+    }
+
+    PUBLICATION {
+        string id PK
+        string researchProjectId FK
+        string title
+        string authorsList
+        string journalOrConference
+        datetime publicationDate
+        string volume
+        string issue
+        string pages
+        string doiUrl
+        int citationCount
+    }
+
+    DOCUMENT {
+        string id PK
+        string studentId FK
+        string employeeId FK
+        enum documentType
+        string documentName
+        string fileUrl
+        int fileSize
+        string mimeType
+        string verificationCode UK
+        boolean isVerified
+        datetime issuedAt
+        datetime expiresAt
+    }
+
+    CUSTOM_REPORT {
+        string id PK
+        string createdById FK
+        string name
+        string domain
+        json config
+        string chartType
+        boolean isShared
+        datetime createdAt
+        datetime updatedAt
+    }

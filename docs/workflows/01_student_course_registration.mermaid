@@ -1,0 +1,48 @@
+sequenceDiagram
+    autonumber
+    actor Student as 🎓 Student
+    participant Portal as 💻 Student Portal UI
+    participant RegEngine as ⚙️ Registration Service
+    participant PrereqService as 🔍 Prerequisite Engine
+    participant TimetableService as 📅 Timetable Conflict Validator
+    participant DB as 🗄️ PostgreSQL (Prisma)
+
+    Student->>Portal: Accesses Course Registration for Active Semester
+    Portal->>RegEngine: GET /api/v1/offerings?semester=current
+    RegEngine->>DB: Query open offerings & remaining seats
+    DB-->>RegEngine: CourseOfferings List
+    RegEngine-->>Portal: Display available courses & sections
+
+    Student->>Portal: Selects course offerings & sections (e.g. CS201-A, MT102-B)
+    Portal->>RegEngine: POST /api/v1/lms/enrollments/register { studentId, offeringIds }
+
+    Note over RegEngine, PrereqService: 1. Prerequisite Validation
+    RegEngine->>PrereqService: Check CoursePrerequisites for studentId
+    PrereqService->>DB: Query past passed Enrollments (grade != F)
+    DB-->>PrereqService: Passed courses history
+    
+    alt Prerequisite Failed (e.g. CS101 not passed)
+        PrereqService-->>RegEngine: Error: Prerequisite CS101 required with min grade C
+        RegEngine-->>Portal: 422 Unprocessable (Show Prerequisite Error)
+        Portal-->>Student: Display error modal with missing prerequisites
+    else Prerequisites Cleared
+        PrereqService-->>RegEngine: Prerequisite check PASSED
+        
+        Note over RegEngine, TimetableService: 2. Timetable Slot Conflict Check
+        RegEngine->>TimetableService: Check for overlapping TimetableSlots
+        TimetableService->>DB: Query scheduled slots for selected offerings
+        
+        alt Time Conflict Detected (e.g. Mon 09:00 - 10:30 collision)
+            TimetableService-->>RegEngine: Error: Slot clash detected
+            RegEngine-->>Portal: 409 Conflict (Show Clash Details)
+            Portal-->>Student: Highlight overlapping course timings
+        else No Conflicts & Capacity Available
+            TimetableService-->>RegEngine: Schedule check PASSED
+            
+            Note over RegEngine, DB: 3. Atomic Enrollment Transaction
+            RegEngine->>DB: prisma.$transaction [create Enrollment, increment enrolledCount]
+            DB-->>RegEngine: Enrollment records created with status = ENROLLED
+            RegEngine-->>Portal: 201 Created { enrolledCourses, creditHoursTotal }
+            Portal-->>Student: Show Success Dashboard & Updated Weekly Timetable
+        end
+    end
