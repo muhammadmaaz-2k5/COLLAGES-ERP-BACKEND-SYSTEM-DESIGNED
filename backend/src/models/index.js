@@ -6,6 +6,8 @@ const RolePermission = require("./RolePermission");
 const RefreshToken = require("./RefreshToken");
 const AuditLog = require("./AuditLog");
 const Student = require("./Student");
+const Department = require("./Department");
+const { Program, DegreeRequirement } = require("./Program");
 const Course = require("./Course");
 const CoursePrerequisite = require("./CoursePrerequisite");
 const CourseOffering = require("./CourseOffering");
@@ -39,6 +41,16 @@ AuditLog.belongsTo(User, { foreignKey: "userId", as: "user" });
 // Student & Academic Associations
 User.hasOne(Student, { foreignKey: "userId", as: "student" });
 Student.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+Department.hasMany(Program, { foreignKey: "departmentId", as: "programs" });
+Program.belongsTo(Department, { foreignKey: "departmentId", as: "department" });
+
+Department.hasMany(Course, { foreignKey: "departmentId", as: "courses" });
+Course.belongsTo(Department, { foreignKey: "departmentId", as: "departmentObj" });
+
+Program.hasMany(DegreeRequirement, { foreignKey: "programId", as: "requirements" });
+DegreeRequirement.belongsTo(Program, { foreignKey: "programId", as: "program" });
+DegreeRequirement.belongsTo(Course, { foreignKey: "courseId", as: "course" });
 
 Course.hasMany(CourseOffering, { foreignKey: "courseId", as: "offerings" });
 CourseOffering.belongsTo(Course, { foreignKey: "courseId", as: "course" });
@@ -83,6 +95,9 @@ module.exports = {
   RefreshToken,
   AuditLog,
   Student,
+  Department,
+  Program,
+  DegreeRequirement,
   Course,
   CoursePrerequisite,
   CourseOffering,

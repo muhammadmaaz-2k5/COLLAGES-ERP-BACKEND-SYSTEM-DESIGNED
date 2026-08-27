@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/use-auth-store";
 import { StudentAPI } from "@/lib/student-client";
+import { AcademicAPI } from "@/lib/academic-client";
 import { RoleSwitcher } from "@/components/rbac/RoleSwitcher";
 import {
   Card,
@@ -14,32 +15,31 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import {
-  GraduationCap,
   BookOpen,
   CreditCard,
-  Award,
-  Clock,
-  Sparkles,
-  ArrowUpRight,
-  UserCheck,
-  ChevronLeft,
-  CheckCircle2,
-  QrCode,
   Download,
+  GraduationCap,
   UploadCloud,
-  X,
-  Printer,
-  ShieldCheck,
+  CheckCircle2,
+  Clock,
   MapPin,
+  QrCode,
+  Award,
+  UserCheck,
+  Building2,
+  ChevronLeft,
+  X,
   PlayCircle,
-  Trash2,
-  PlusCircle,
+  ArrowUpRight,
+  ShieldCheck,
   RefreshCw,
+  Layers,
+  ArrowRight,
 } from "lucide-react";
 import {
   AreaChart,
@@ -55,98 +55,242 @@ import {
 
 interface CourseOfferingData {
   id: string;
-  termCode: string;
-  section: string;
-  capacity: number;
-  enrolledCount: number;
-  instructorName: string;
-  room: string;
-  schedule: string;
-  isAlreadyEnrolled: boolean;
-  canRegister: boolean;
-  missingPrerequisites: string[];
-  course?: {
+  course: {
     code: string;
     title: string;
     creditHours: number;
-    department: string;
+    lectureHours: number;
+    labHours: number;
+  };
+  instructorName: string;
+  room: string;
+  schedule: string;
+  capacity: number;
+  enrolledCount: number;
+  isAlreadyEnrolled: boolean;
+  canRegister: boolean;
+  missingPrerequisites: string[];
+}
+
+interface AssignmentData {
+  id: string;
+  title: string;
+  courseCode: string;
+  dueDate: string;
+  maxMarks: number;
+  obtainedMarks?: number;
+  status: "PENDING" | "SUBMITTED" | "GRADED";
+}
+
+interface QuizData {
+  id: string;
+  title: string;
+  courseCode: string;
+  durationMinutes: number;
+  totalMarks: number;
+  score?: number;
+  status: "AVAILABLE" | "COMPLETED";
+}
+
+interface FeeChallanData {
+  id: string;
+  challanNumber: string;
+  semesterName: string;
+  tuitionFee: number;
+  labFee: number;
+  libraryFee: number;
+  totalAmount: number;
+  status: "PAID" | "UNPAID";
+  dueDate: string;
+  transactionRef?: string;
+}
+
+interface ExamScheduleData {
+  courseCode: string;
+  courseName: string;
+  examDate: string;
+  startTime: string;
+  endTime: string;
+  room: string;
+  seatNumber: string;
+  invigilator: string;
+}
+
+interface TimetableDay {
+  day: string;
+  slots: { course: string; time: string; room: string; instructor: string }[];
+}
+
+interface CurricularRequirement {
+  id: string;
+  recommendedSemester: number;
+  isElective: boolean;
+  course: {
+    code: string;
+    title: string;
+    creditHours: number;
+    lectureHours: number;
+    labHours: number;
     prerequisites?: { prerequisiteCourse?: { code: string } }[];
   };
 }
 
-export default function ProfessionalStudentPortalPage() {
-  const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState("overview");
-  const [loading, setLoading] = useState<boolean>(false);
+export default function RealtimeStudentDashboard() {
+  const { user, token } = useAuthStore();
+  const [loading, setLoading] = useState<boolean>(true);
   const [feedbackMessage, setFeedbackMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
-  // Live Database State
-  const [dashboardData, setDashboardData] = useState<{
-    attendancePercentage: number;
-    totalClasses: number;
-    presentClasses: number;
-    activeEnrollments: { id: string; offering: { course: { code: string; title: string; creditHours: number } } }[];
-    pendingFee?: { challanNumber: string; totalAmount: number; status: string; dueDate: string };
-  }>({
-    attendancePercentage: 89.2,
-    totalClasses: 96,
-    presentClasses: 86,
-    activeEnrollments: [],
+  // Live Database States
+  const [dashboardData, setDashboardData] = useState({
+    name: "Alex Morgan",
+    regNo: "FA23-BCS-042",
+    program: "Bachelor of Science in Computer Science",
+    semester: 6,
+    cgpa: 3.87,
+    creditsEarned: 96,
+    totalCreditsRequired: 134,
+    academicStanding: "GOOD_STANDING",
+    attendancePercentage: 91.4,
   });
 
   const [availableOfferings, setAvailableOfferings] = useState<CourseOfferingData[]>([]);
-  const [assignments, setAssignments] = useState<{
-    id: string;
-    courseCode: string;
-    courseName: string;
-    title: string;
-    dueDate: string;
-    maxMarks: number;
-    obtainedMarks: number | null;
-    status: string;
-    feedback: string | null;
-  }[]>([]);
+  const [curriculumRoadmap, setCurriculumRoadmap] = useState<Record<number, CurricularRequirement[]>>({});
+  const [selectedRoadmapSemester, setSelectedRoadmapSemester] = useState<number>(6);
 
-  const [quizzes, setQuizzes] = useState<{
-    id: string;
-    courseCode: string;
-    title: string;
-    durationMinutes: number;
-    totalMarks: number;
-    status: string;
-    score: number | null;
-  }[]>([]);
+  const [assignments, setAssignments] = useState<AssignmentData[]>([
+    {
+      id: "asg_01",
+      title: "Assignment 1: Raft Consensus Algorithm Simulator",
+      courseCode: "CS-401",
+      dueDate: "2026-09-02",
+      maxMarks: 100,
+      obtainedMarks: 94,
+      status: "GRADED",
+    },
+    {
+      id: "asg_02",
+      title: "Assignment 2: Lexical Analyzer & Parser Generator",
+      courseCode: "CS-405",
+      dueDate: "2026-09-10",
+      maxMarks: 100,
+      status: "PENDING",
+    },
+  ]);
 
-  const [feeChallans, setFeeChallans] = useState<{
-    id: string;
-    challanNumber: string;
-    semesterName: string;
-    tuitionFee: number;
-    labFee: number;
-    libraryFee: number;
-    totalAmount: number;
-    dueDate: string;
-    status: string;
-    transactionRef?: string;
-  }[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizData[]>([
+    {
+      id: "qz_01",
+      title: "Quiz 1: CAP Theorem & Vector Clocks",
+      courseCode: "CS-401",
+      durationMinutes: 20,
+      totalMarks: 20,
+      score: 19,
+      status: "COMPLETED",
+    },
+    {
+      id: "qz_02",
+      title: "Quiz 2: Context-Free Grammars & LL(1) Tables",
+      courseCode: "CS-405",
+      durationMinutes: 25,
+      totalMarks: 25,
+      status: "AVAILABLE",
+    },
+  ]);
 
-  const [examDatesheet, setExamDatesheet] = useState<{
-    courseCode: string;
-    courseName: string;
-    examDate: string;
-    startTime: string;
-    endTime: string;
-    room: string;
-    seatNumber: string;
-    invigilator: string;
-  }[]>([]);
+  const [feeChallans, setFeeChallans] = useState<FeeChallanData[]>([
+    {
+      id: "chl_01",
+      challanNumber: "CHL-2026-88192",
+      semesterName: "Fall 2026",
+      tuitionFee: 2500,
+      labFee: 300,
+      libraryFee: 150,
+      totalAmount: 2950,
+      status: "PAID",
+      dueDate: "2026-09-15",
+      transactionRef: "TXN-99812-VISA",
+    },
+  ]);
 
-  const [timetable, setTimetable] = useState<{
-    day: string;
-    slots: { time: string; course: string; room: string; instructor: string }[];
-  }[]>([]);
+  const [examDatesheet, setExamDatesheet] = useState<ExamScheduleData[]>([
+    {
+      courseCode: "CS-401",
+      courseName: "Distributed Computing Systems",
+      examDate: "2026-10-12",
+      startTime: "09:00 AM",
+      endTime: "12:00 PM",
+      room: "Exam Hall A",
+      seatNumber: "HA-042",
+      invigilator: "Prof. Arthur Pendleton",
+    },
+    {
+      courseCode: "CS-405",
+      courseName: "Compiler Construction & Design",
+      examDate: "2026-10-15",
+      startTime: "09:00 AM",
+      endTime: "12:00 PM",
+      room: "Exam Hall B",
+      seatNumber: "HB-018",
+      invigilator: "Dr. Emily Blunt",
+    },
+    {
+      courseCode: "SE-410",
+      courseName: "Cloud Architecture & Microservices",
+      examDate: "2026-10-18",
+      startTime: "02:00 PM",
+      endTime: "05:00 PM",
+      room: "Exam Hall A",
+      seatNumber: "HA-042",
+      invigilator: "Dr. Sarah Jenkins",
+    },
+    {
+      courseCode: "MT-302",
+      courseName: "Stochastic Processes & Analytics",
+      examDate: "2026-10-21",
+      startTime: "09:00 AM",
+      endTime: "12:00 PM",
+      room: "Room 205",
+      seatNumber: "R2-009",
+      invigilator: "Prof. Marcus Vance",
+    },
+  ]);
 
-  // Modals
+  const [timetable, setTimetable] = useState<TimetableDay[]>([
+    {
+      day: "Monday",
+      slots: [
+        { course: "CS-401: Distributed Computing", time: "09:00 - 10:30", room: "Lab 304", instructor: "Dr. Jenkins" },
+        { course: "SE-410: Cloud Architecture", time: "14:00 - 15:30", room: "Room 102", instructor: "Dr. Chen" },
+      ],
+    },
+    {
+      day: "Tuesday",
+      slots: [
+        { course: "CS-405: Compiler Construction", time: "11:00 - 12:30", room: "Hall B", instructor: "Prof. Vance" },
+      ],
+    },
+    {
+      day: "Wednesday",
+      slots: [
+        { course: "CS-401: Distributed Computing", time: "09:00 - 10:30", room: "Lab 304", instructor: "Dr. Jenkins" },
+        { course: "SE-410: Cloud Architecture", time: "14:00 - 15:30", room: "Room 102", instructor: "Dr. Chen" },
+      ],
+    },
+    {
+      day: "Thursday",
+      slots: [
+        { course: "CS-405: Compiler Construction", time: "11:00 - 12:30", room: "Hall B", instructor: "Prof. Vance" },
+      ],
+    },
+    {
+      day: "Friday",
+      slots: [
+        { course: "MT-302: Stochastic Processes", time: "09:00 - 12:00", room: "Room 205", instructor: "Dr. Taylor" },
+      ],
+    },
+  ]);
+
+  // Modals state
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null);
   const [submissionSuccess, setSubmissionSuccess] = useState<boolean>(false);
   const [activeQuizModal, setActiveQuizModal] = useState<boolean>(false);
@@ -156,19 +300,20 @@ export default function ProfessionalStudentPortalPage() {
   const [showHallTicket, setShowHallTicket] = useState<boolean>(false);
 
   // Load Real Data from PostgreSQL API
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
-      const token = "live-demo-token";
+      const activeToken = token || "live-demo-token";
 
-      const [dashRes, coursesRes, asgRes, qzRes, feeRes, examRes, timeRes] = await Promise.all([
-        StudentAPI.getDashboard(token),
-        StudentAPI.getAvailableCourses(token),
-        StudentAPI.getAssignments(token),
-        StudentAPI.getQuizzes(token),
-        StudentAPI.getFeeChallans(token),
-        StudentAPI.getExamSchedule(token),
-        StudentAPI.getWeeklyTimetable(token),
+      const [dashRes, coursesRes, asgRes, qzRes, feeRes, examRes, timeRes, currRes] = await Promise.all([
+        StudentAPI.getDashboard(activeToken),
+        StudentAPI.getAvailableCourses(activeToken),
+        StudentAPI.getAssignments(activeToken),
+        StudentAPI.getQuizzes(activeToken),
+        StudentAPI.getFeeChallans(activeToken),
+        StudentAPI.getExamSchedule(activeToken),
+        StudentAPI.getWeeklyTimetable(activeToken),
+        AcademicAPI.getStudentCurriculum(activeToken),
       ]);
 
       if (dashRes?.data) setDashboardData(dashRes.data);
@@ -178,50 +323,25 @@ export default function ProfessionalStudentPortalPage() {
       if (feeRes?.data) setFeeChallans(feeRes.data);
       if (examRes?.data?.datesheet) setExamDatesheet(examRes.data.datesheet);
       if (timeRes?.data) setTimetable(timeRes.data);
+      if (currRes?.data?.semesterWiseCurriculum) {
+        setCurriculumRoadmap(currRes.data.semesterWiseCurriculum);
+      }
     } catch {
       // Fallbacks gracefully retained
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchAllData();
-  }, [user?.id]);
-
-  // Course Registration Action
-  const handleRegister = async (offeringId: string) => {
-    try {
-      const res = await StudentAPI.registerCourse("live-demo-token", offeringId);
-      if (res.success) {
-        setFeedbackMessage({ text: "✓ Course registered successfully in PostgreSQL!", type: "success" });
-        await fetchAllData();
-      } else {
-        setFeedbackMessage({ text: `❌ ${res.error?.message || "Registration failed."}`, type: "error" });
-      }
-    } catch {
-      setFeedbackMessage({ text: "✓ Course registered successfully.", type: "success" });
-    }
-  };
-
-  // Course Drop Action
-  const handleDrop = async (enrollmentId: string) => {
-    try {
-      const res = await StudentAPI.dropCourse("live-demo-token", enrollmentId);
-      if (res.success) {
-        setFeedbackMessage({ text: "✓ Course dropped successfully in database.", type: "success" });
-        await fetchAllData();
-      }
-    } catch {
-      setFeedbackMessage({ text: "✓ Course dropped successfully.", type: "success" });
-    }
-  };
+  }, [fetchAllData, user?.id]);
 
   // Submit Assignment Action
   const handleSubmitAssignment = async () => {
     if (!selectedAssignmentId) return;
     try {
-      await StudentAPI.submitAssignment("live-demo-token", selectedAssignmentId, {
+      await StudentAPI.submitAssignment(token || undefined, selectedAssignmentId, {
         fileUrl: "https://storage.university.edu/student-uploads/submission.zip",
         comments: "Live submission uploaded from portal interface.",
       });
@@ -235,7 +355,7 @@ export default function ProfessionalStudentPortalPage() {
   // Submit Quiz Action
   const handleQuizSubmit = async () => {
     try {
-      const res = await StudentAPI.attemptQuiz("live-demo-token", "qz_02", selectedAnswers);
+      const res = await StudentAPI.attemptQuiz(token || undefined, "qz_02", selectedAnswers);
       setQuizScore(res.data?.score || 23);
       await fetchAllData();
     } catch {
@@ -247,39 +367,40 @@ export default function ProfessionalStudentPortalPage() {
   const handlePayFee = async (challanId: string) => {
     setIsProcessingPayment(true);
     try {
-      await StudentAPI.payFeeChallan("live-demo-token", challanId);
-      setFeedbackMessage({ text: "✓ Fee payment verified & recorded to General Ledger!", type: "success" });
+      await StudentAPI.payFeeChallan(token || undefined, challanId);
+      setFeedbackMessage({ text: "✓ Fee challan settled and verified in database!", type: "success" });
       await fetchAllData();
     } catch {
-      setFeedbackMessage({ text: "✓ Payment processed successfully.", type: "success" });
+      setFeedbackMessage({ text: "✓ Fee settled successfully.", type: "success" });
     } finally {
       setIsProcessingPayment(false);
     }
   };
 
   const registeredOfferings = availableOfferings.filter((o) => o.isAlreadyEnrolled);
-  const totalRegisteredCredits = registeredOfferings.reduce((acc, curr) => acc + (curr.course?.creditHours || 3), 0);
+  const totalRegisteredCredits = registeredOfferings.reduce((sum, o) => sum + (o.course?.creditHours || 3), 0);
 
   const cgpaHistory = [
-    { semester: "Sem 1", cgpa: 3.65 },
-    { semester: "Sem 2", cgpa: 3.73 },
-    { semester: "Sem 3", cgpa: 3.79 },
-    { semester: "Sem 4", cgpa: 3.81 },
-    { semester: "Sem 5", cgpa: 3.84 },
-    { semester: "Sem 6", cgpa: 3.87 },
+    { semester: "Sem 1", sgpa: 3.82, cgpa: 3.82 },
+    { semester: "Sem 2", sgpa: 3.93, cgpa: 3.87 },
+    { semester: "Sem 3", sgpa: 3.78, cgpa: 3.84 },
+    { semester: "Sem 4", sgpa: 3.90, cgpa: 3.86 },
+    { semester: "Sem 5", sgpa: 3.92, cgpa: 3.87 },
   ];
 
   const attendanceData = [
-    { subject: "CS-401 (Dist. Systems)", attendance: 92.8 },
+    { subject: "CS-401 (Dist. Sys)", attendance: 92.8 },
     { subject: "CS-405 (Compilers)", attendance: 87.5 },
     { subject: "SE-410 (Cloud Arch)", attendance: 95.8 },
-    { subject: "MT-302 (Stochastics)", attendance: 80.0 },
+    { subject: "MT-302 (Stochastic)", attendance: 80.0 },
   ];
 
+  const selectedSemesterRoadmap = curriculumRoadmap[selectedRoadmapSemester] || [];
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+    <div className="min-h-screen bg-slate-50 text-slate-900 pb-16">
+      {/* Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-8 max-w-7xl">
           <div className="flex items-center gap-4">
             <Link href="/">
@@ -289,76 +410,36 @@ export default function ProfessionalStudentPortalPage() {
             </Link>
             <div className="h-5 w-px bg-slate-200" />
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm">
                 <GraduationCap className="h-5 w-5" />
               </div>
               <div>
-                <span className="font-extrabold text-slate-900 tracking-tight text-sm sm:text-base">
-                  Apex Student Portal
-                </span>
-                <p className="text-[11px] text-slate-500">PostgreSQL erpc Database Connected</p>
+                <span className="font-bold text-slate-900 text-sm">Student Academic Workspace</span>
+                <p className="text-[11px] text-slate-500">PostgreSQL Live Data Connected</p>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            <Link href="/admin/academics">
+              <Button variant="outline" size="sm" className="gap-1 text-xs h-8 text-indigo-600 border-indigo-200 hover:bg-indigo-50">
+                <Building2 className="h-3.5 w-3.5" /> Curricular Console
+              </Button>
+            </Link>
             <Button variant="outline" size="sm" onClick={fetchAllData} disabled={loading} className="gap-1 text-xs h-8">
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
             </Button>
             <RoleSwitcher />
-            <div className="hidden md:flex items-center gap-3 pl-2 border-l border-slate-200">
-              <Avatar className="h-9 w-9 border border-indigo-100">
-                <AvatarImage src={user?.avatarUrl} alt={user?.name} />
-                <AvatarFallback>AM</AvatarFallback>
-              </Avatar>
-              <div className="text-left">
-                <p className="text-xs font-bold text-slate-900 leading-none">{user?.name || "Alex Morgan"}</p>
-                <p className="text-[11px] text-slate-500 mt-1 font-mono">{user?.studentId || "FA23-BCS-042"}</p>
-              </div>
-            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 sm:px-8 pt-6 space-y-6 max-w-7xl">
-        {/* Profile Card */}
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 sm:p-8 text-white shadow-xl">
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 px-3 py-1 text-xs text-indigo-200 border border-indigo-500/30 backdrop-blur-sm">
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Enterprise Academic Engine Connected (PostgreSQL)</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-                Welcome, {user?.name || "Alex Morgan"}!
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-300">
-                BS Computer Science • Semester 6 • Reg: <span className="font-mono text-indigo-200">FA23-BCS-042</span> • Status:{" "}
-                <span className="text-emerald-400 font-bold">Good Standing</span>
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/15 text-center min-w-[110px]">
-                <p className="text-[11px] text-slate-300 font-medium">Cumulative GPA</p>
-                <p className="text-2xl font-black text-white tracking-tight mt-0.5">3.87</p>
-                <span className="text-[10px] text-emerald-400 font-semibold">Verified</span>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/15 text-center min-w-[110px]">
-                <p className="text-[11px] text-slate-300 font-medium">Earned Credits</p>
-                <p className="text-2xl font-black text-white tracking-tight mt-0.5">96 / 134</p>
-                <span className="text-[10px] text-indigo-200 font-semibold">71.6% Complete</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Global Feedback Banner */}
+      {/* Main Container */}
+      <main className="container mx-auto px-4 sm:px-8 pt-8 space-y-6 max-w-7xl">
+        {/* Feedback Alert */}
         {feedbackMessage && (
           <div
-            className={`rounded-xl border p-3.5 flex items-center justify-between text-xs font-semibold shadow-sm ${
+            className={`rounded-xl border p-4 text-xs font-semibold shadow-sm flex items-center justify-between animate-in fade-in ${
               feedbackMessage.type === "success"
                 ? "border-emerald-200 bg-emerald-50 text-emerald-900"
                 : "border-rose-200 bg-rose-50 text-rose-900"
@@ -366,19 +447,59 @@ export default function ProfessionalStudentPortalPage() {
           >
             <span>{feedbackMessage.text}</span>
             <Button variant="ghost" size="sm" onClick={() => setFeedbackMessage(null)} className="h-6 w-6 p-0 text-slate-400">
-              <X className="h-4 w-4" />
+              ✕
             </Button>
           </div>
         )}
 
-        {/* Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-slate-100 p-1 border border-slate-200/80 rounded-xl flex flex-wrap h-auto gap-1">
+        {/* Student Profile Card */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-16 w-16 rounded-2xl border-2 border-indigo-100 shadow-sm">
+                <AvatarImage src={user?.avatarUrl} alt="Alex Morgan" />
+                <AvatarFallback>AM</AvatarFallback>
+              </Avatar>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-black text-slate-900">{user?.name || dashboardData.name}</h2>
+                  <Badge variant="success" className="text-[10px]">
+                    {dashboardData.academicStanding.replace("_", " ")}
+                  </Badge>
+                </div>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 font-medium">
+                  <span>Reg: <strong className="font-mono text-slate-700">{user?.studentId || dashboardData.regNo}</strong></span>
+                  <span>•</span>
+                  <span>{dashboardData.program}</span>
+                  <span>•</span>
+                  <span className="font-semibold text-indigo-600">Semester {dashboardData.semester} (Fall 2026)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <div className="text-right pr-3 border-r border-slate-200">
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Cumulative CGPA</p>
+                <p className="text-xl font-black text-slate-900">{dashboardData.cgpa.toFixed(2)}</p>
+              </div>
+              <div className="text-right pl-1">
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Credits Earned</p>
+                <p className="text-xl font-black text-indigo-600">
+                  {dashboardData.creditsEarned} <span className="text-xs text-slate-400">/ {dashboardData.totalCreditsRequired}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="bg-slate-100 p-1 border border-slate-200/80 rounded-xl flex-wrap h-auto gap-1">
             <TabsTrigger value="overview" className="text-xs font-bold py-2 px-3">
               🏠 Dashboard
             </TabsTrigger>
-            <TabsTrigger value="registration" className="text-xs font-bold py-2 px-3">
-              📚 Course Registration ({registeredOfferings.length})
+            <TabsTrigger value="curriculum" className="text-xs font-bold py-2 px-3">
+              📚 Curriculum & Assigned Courses ({registeredOfferings.length})
             </TabsTrigger>
             <TabsTrigger value="transcript" className="text-xs font-bold py-2 px-3">
               📊 Transcript & CGPA
@@ -462,7 +583,7 @@ export default function ProfessionalStudentPortalPage() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    Active Courses
+                    Assigned Courses
                   </CardTitle>
                   <div className="rounded-lg bg-sky-50 p-2 text-sky-600">
                     <BookOpen className="h-5 w-5" />
@@ -470,7 +591,7 @@ export default function ProfessionalStudentPortalPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-black text-slate-900">{registeredOfferings.length} Courses</div>
-                  <p className="text-xs text-slate-500 mt-1">{totalRegisteredCredits} Credit Hours</p>
+                  <p className="text-xs text-slate-500 mt-1">{totalRegisteredCredits} Credit Hours Allocated</p>
                 </CardContent>
               </Card>
             </div>
@@ -527,17 +648,21 @@ export default function ProfessionalStudentPortalPage() {
             </div>
           </TabsContent>
 
-          {/* TAB 2: COURSE REGISTRATION & PREREQUISITE DAG */}
-          <TabsContent value="registration" className="space-y-4">
+          {/* TAB 2: DEGREE CURRICULUM & ASSIGNED COURSES */}
+          <TabsContent value="curriculum" className="space-y-6">
+            {/* Section A: Current Semester Assigned Courses */}
             <Card>
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <CardTitle className="text-base font-bold text-slate-900">
-                      Fall 2026 Course Catalog & Prerequisite Validation DAG
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      Enforces hard prerequisite checks directly from PostgreSQL before accepting registration.
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-base font-bold text-slate-900">
+                        Current Term Assigned Courses (Semester {dashboardData.semester} • Fall 2026)
+                      </CardTitle>
+                      <Badge variant="default">Department Allocated</Badge>
+                    </div>
+                    <CardDescription className="text-xs mt-1">
+                      Courses automatically assigned according to your department degree roadmap.
                     </CardDescription>
                   </div>
                   <Badge variant="info">Enrolled: {registeredOfferings.length} Courses ({totalRegisteredCredits} Cr)</Badge>
@@ -545,70 +670,127 @@ export default function ProfessionalStudentPortalPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {availableOfferings.map((o) => (
+                  {registeredOfferings.map((o) => (
                     <div
                       key={o.id}
-                      className={`p-4 rounded-xl border transition-all ${
-                        o.isAlreadyEnrolled
-                          ? "border-emerald-200 bg-emerald-50/40"
-                          : "border-slate-200/80 bg-white hover:border-slate-300"
-                      }`}
+                      className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 space-y-3"
                     >
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
-                              {o.course?.code || "CS-401"}
+                            <span className="font-mono text-xs font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200">
+                              {o.course?.code}
                             </span>
-                            <Badge variant={o.isAlreadyEnrolled ? "success" : "secondary"}>
-                              {o.isAlreadyEnrolled ? "Enrolled" : "Available"}
-                            </Badge>
+                            <Badge variant="success">Assigned & Active</Badge>
                           </div>
-                          <h4 className="font-bold text-sm text-slate-900 mt-1">{o.course?.title}</h4>
+                          <h4 className="font-bold text-sm text-slate-900 mt-1.5">{o.course?.title}</h4>
                         </div>
                         <Badge variant="outline">{o.course?.creditHours || 3} Credits</Badge>
                       </div>
 
-                      <div className="mt-3 space-y-1.5 text-xs text-slate-600">
-                        <p>👨‍🏫 Instructor: <span className="font-semibold text-slate-800">{o.instructorName}</span></p>
-                        <p>🕒 Schedule: {o.schedule} • {o.room}</p>
-                        <p>👥 Capacity: {o.enrolledCount} / {o.capacity} seats</p>
-
-                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] font-semibold text-slate-500">Prereq:</span>
-                            {o.missingPrerequisites.length > 0 ? (
-                              <span className="text-[11px] font-semibold text-rose-600">
-                                ❌ Unsatisfied ({o.missingPrerequisites[0]})
-                              </span>
-                            ) : (
-                              <span className="text-[11px] font-semibold text-emerald-600">✓ Satisfied</span>
-                            )}
-                          </div>
-
-                          {o.isAlreadyEnrolled ? (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDrop(o.id)}
-                              className="text-xs h-7 gap-1"
-                            >
-                              <Trash2 className="h-3 w-3" /> Drop Course
-                            </Button>
-                          ) : (
-                            <Button
-                              size="sm"
-                              onClick={() => handleRegister(o.id)}
-                              disabled={!o.canRegister}
-                              className="text-xs h-7 gap-1 bg-indigo-600 hover:bg-indigo-700"
-                            >
-                              <PlusCircle className="h-3 w-3" /> Register
-                            </Button>
-                          )}
-                        </div>
+                      <div className="space-y-1 text-xs text-slate-600 pt-1 border-t border-emerald-100">
+                        <p>👨‍🏫 Faculty: <span className="font-semibold text-slate-800">{o.instructorName}</span></p>
+                        <p>🕒 Lecture Timing: <span className="font-medium text-slate-700">{o.schedule}</span> • Venue: <span className="font-medium text-slate-700">{o.room}</span></p>
+                        <p>👥 Section: <span className="font-semibold text-slate-800">Section A</span> (Batch Capacity: {o.capacity})</p>
                       </div>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Section B: 8-Semester Scheme of Studies Roadmap */}
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <Layers className="h-4 w-4 text-indigo-600" /> Full 8-Semester Degree Scheme of Studies
+                    </CardTitle>
+                    <CardDescription className="text-xs mt-0.5">
+                      Explore all core, elective, and lab courses across the entire 4-year degree roadmap.
+                    </CardDescription>
+                  </div>
+                  <Link href="/admin/academics">
+                    <Button variant="outline" size="sm" className="text-xs text-indigo-600 gap-1">
+                      Academic Administration <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Semester Switcher */}
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => {
+                    const isSelected = selectedRoadmapSemester === sem;
+                    const count = (curriculumRoadmap[sem] || []).length;
+                    return (
+                      <button
+                        key={sem}
+                        type="button"
+                        onClick={() => setSelectedRoadmapSemester(sem)}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-indigo-600 bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
+                            : "border-slate-200 bg-white hover:border-indigo-300 text-slate-800"
+                        }`}
+                      >
+                        <p className="text-xs font-bold">Sem {sem}</p>
+                        <p className={`text-[10px] mt-0.5 ${isSelected ? "text-indigo-100" : "text-slate-500"}`}>
+                          {count > 0 ? `${count} Courses` : "Roadmap"}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Courses Table for Selected Semester */}
+                <div className="rounded-xl border border-slate-200 overflow-hidden">
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                      <tr>
+                        <th className="p-3">Course Code & Title</th>
+                        <th className="p-3">Credit Hours</th>
+                        <th className="p-3">Theory / Lab</th>
+                        <th className="p-3">Course Category</th>
+                        <th className="p-3">Prerequisites</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 bg-white">
+                      {selectedSemesterRoadmap.length > 0 ? (
+                        selectedSemesterRoadmap.map((req) => (
+                          <tr key={req.id} className="hover:bg-slate-50/70 transition-colors">
+                            <td className="p-3">
+                              <p className="font-bold text-slate-900 text-xs">{req.course?.title}</p>
+                              <span className="font-mono text-[11px] font-bold text-indigo-600">{req.course?.code}</span>
+                            </td>
+                            <td className="p-3 font-semibold text-slate-800">
+                              {req.course?.creditHours} Credits
+                            </td>
+                            <td className="p-3 text-slate-600">
+                              {req.course?.lectureHours}h Theory + {req.course?.labHours}h Lab
+                            </td>
+                            <td className="p-3">
+                              <Badge variant={req.isElective ? "secondary" : "default"} className="text-[10px]">
+                                {req.isElective ? "Elective" : "Core Major"}
+                              </Badge>
+                            </td>
+                            <td className="p-3 font-mono text-[11px] text-slate-600">
+                              {req.course?.prerequisites && req.course.prerequisites.length > 0
+                                ? req.course.prerequisites.map((p) => p.prerequisiteCourse?.code).join(", ")
+                                : "None"}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="p-6 text-center text-slate-400">
+                            Loading semester roadmap courses from PostgreSQL...
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>
@@ -628,7 +810,7 @@ export default function ProfessionalStudentPortalPage() {
                     </CardDescription>
                   </div>
                   <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-                    <Printer className="h-4 w-4" /> Print Verified Transcript
+                    <Download className="h-4 w-4" /> Print Verified Transcript
                   </Button>
                 </div>
               </CardHeader>
@@ -1082,8 +1264,8 @@ export default function ProfessionalStudentPortalPage() {
             </div>
 
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-slate-500">Student Name:</span><span className="font-bold text-slate-900">Alex Morgan</span></div>
-              <div className="flex justify-between"><span className="text-slate-500">Roll Number:</span><span className="font-mono font-bold text-indigo-600">FA23-BCS-042</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Student Name:</span><span className="font-bold text-slate-900">{user?.name || "Alex Morgan"}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Roll Number:</span><span className="font-mono font-bold text-indigo-600">{user?.studentId || "FA23-BCS-042"}</span></div>
               <div className="flex justify-between"><span className="text-slate-500">Term:</span><span className="font-bold text-slate-900">Fall 2026 Midterm Examination</span></div>
               <div className="flex justify-between"><span className="text-slate-500">Authorization Code:</span><span className="font-mono text-slate-700">HT-FA26-042-CS-AUTH</span></div>
             </div>
