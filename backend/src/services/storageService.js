@@ -16,10 +16,26 @@ class StorageService {
   }
 
   static getCloudinaryConfig() {
+    let cloudName = process.env.CLOUDINARY_CLOUD_NAME || "itomku0j";
+    let apiKey = process.env.CLOUDINARY_API_KEY || "943764431136496";
+    let apiSecret = process.env.CLOUDINARY_API_SECRET || "CzMT-GZtRRTso6cPBhdW8BFkmVE";
+
+    if (process.env.CLOUDINARY_URL) {
+      try {
+        const parsed = new URL(process.env.CLOUDINARY_URL);
+        cloudName = parsed.hostname || cloudName;
+        apiKey = parsed.username || apiKey;
+        apiSecret = parsed.password || apiSecret;
+      } catch {
+        // Fallback to explicit env vars
+      }
+    }
+
     return {
-      cloudName: process.env.CLOUDINARY_CLOUD_NAME || "apex-university-media",
-      apiKey: process.env.CLOUDINARY_API_KEY || "mock-cloudinary-key",
-      apiSecret: process.env.CLOUDINARY_API_SECRET || "mock-cloudinary-secret",
+      cloudName,
+      apiKey,
+      apiSecret,
+      uploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET || "FOODPANDA",
       secure: process.env.CLOUDINARY_SECURE !== "false",
     };
   }
@@ -89,8 +105,7 @@ class StorageService {
         apiKey: config.apiKey,
         timestamp,
         signature,
-        folder,
-        tags,
+        uploadPreset: config.uploadPreset,
         uploadEndpoint: `https://api.cloudinary.com/v1_1/${config.cloudName}/auto/upload`,
       },
     };
