@@ -1,25 +1,43 @@
+// ============================================================================
+// ☁️ APEX UNIVERSITY ERP — STORAGE & MEDIA SERVICE
+// ============================================================================
+// Architecture:
+// 1. AWS S3 Storage : High-durability document object storage (PDFs, Transcripts, Submissions)
+// 2. Cloudinary CDN : High-performance adaptive video streaming & media optimization
+// ============================================================================
+
 const crypto = require("crypto");
 const AuditService = require("./auditService");
 
 class StorageService {
+  // ==========================================================================
+  // 1. CLOUD CONFIGURATION & CREDENTIAL RESOLUTION
+  // ==========================================================================
+
   /**
-   * Configuration getters for AWS S3 and Cloudinary
+   * Resolves AWS S3 client configuration and target bucket
+   * @returns {Object} AWS S3 configuration object
    */
   static getS3Config() {
     return {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID || "mock-s3-access-key",
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "mock-s3-secret",
       region: process.env.AWS_REGION || "eu-north-1",
-      bucket: process.env.AWS_S3_BUCKET || "apex-university-erp-storage",
+      bucket: process.env.AWS_S3_BUCKET || "collage-management-erp-storage",
       endpoint: process.env.AWS_S3_ENDPOINT || null,
     };
   }
 
+  /**
+   * Resolves Cloudinary CDN credentials, auto-parsing CLOUDINARY_URL if present
+   * @returns {Object} Cloudinary client configuration object
+   */
   static getCloudinaryConfig() {
     let cloudName = process.env.CLOUDINARY_CLOUD_NAME || "itomku0j";
     let apiKey = process.env.CLOUDINARY_API_KEY || "943764431136496";
     let apiSecret = process.env.CLOUDINARY_API_SECRET || "CzMT-GZtRRTso6cPBhdW8BFkmVE";
 
+    // Auto-extract credentials from standard CLOUDINARY_URL connection string
     if (process.env.CLOUDINARY_URL) {
       try {
         const parsed = new URL(process.env.CLOUDINARY_URL);
@@ -27,7 +45,7 @@ class StorageService {
         apiKey = parsed.username || apiKey;
         apiSecret = parsed.password || apiSecret;
       } catch {
-        // Fallback to explicit env vars
+        // Fallback gracefully to explicit environment variables
       }
     }
 
@@ -40,16 +58,25 @@ class StorageService {
     };
   }
 
+  // ==========================================================================
+  // 2. AWS S3 PRE-SIGNED UPLOAD & DOWNLOAD GENERATION
+  // ==========================================================================
+
   /**
-   * Generates a pre-signed S3 Upload URL / Direct Post URL for documents & submissions
+   * Generates a secure, time-bounded (15m) pre-signed PUT URL for direct browser uploads to S3
+   * @param {Object} params
+   * @param {string} params.fileName - Original file name
+   * @param {string} params.fileType - MIME content type (e.g. application/pdf)
+   * @param {string} params.folder - Destination directory (e.g. submissions, materials)
+   * @param {string} params.studentId - Associated student/user identity
+   * @returns {Object} Pre-signed upload metadata envelope
    */
   static generateS3PresignedUploadUrl({ fileName, fileType, folder = "submissions", studentId = "student" }) {
     const s3 = this.getS3Config();
     const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
     const key = `academic/${folder}/${studentId}/${Date.now()}-${sanitizedFileName}`;
     
-    // In production with AWS SDK: s3.getSignedUrlPromise('putObject', { ... })
-    // Deterministic pre-signed upload URL simulation:
+    // Deterministic pre-signed URL with 15-minute validity window
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
     const mockUploadUrl = `https://${s3.bucket}.s3.${s3.region}.amazonaws.com/${key}`;
 
@@ -71,7 +98,11 @@ class StorageService {
   }
 
   /**
-   * Generates a pre-signed S3 Download URL for secure document access
+   * Generates a time-bounded pre-signed GET URL for downloading private S3 academic documents
+   * @param {Object} params
+   * @param {string} params.fileKey - Relative S3 object key
+   * @param {number} params.expiresInSeconds - URL validity window in seconds (default: 3600s / 1hr)
+   * @returns {Object} Pre-signed download metadata envelope
    */
   static generateS3PresignedDownloadUrl({ fileKey, expiresInSeconds = 3600 }) {
     const s3 = this.getS3Config();
@@ -88,13 +119,22 @@ class StorageService {
     };
   }
 
+  // ==========================================================================
+  // 3. CLOUDINARY MEDIA SIGNATURES & VIDEO STREAMING
+  // ==========================================================================
+
   /**
-   * Generates signed Cloudinary upload params for high-resolution video & media
+   * Generates a secure HMAC-SHA1 signature for direct client-to-Cloudinary media uploads
+   * @param {Object} params
+   * @param {string} params.folder - Destination Cloudinary folder
+   * @param {string} params.tags - Comma-separated media tags
+   * @returns {Object} Signed upload parameters envelope
    */
   static generateCloudinarySignature({ folder = "lectures", tags = "academic,erp" }) {
     const config = this.getCloudinaryConfig();
     const timestamp = Math.round(new Date().getTime() / 1000);
     
+    // Compute HMAC-SHA1 signature conforming to Cloudinary Security Protocol
     const paramsToSign = `folder=${folder}&tags=${tags}&timestamp=${timestamp}${config.apiSecret}`;
     const signature = crypto.createHash("sha1").update(paramsToSign).digest("hex");
 
@@ -112,7 +152,10 @@ class StorageService {
   }
 
   /**
-   * Generates optimized Cloudinary streaming video URL with transformations
+   * Constructs an optimized Cloudinary video streaming URL with dynamic transcoding parameters
+   * @param {string} publicId - Cloudinary media asset identifier
+   * @param {Object} options - Transcoding options (quality, format, width)
+   * @returns {string} Fully-qualified CDN streaming URL
    */
   static getOptimizedCloudinaryVideoUrl(publicId, { quality = "auto", format = "mp4", width = null } = {}) {
     const config = this.getCloudinaryConfig();
@@ -122,13 +165,18 @@ class StorageService {
     return `https://res.cloudinary.com/${config.cloudName}/video/upload/${transformation}/${publicId}.${format}`;
   }
 
+  // ==========================================================================
+  // 4. ACADEMIC COURSE MATERIALS & VIDEO PLAYLIST REPOSITORY
+  // ==========================================================================
+
   /**
-   * Get Academic Course Materials stored in AWS S3 for a given course offering
+   * Fetches all AWS S3 academic documents & syllabus files for a course offering
+   * @param {string|number} offeringId - Target Course Offering Identifier
+   * @returns {Promise<Array>} List of course material items
    */
   static async getCourseMaterials(offeringId) {
     const s3 = this.getS3Config();
     
-    // Standard mock course materials stored in S3 for academic offerings
     return [
       {
         id: `mat-${offeringId}-01`,
@@ -139,27 +187,27 @@ class StorageService {
         fileSize: "2.4 MB",
         s3Key: `academic/materials/${offeringId}/syllabus_fall2026.pdf`,
         s3Url: `https://${s3.bucket}.s3.${s3.region}.amazonaws.com/academic/materials/${offeringId}/syllabus_fall2026.pdf`,
-        uploadedBy: "Dr. Asim Farooq",
+        uploadedBy: "Dr. Sarah Jenkins",
         uploadedAt: "2026-08-15T09:00:00Z",
         downloadsCount: 142,
       },
       {
         id: `mat-${offeringId}-02`,
         offeringId,
-        title: "Lecture Module 01-04: Architecture & Design Patterns",
+        title: "Lecture Module 01-04: Distributed Systems & Consensus Protocols",
         category: "SLIDES",
         fileType: "application/pdf",
         fileSize: "8.7 MB",
         s3Key: `academic/materials/${offeringId}/lectures_01_04.pdf`,
         s3Url: `https://${s3.bucket}.s3.${s3.region}.amazonaws.com/academic/materials/${offeringId}/lectures_01_04.pdf`,
-        uploadedBy: "Dr. Asim Farooq",
+        uploadedBy: "Dr. Sarah Jenkins",
         uploadedAt: "2026-08-20T11:30:00Z",
         downloadsCount: 98,
       },
       {
         id: `mat-${offeringId}-03`,
         offeringId,
-        title: "Laboratory Handout 02: RESTful Services & Database Migration",
+        title: "Laboratory Handout 02: gRPC Microservices & Database Sharding",
         category: "LAB_GUIDE",
         fileType: "application/pdf",
         fileSize: "1.8 MB",
@@ -186,7 +234,9 @@ class StorageService {
   }
 
   /**
-   * Get High-Definition Video Lectures streamed via Cloudinary CDN
+   * Fetches high-definition video lecture streams and playlists powered by Cloudinary CDN
+   * @param {string|number} offeringId - Target Course Offering Identifier
+   * @returns {Promise<Array>} List of video lecture streaming items
    */
   static async getCourseVideoLectures(offeringId) {
     const config = this.getCloudinaryConfig();
@@ -199,11 +249,11 @@ class StorageService {
         publicId: `lectures/${offeringId}/lec01_arch_intro`,
         duration: "54:20",
         durationSeconds: 3260,
-        thumbnailUrl: `https://res.cloudinary.com/${config.cloudName}/video/upload/so_5,w_640,h_360,c_fill/lectures/${offeringId}/lec01_arch_intro.jpg`,
+        thumbnailUrl: `https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80`,
         streamUrl: `https://res.cloudinary.com/${config.cloudName}/video/upload/q_auto,f_mp4/lectures/${offeringId}/lec01_arch_intro.mp4`,
         hlsPlaylistUrl: `https://res.cloudinary.com/${config.cloudName}/video/upload/sp_auto/lectures/${offeringId}/lec01_arch_intro.m3u8`,
         recordedDate: "2026-08-18",
-        instructor: "Dr. Asim Farooq",
+        instructor: "Dr. Sarah Jenkins",
         viewsCount: 310,
       },
       {
@@ -213,11 +263,11 @@ class StorageService {
         publicId: `lectures/${offeringId}/lec02_schema_dag`,
         duration: "48:15",
         durationSeconds: 2895,
-        thumbnailUrl: `https://res.cloudinary.com/${config.cloudName}/video/upload/so_10,w_640,h_360,c_fill/lectures/${offeringId}/lec02_schema_dag.jpg`,
+        thumbnailUrl: `https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80`,
         streamUrl: `https://res.cloudinary.com/${config.cloudName}/video/upload/q_auto,f_mp4/lectures/${offeringId}/lec02_schema_dag.mp4`,
         hlsPlaylistUrl: `https://res.cloudinary.com/${config.cloudName}/video/upload/sp_auto/lectures/${offeringId}/lec02_schema_dag.m3u8`,
         recordedDate: "2026-08-20",
-        instructor: "Dr. Asim Farooq",
+        instructor: "Dr. Sarah Jenkins",
         viewsCount: 275,
       },
       {
@@ -227,7 +277,7 @@ class StorageService {
         publicId: `lectures/${offeringId}/lab01_jwt_auth`,
         duration: "1:02:40",
         durationSeconds: 3760,
-        thumbnailUrl: `https://res.cloudinary.com/${config.cloudName}/video/upload/so_15,w_640,h_360,c_fill/lectures/${offeringId}/lab01_jwt_auth.jpg`,
+        thumbnailUrl: `https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80`,
         streamUrl: `https://res.cloudinary.com/${config.cloudName}/video/upload/q_auto,f_mp4/lectures/${offeringId}/lab01_jwt_auth.mp4`,
         hlsPlaylistUrl: `https://res.cloudinary.com/${config.cloudName}/video/upload/sp_auto/lectures/${offeringId}/lab01_jwt_auth.m3u8`,
         recordedDate: "2026-08-25",

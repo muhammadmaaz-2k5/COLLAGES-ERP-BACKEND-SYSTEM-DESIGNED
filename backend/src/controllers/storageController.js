@@ -1,10 +1,20 @@
+// ============================================================================
+// ☁️ APEX UNIVERSITY ERP — STORAGE & MEDIA CONTROLLER
+// ============================================================================
+// Endpoints for AWS S3 pre-signed upload/download URLs and Cloudinary streaming
+// ============================================================================
+
 const StorageService = require("../services/storageService");
 const AuditService = require("../services/auditService");
 
 class StorageController {
+  // ==========================================================================
+  // 1. AWS S3 PRE-SIGNED UPLOAD & DOWNLOAD CONTROLLERS
+  // ==========================================================================
+
   /**
    * GET /api/v1/storage/s3/presigned-upload
-   * Generate pre-signed URL for direct browser-to-S3 document uploads
+   * Generates a pre-signed URL for direct browser-to-S3 document uploads
    */
   static async getS3UploadUrl(req, res, next) {
     try {
@@ -13,7 +23,10 @@ class StorageController {
       if (!fileName) {
         return res.status(400).json({
           success: false,
-          error: { code: "BAD_REQUEST", message: "fileName query parameter is required" },
+          error: {
+            code: "BAD_REQUEST",
+            message: "Parameter 'fileName' is required to generate an S3 pre-signed URL",
+          },
         });
       }
 
@@ -32,7 +45,7 @@ class StorageController {
 
   /**
    * GET /api/v1/storage/s3/presigned-download
-   * Generate pre-signed URL for downloading private S3 academic documents
+   * Generates a secure, time-bounded URL for downloading private S3 academic documents
    */
   static async getS3DownloadUrl(req, res, next) {
     try {
@@ -41,7 +54,10 @@ class StorageController {
       if (!fileKey) {
         return res.status(400).json({
           success: false,
-          error: { code: "BAD_REQUEST", message: "fileKey query parameter is required" },
+          error: {
+            code: "BAD_REQUEST",
+            message: "Parameter 'fileKey' is required to generate a download URL",
+          },
         });
       }
 
@@ -52,9 +68,13 @@ class StorageController {
     }
   }
 
+  // ==========================================================================
+  // 2. CLOUDINARY MEDIA SIGNATURE CONTROLLER
+  // ==========================================================================
+
   /**
    * GET /api/v1/storage/cloudinary/signature
-   * Generate Cloudinary secure upload parameters for media & videos
+   * Generates a signed payload for client-side direct media & video uploads
    */
   static async getCloudinarySignature(req, res, next) {
     try {
@@ -66,9 +86,13 @@ class StorageController {
     }
   }
 
+  // ==========================================================================
+  // 3. COURSE MATERIALS & VIDEO LECTURE REPOSITORY CONTROLLERS
+  // ==========================================================================
+
   /**
    * GET /api/v1/storage/course-materials/:offeringId
-   * Fetch all course documents (PDFs, slides, syllabi) in AWS S3 for a course offering
+   * Fetches academic course documents (PDFs, slides, syllabi) stored in AWS S3
    */
   static async getCourseMaterials(req, res, next) {
     try {
@@ -91,7 +115,7 @@ class StorageController {
 
   /**
    * GET /api/v1/storage/video-lectures/:offeringId
-   * Fetch Cloudinary video lecture streams and media playlists for a course offering
+   * Fetches high-definition video lecture streams and playlists via Cloudinary CDN
    */
   static async getVideoLectures(req, res, next) {
     try {
@@ -104,6 +128,7 @@ class StorageController {
           offeringId,
           cdnProvider: "CLOUDINARY",
           cloudName: StorageService.getCloudinaryConfig().cloudName,
+          uploadPreset: StorageService.getCloudinaryConfig().uploadPreset,
           videos,
         },
       });

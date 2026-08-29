@@ -1,4 +1,14 @@
+// ============================================================================
+// ☁️ APEX UNIVERSITY ERP — STORAGE & MEDIA CLIENT
+// ============================================================================
+// Frontend client for AWS S3 document pre-signed URLs & Cloudinary video streaming
+// ============================================================================
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+
+// ============================================================================
+// 1. DATA CONTRACTS & TYPE DEFINITIONS
+// ============================================================================
 
 export interface S3CourseMaterial {
   id: string;
@@ -38,9 +48,15 @@ export interface StorageResponse<T> {
   };
 }
 
+// ============================================================================
+// 2. STORAGE & MEDIA API SERVICE CLIENT
+// ============================================================================
+
 export class StorageAPI {
   /**
-   * Fetch Course Documents & Materials stored in AWS S3
+   * Fetches academic course documents (PDFs, slides, past exams) stored in AWS S3
+   * @param offeringId - Target Course Offering Identifier
+   * @param token - Bearer Authorization Token
    */
   static async getCourseMaterials(
     offeringId: string | number,
@@ -51,9 +67,9 @@ export class StorageAPI {
 
     const res = await fetch(`${API_BASE_URL}/storage/course-materials/${offeringId}`, { headers });
     if (!res.ok) {
-      // Return realistic fallback data for smooth client experience
+      // Graceful fallback for offline demo simulations
       return {
-        bucket: "apex-university-erp-storage",
+        bucket: "collage-management-erp-storage",
         materials: [
           {
             id: `mat-${offeringId}-01`,
@@ -63,33 +79,33 @@ export class StorageAPI {
             fileType: "application/pdf",
             fileSize: "2.4 MB",
             s3Key: `academic/materials/${offeringId}/syllabus.pdf`,
-            s3Url: `https://apex-university-erp-storage.s3.us-east-1.amazonaws.com/academic/materials/${offeringId}/syllabus.pdf`,
-            uploadedBy: "Dr. Asim Farooq",
+            s3Url: `https://collage-management-erp-storage.s3.eu-north-1.amazonaws.com/academic/materials/${offeringId}/syllabus.pdf`,
+            uploadedBy: "Dr. Sarah Jenkins",
             uploadedAt: "2026-08-15T09:00:00Z",
             downloadsCount: 142,
           },
           {
             id: `mat-${offeringId}-02`,
             offeringId,
-            title: "Lecture Module 01-04: System Architecture & Design Patterns",
+            title: "Lecture Module 01-04: System Architecture & Consensus Protocols",
             category: "SLIDES",
             fileType: "application/pdf",
             fileSize: "8.7 MB",
             s3Key: `academic/materials/${offeringId}/lectures_01_04.pdf`,
-            s3Url: `https://apex-university-erp-storage.s3.us-east-1.amazonaws.com/academic/materials/${offeringId}/lectures_01_04.pdf`,
-            uploadedBy: "Dr. Asim Farooq",
+            s3Url: `https://collage-management-erp-storage.s3.eu-north-1.amazonaws.com/academic/materials/${offeringId}/lectures_01_04.pdf`,
+            uploadedBy: "Dr. Sarah Jenkins",
             uploadedAt: "2026-08-20T11:30:00Z",
             downloadsCount: 98,
           },
           {
             id: `mat-${offeringId}-03`,
             offeringId,
-            title: "Laboratory Handout 02: Microservices & Database Migrations",
+            title: "Laboratory Handout 02: gRPC Microservices & Database Sharding",
             category: "LAB_GUIDE",
             fileType: "application/pdf",
             fileSize: "1.8 MB",
             s3Key: `academic/materials/${offeringId}/lab_02.pdf`,
-            s3Url: `https://apex-university-erp-storage.s3.us-east-1.amazonaws.com/academic/materials/${offeringId}/lab_02.pdf`,
+            s3Url: `https://collage-management-erp-storage.s3.eu-north-1.amazonaws.com/academic/materials/${offeringId}/lab_02.pdf`,
             uploadedBy: "Lab Instructor",
             uploadedAt: "2026-08-22T14:15:00Z",
             downloadsCount: 76,
@@ -97,12 +113,12 @@ export class StorageAPI {
           {
             id: `mat-${offeringId}-04`,
             offeringId,
-            title: "Mid-Term Examination Past Papers (2023-2025)",
+            title: "Mid-Term Examination Past Papers & Solutions (2023-2025)",
             category: "PAST_PAPERS",
             fileType: "application/zip",
             fileSize: "14.2 MB",
             s3Key: `academic/materials/${offeringId}/past_papers.zip`,
-            s3Url: `https://apex-university-erp-storage.s3.us-east-1.amazonaws.com/academic/materials/${offeringId}/past_papers.zip`,
+            s3Url: `https://collage-management-erp-storage.s3.eu-north-1.amazonaws.com/academic/materials/${offeringId}/past_papers.zip`,
             uploadedBy: "Academic Cell",
             uploadedAt: "2026-08-25T16:00:00Z",
             downloadsCount: 210,
@@ -116,20 +132,23 @@ export class StorageAPI {
   }
 
   /**
-   * Fetch Video Lectures Streamed via Cloudinary CDN
+   * Fetches high-definition video lecture streams and playlists powered by Cloudinary CDN
+   * @param offeringId - Target Course Offering Identifier
+   * @param token - Bearer Authorization Token
    */
   static async getVideoLectures(
     offeringId: string | number,
     token?: string
-  ): Promise<{ videos: CloudinaryVideoLecture[]; cloudName: string }> {
+  ): Promise<{ videos: CloudinaryVideoLecture[]; cloudName: string; uploadPreset?: string }> {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const res = await fetch(`${API_BASE_URL}/storage/video-lectures/${offeringId}`, { headers });
     if (!res.ok) {
-      // Fallback realistic video streaming data
+      // Graceful fallback for offline demo simulations
       return {
-        cloudName: "apex-university-media",
+        cloudName: "itomku0j",
+        uploadPreset: "FOODPANDA",
         videos: [
           {
             id: `vid-${offeringId}-01`,
@@ -138,10 +157,10 @@ export class StorageAPI {
             publicId: `lectures/${offeringId}/lec01`,
             duration: "54:20",
             durationSeconds: 3260,
-            thumbnailUrl: `https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80`,
-            streamUrl: `https://res.cloudinary.com/apex-university-media/video/upload/q_auto/lectures/${offeringId}/lec01.mp4`,
+            thumbnailUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80",
+            streamUrl: "https://res.cloudinary.com/itomku0j/video/upload/q_auto/lectures/cs401/lec01.mp4",
             recordedDate: "2026-08-18",
-            instructor: "Dr. Asim Farooq",
+            instructor: "Dr. Sarah Jenkins",
             viewsCount: 310,
           },
           {
@@ -151,10 +170,10 @@ export class StorageAPI {
             publicId: `lectures/${offeringId}/lec02`,
             duration: "48:15",
             durationSeconds: 2895,
-            thumbnailUrl: `https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80`,
-            streamUrl: `https://res.cloudinary.com/apex-university-media/video/upload/q_auto/lectures/${offeringId}/lec02.mp4`,
+            thumbnailUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80",
+            streamUrl: "https://res.cloudinary.com/itomku0j/video/upload/q_auto/lectures/cs401/lec02.mp4",
             recordedDate: "2026-08-20",
-            instructor: "Dr. Asim Farooq",
+            instructor: "Dr. Sarah Jenkins",
             viewsCount: 275,
           },
           {
@@ -164,8 +183,8 @@ export class StorageAPI {
             publicId: `lectures/${offeringId}/lab01`,
             duration: "1:02:40",
             durationSeconds: 3760,
-            thumbnailUrl: `https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80`,
-            streamUrl: `https://res.cloudinary.com/apex-university-media/video/upload/q_auto/lectures/${offeringId}/lab01.mp4`,
+            thumbnailUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+            streamUrl: "https://res.cloudinary.com/itomku0j/video/upload/q_auto/lectures/cs401/lab01.mp4",
             recordedDate: "2026-08-25",
             instructor: "Engr. Fatima Noor",
             viewsCount: 198,
@@ -179,7 +198,7 @@ export class StorageAPI {
   }
 
   /**
-   * Request AWS S3 Pre-signed Upload URL for Assignment File Dropzone
+   * Requests a time-bounded AWS S3 Pre-signed Upload URL for Assignment File Dropzone
    */
   static async getS3UploadUrl(
     fileName: string,
@@ -194,7 +213,7 @@ export class StorageAPI {
       `${API_BASE_URL}/storage/s3/presigned-upload?fileName=${encodeURIComponent(fileName)}&fileType=${encodeURIComponent(fileType)}&folder=${encodeURIComponent(folder)}`,
       { headers }
     );
-    if (!res.ok) throw new Error("Failed to get S3 upload signature");
+    if (!res.ok) throw new Error("Failed to generate AWS S3 upload signature");
     return res.json();
   }
 }
