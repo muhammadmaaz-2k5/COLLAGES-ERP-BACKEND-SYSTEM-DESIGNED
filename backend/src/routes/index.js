@@ -6,7 +6,7 @@ const rbacRoutes = require("./rbacRoutes");
 const userRoutes = require("./userRoutes");
 const studentRoutes = require("./studentRoutes");
 const academicRoutes = require("./academicRoutes");
-const googleClassroomRoutes = require("./googleClassroomRoutes");
+const storageRoutes = require("./storageRoutes");
 
 // Mount sub-routers
 router.use("/auth", authRoutes);
@@ -14,7 +14,7 @@ router.use("/rbac", rbacRoutes);
 router.use("/users", userRoutes);
 router.use("/student", studentRoutes);
 router.use("/academics", academicRoutes);
-router.use("/google-classroom", googleClassroomRoutes);
+router.use("/storage", storageRoutes);
 
 // System Health endpoint
 router.get("/health", (req, res) => {
@@ -28,6 +28,7 @@ router.get("/health", (req, res) => {
       rolesConfigured: 12,
       module1StudentPortal: "ENABLED",
       module2AcademicsCurriculum: "ENABLED",
+      storageEngine: "AWS_S3_AND_CLOUDINARY",
     },
   });
 });

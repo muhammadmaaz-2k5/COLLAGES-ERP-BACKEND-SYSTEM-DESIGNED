@@ -1,8 +1,8 @@
-# Module Rules: LMS, Assessments & Google Classroom Integration
+# Module Rules: LMS, Assessments & Cloud Storage / Media Streaming
 
 ## 1. Coursework Submissions
 * **Due Date Enforcement**: If `submittedAt > Assignment.dueDate`, the submission must be flagged as `isLate = true`.
-* **File Uploads**: All submission attachments must be validated for allowed MIME types (PDF, ZIP, DOCX) and maximum size ($25\text{ MB}$).
+* **AWS S3 File Storage**: All submission attachments must be validated for allowed MIME types (PDF, ZIP, DOCX) and maximum size ($25\text{ MB}$). Files are stored with pre-signed S3 keys under `academic/submissions/{studentId}/`.
 
 ## 2. Timed Online Quizzes
 * When a student begins a quiz (`POST /quizzes/:id/attempt`):
@@ -17,8 +17,8 @@
   $$\text{Total Weight} = \text{Assignments}(10\%) + \text{Quizzes}(10\%) + \text{Midterm}(30\%) + \text{Final}(50\%) = 100\%$$
 * Marks submitted by teachers remain in draft status until the `Exam Controller` executes `POST /grades/approve-final`, which locks all records and prevents post-publication tampering.
 
-## 4. Google Classroom Integration & Security Invariants
-* **OAuth 2.0 Token Isolation**: Refresh tokens and access tokens must never be sent to the client browser. All token exchanges must occur strictly within the backend server.
-* **API Key Transport**: Google API keys must never be exposed in query parameters; they must be provided via the `x-goog-api-key` HTTP header or backend server SDK.
-* **Idempotent Synchronization**: Syncing a course offering (`POST /google-classroom/sync-offering`) multiple times must update the existing Google Classroom class without creating duplicates.
-* **Grade Passback Reconciliation**: When importing grades from Google Classroom into PostgreSQL, verify that the student email matches an active `Enrollment` before updating `AssignmentSubmission.obtainedMarks`.
+## 4. Cloud Storage (AWS S3) & Multimedia Streaming (Cloudinary) Invariants
+* **AWS S3 Pre-Signed Upload Invariant**: All file uploads must be authorized via time-bounded (15 minutes) pre-signed PUT URLs. S3 secret credentials must never be exposed to the client application.
+* **Pre-Signed Download Authorization**: Academic course materials (lecture PDFs, lab guides, past exams) require authenticated pre-signed GET requests with a 1-hour expiration window.
+* **Cloudinary Streaming Delivery**: High-definition video lectures and lab walkthroughs must be transcoded with adaptive HLS/MP4 streaming and cached globally across Cloudinary CDN edge nodes.
+* **Student File Submission Verification**: When a student records an assignment submission (`POST /api/v1/student/lms/assignments/:id/submit`), verify that the S3 file key belongs to the authenticated student's tenant path before persisting into PostgreSQL.

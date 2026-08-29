@@ -177,12 +177,11 @@ X-Institution-Id: <INSTITUTION_ID>
 | `GET` | `/exams/datesheets` | Authenticated | Gets semester examination timetable schedule. |
 | `GET` | `/exams/results/my` | `STUDENT` | Gets published examination result cards. |
 | `GET` | `/grades/transcript/my` | `STUDENT` | Generates official full transcript across all 8+ semesters with CGPA. |
-| `GET` | `/google-classroom/auth-url` | Authenticated | Generates Google OAuth 2.0 consent URL for Classroom offline access. |
-| `GET` | `/google-classroom/callback` | Public | Handles OAuth redirect callback and stores user access tokens. |
-| `GET` | `/google-classroom/courses` | Authenticated | Lists synced Google Classroom courses and direct links. |
-| `POST` | `/google-classroom/sync-offering` | `TEACHER`, `ADMIN` | Provisions ERP course offering into Google Classroom with section code. |
-| `POST` | `/google-classroom/sync-coursework` | `TEACHER`, `ADMIN` | Synchronizes coursework assignment to Google Classroom stream. |
-| `POST` | `/google-classroom/import-grades` | `TEACHER`, `EXAM_CONTROLLER` | Pulls graded student submissions from Google Classroom into ERP gradebook. |
+| `GET` | `/storage/s3/presigned-upload` | Authenticated | Generates pre-signed S3 upload URL for assignments & documents. |
+| `GET` | `/storage/s3/presigned-download` | Authenticated | Generates pre-signed S3 download URL for private academic files. |
+| `GET` | `/storage/cloudinary/signature` | Authenticated | Generates signed signature for client-side direct media uploads. |
+| `GET` | `/storage/course-materials/:offeringId` | Authenticated | Lists AWS S3 course documents (Syllabus, Slides, Lab Handouts, Past Papers). |
+| `GET` | `/storage/video-lectures/:offeringId` | Authenticated | Lists Cloudinary HD recorded video lectures and lab walkthrough streams. |
 
 ---
 

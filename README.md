@@ -46,7 +46,7 @@ A production-grade, enterprise-scale **University & College Management Enterpris
 | 🛡️ **Disaster Recovery** | [docs/backup-recovery.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/backup-recovery.md) — Continuous WAL archiving, PITR recovery, and failover topologies. |
 | 📜 **Audit & Compliance** | [docs/audit-logging.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/audit-logging.md) — Mutation auditing, security event matrix, and WORM log immutability. |
 | 📊 **BI & Analytics Engine** | [docs/reporting.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/reporting.md) — Read replica query routing, KPI dashboards, and custom report builder. |
-| 🌐 **Google Classroom Integration** | [docs/google_classroom_integration.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/google_classroom_integration.md) — Two-way sync, OAuth 2.0 authorization, coursework stream, and grade passback. |
+| ☁️ **Cloud Storage & Media** | [docs/cloud_storage_media.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/cloud_storage_media.md) — AWS S3 object storage for documents & Cloudinary CDN video streaming. |
 | 🔔 **Notifications & Comms** | [docs/notifications.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/notifications.md) — Multi-channel SSE, Email, SMS, Push, and direct messaging. |
 
 ---
@@ -135,12 +135,16 @@ DATABASE_URL="postgresql://postgres:maaz@localhost:5432/erpc"
 JWT_SECRET="your-super-secret-key-change-in-production"
 PORT=5000
 
-# Google Classroom OAuth 2.0 Integration
-GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-GOOGLE_API_KEY="your-google-cloud-api-key"
-GOOGLE_REDIRECT_URI="http://localhost:5000/api/v1/google-classroom/callback"
-GOOGLE_FRONTEND_ORIGIN="http://localhost:3000"
+# AWS S3 Storage (Documents & Submissions)
+AWS_ACCESS_KEY_ID="your-aws-access-key-id"
+AWS_SECRET_ACCESS_KEY="your-aws-secret-access-key"
+AWS_REGION="us-east-1"
+AWS_S3_BUCKET="apex-university-erp-storage"
+
+# Cloudinary CDN (Video Lectures & Media)
+CLOUDINARY_CLOUD_NAME="apex-university-media"
+CLOUDINARY_API_KEY="your-cloudinary-api-key"
+CLOUDINARY_API_SECRET="your-cloudinary-api-secret"
 ```
 
 ### 4. Run Database Migrations

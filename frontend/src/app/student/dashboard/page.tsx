@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/store/use-auth-store";
 import { StudentAPI } from "@/lib/student-client";
 import { AcademicAPI } from "@/lib/academic-client";
-import { GoogleClassroomAPI, type GoogleClassroomCourse } from "@/lib/google-classroom-client";
+import { StorageAPI, type S3CourseMaterial, type CloudinaryVideoLecture } from "@/lib/storage-client";
 import { RoleSwitcher } from "@/components/rbac/RoleSwitcher";
 import { StudentSidebar, type StudentTabKey } from "@/components/layout/StudentSidebar";
 import {
@@ -303,50 +303,100 @@ export default function RealtimeStudentDashboard() {
     },
   ]);
 
-  const [classroomCourses, setClassroomCourses] = useState<GoogleClassroomCourse[]>([
+  const [courseMaterials, setCourseMaterials] = useState<S3CourseMaterial[]>([
     {
-      id: "gc_cs401",
-      name: "CS-401: Distributed Computing Systems",
-      section: "Section A • Fall 2026",
-      room: "Lab 304",
-      alternateLink: "https://classroom.google.com",
-      enrollmentCode: "apex401d",
-      courseState: "ACTIVE",
-      teacherName: "Dr. Sarah Jenkins",
-      pendingCoursework: 2,
+      id: "mat_cs401_01",
+      offeringId: "off_cs401",
+      title: "Course Syllabus & Academic Policies (Fall 2026)",
+      category: "SYLLABUS",
+      fileType: "application/pdf",
+      fileSize: "2.4 MB",
+      s3Key: "academic/materials/cs401/syllabus_fall2026.pdf",
+      s3Url: "https://apex-university-erp-storage.s3.us-east-1.amazonaws.com/academic/materials/cs401/syllabus_fall2026.pdf",
+      uploadedBy: "Dr. Sarah Jenkins",
+      uploadedAt: "2026-08-15T09:00:00Z",
+      downloadsCount: 142,
     },
     {
-      id: "gc_cs405",
-      name: "CS-405: Compiler Construction & Design",
-      section: "Section A • Fall 2026",
-      room: "Hall B",
-      alternateLink: "https://classroom.google.com",
-      enrollmentCode: "apex405c",
-      courseState: "ACTIVE",
-      teacherName: "Prof. Alan Vance",
-      pendingCoursework: 1,
+      id: "mat_cs401_02",
+      offeringId: "off_cs401",
+      title: "Lecture Module 01-04: Distributed Consensus & Raft Protocol",
+      category: "SLIDES",
+      fileType: "application/pdf",
+      fileSize: "8.7 MB",
+      s3Key: "academic/materials/cs401/lectures_01_04.pdf",
+      s3Url: "https://apex-university-erp-storage.s3.us-east-1.amazonaws.com/academic/materials/cs401/lectures_01_04.pdf",
+      uploadedBy: "Dr. Sarah Jenkins",
+      uploadedAt: "2026-08-20T11:30:00Z",
+      downloadsCount: 98,
     },
     {
-      id: "gc_se410",
-      name: "SE-410: Cloud Architecture & Microservices",
-      section: "Section A • Fall 2026",
-      room: "Room 102",
-      alternateLink: "https://classroom.google.com",
-      enrollmentCode: "apex410s",
-      courseState: "ACTIVE",
-      teacherName: "Dr. Michael Chen",
-      pendingCoursework: 1,
+      id: "mat_cs401_03",
+      offeringId: "off_cs401",
+      title: "Laboratory Handout 02: gRPC Microservices & Protocol Buffers",
+      category: "LAB_GUIDE",
+      fileType: "application/pdf",
+      fileSize: "1.8 MB",
+      s3Key: "academic/materials/cs401/lab_handout_02.pdf",
+      s3Url: "https://apex-university-erp-storage.s3.us-east-1.amazonaws.com/academic/materials/cs401/lab_handout_02.pdf",
+      uploadedBy: "Lab Instructor",
+      uploadedAt: "2026-08-22T14:15:00Z",
+      downloadsCount: 76,
     },
     {
-      id: "gc_mt302",
-      name: "MT-302: Stochastic Processes & Analytics",
-      section: "Section A • Fall 2026",
-      room: "Room 205",
-      alternateLink: "https://classroom.google.com",
-      enrollmentCode: "apex302m",
-      courseState: "ACTIVE",
-      teacherName: "Dr. Emily Taylor",
-      pendingCoursework: 0,
+      id: "mat_cs401_04",
+      offeringId: "off_cs401",
+      title: "Mid-Term Examination Past Papers & Solution Keys (2023-2025)",
+      category: "PAST_PAPERS",
+      fileType: "application/zip",
+      fileSize: "14.2 MB",
+      s3Key: "academic/materials/cs401/past_papers.zip",
+      s3Url: "https://apex-university-erp-storage.s3.us-east-1.amazonaws.com/academic/materials/cs401/past_papers.zip",
+      uploadedBy: "Academic Cell",
+      uploadedAt: "2026-08-25T16:00:00Z",
+      downloadsCount: 210,
+    },
+  ]);
+
+  const [videoLectures, setVideoLectures] = useState<CloudinaryVideoLecture[]>([
+    {
+      id: "vid_cs401_01",
+      offeringId: "off_cs401",
+      title: "Lecture 01: Distributed Systems Topology & CAP Theorem",
+      publicId: "lectures/cs401/lec01_intro",
+      duration: "54:20",
+      durationSeconds: 3260,
+      thumbnailUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80",
+      streamUrl: "https://res.cloudinary.com/apex-university-media/video/upload/q_auto/lectures/cs401/lec01_intro.mp4",
+      recordedDate: "2026-08-18",
+      instructor: "Dr. Sarah Jenkins",
+      viewsCount: 310,
+    },
+    {
+      id: "vid_cs401_02",
+      offeringId: "off_cs401",
+      title: "Lecture 02: Byzantine Fault Tolerance & Quorum Systems",
+      publicId: "lectures/cs401/lec02_bft",
+      duration: "48:15",
+      durationSeconds: 2895,
+      thumbnailUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80",
+      streamUrl: "https://res.cloudinary.com/apex-university-media/video/upload/q_auto/lectures/cs401/lec02_bft.mp4",
+      recordedDate: "2026-08-20",
+      instructor: "Dr. Sarah Jenkins",
+      viewsCount: 275,
+    },
+    {
+      id: "vid_cs401_03",
+      offeringId: "off_cs401",
+      title: "Lab Walkthrough: Live gRPC Microservices & Database Sharding",
+      publicId: "lectures/cs401/lab01_grpc",
+      duration: "1:02:40",
+      durationSeconds: 3760,
+      thumbnailUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
+      streamUrl: "https://res.cloudinary.com/apex-university-media/video/upload/q_auto/lectures/cs401/lab01_grpc.mp4",
+      recordedDate: "2026-08-25",
+      instructor: "Engr. Fatima Noor",
+      viewsCount: 198,
     },
   ]);
 
@@ -358,6 +408,8 @@ export default function RealtimeStudentDashboard() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
   const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
   const [showHallTicket, setShowHallTicket] = useState<boolean>(false);
+  const [activeVideoModal, setActiveVideoModal] = useState<CloudinaryVideoLecture | null>(null);
+  const [selectedMaterialCategory, setSelectedMaterialCategory] = useState<string>("ALL");
 
   // Load Real Data from PostgreSQL API
   const fetchAllData = useCallback(async () => {
@@ -365,7 +417,7 @@ export default function RealtimeStudentDashboard() {
     try {
       const activeToken = token || "live-demo-token";
 
-      const [dashRes, coursesRes, asgRes, qzRes, feeRes, examRes, timeRes, currRes, gClassRes] = await Promise.all([
+      const [dashRes, coursesRes, asgRes, qzRes, feeRes, examRes, timeRes, currRes, matRes, vidRes] = await Promise.all([
         StudentAPI.getDashboard(activeToken),
         StudentAPI.getAvailableCourses(activeToken),
         StudentAPI.getAssignments(activeToken),
@@ -374,7 +426,8 @@ export default function RealtimeStudentDashboard() {
         StudentAPI.getExamSchedule(activeToken),
         StudentAPI.getWeeklyTimetable(activeToken),
         AcademicAPI.getStudentCurriculum(activeToken),
-        GoogleClassroomAPI.getCourses(activeToken).catch(() => null),
+        StorageAPI.getCourseMaterials("cs401", activeToken).catch(() => null),
+        StorageAPI.getVideoLectures("cs401", activeToken).catch(() => null),
       ]);
 
       if (dashRes?.data) {
@@ -408,8 +461,11 @@ export default function RealtimeStudentDashboard() {
       if (currRes?.data?.semesterWiseCurriculum) {
         setCurriculumRoadmap(currRes.data.semesterWiseCurriculum);
       }
-      if (gClassRes?.data?.courses && gClassRes.data.courses.length > 0) {
-        setClassroomCourses(gClassRes.data.courses);
+      if (matRes?.materials && matRes.materials.length > 0) {
+        setCourseMaterials(matRes.materials);
+      }
+      if (vidRes?.videos && vidRes.videos.length > 0) {
+        setVideoLectures(vidRes.videos);
       }
     } catch {
       // Fallbacks gracefully retained
@@ -427,8 +483,8 @@ export default function RealtimeStudentDashboard() {
     if (!selectedAssignmentId) return;
     try {
       await StudentAPI.submitAssignment(token || undefined, selectedAssignmentId, {
-        fileUrl: "https://storage.university.edu/student-uploads/submission.zip",
-        comments: "Live submission uploaded from portal interface.",
+        fileUrl: "https://apex-university-erp-storage.s3.us-east-1.amazonaws.com/academic/submissions/FA23-BCS-042/submission.zip",
+        comments: "Live submission uploaded from portal to AWS S3 storage.",
       });
       setSubmissionSuccess(true);
       await fetchAllData();
@@ -462,17 +518,6 @@ export default function RealtimeStudentDashboard() {
     }
   };
 
-  // Connect Google Classroom OAuth Action
-  const handleConnectGoogle = async () => {
-    try {
-      const res = await GoogleClassroomAPI.getAuthUrl();
-      if (res?.data?.authUrl) {
-        window.open(res.data.authUrl, "_blank", "width=600,height=700");
-      }
-    } catch {
-      window.open("https://classroom.google.com", "_blank");
-    }
-  };
 
   const registeredOfferings = availableOfferings.filter((o) => o.isAlreadyEnrolled);
   const totalRegisteredCredits = registeredOfferings.reduce((sum, o) => sum + (o.course?.creditHours || 3), 0);
@@ -1105,27 +1150,30 @@ export default function RealtimeStudentDashboard() {
             </Card>
           )}
 
-          {/* TAB 5: LMS & SESSIONAL ASSESSMENTS (GOOGLE CLASSROOM SYNC) */}
+          {/* TAB 5: LMS & SESSIONAL ASSESSMENTS (AWS S3 & CLOUDINARY MEDIA HUB) */}
           {activeTab === "lms" && (
             <div className="space-y-6">
-              {/* Google Classroom Sync & Sessional Aggregate Banner */}
-              <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 text-white shadow-xl border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              {/* Cloud Storage & Media Streaming Banner */}
+              <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white shadow-xl border border-indigo-500/30 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0">
-                    <Globe className="h-6 w-6 text-emerald-400" />
+                  <div className="h-12 w-12 rounded-2xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center shrink-0">
+                    <UploadCloud className="h-6 w-6 text-indigo-400" />
                   </div>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-extrabold text-white">LMS & Sessional Assessments</h3>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-extrabold text-white">LMS & Digital Media Repository</h3>
                       <Badge variant="success" className="text-[10px] bg-emerald-500/20 text-emerald-300 border-emerald-400/30">
-                        🟢 Google Classroom Connected
+                        🟢 AWS S3 Connected
+                      </Badge>
+                      <Badge variant="info" className="text-[10px] bg-indigo-500/20 text-indigo-300 border-indigo-400/30">
+                        🟣 Cloudinary CDN Stream Active
                       </Badge>
                     </div>
                     <p className="text-xs text-slate-300">
-                      Synchronized with Google Account: <span className="font-mono text-emerald-200 font-bold">{user?.email || "student@university.edu"}</span>
+                      Academic Documents & Assignments: <span className="font-mono text-indigo-200 font-bold">s3://apex-university-erp-storage</span>
                     </p>
                     <p className="text-[11px] text-slate-400">
-                      Sessional weightage (Assignments 10% + Quizzes 10% + Classroom Stream Participation) is calculated directly in PostgreSQL.
+                      High-definition lecture videos & media streams delivered seamlessly via Cloudinary CDN.
                     </p>
                   </div>
                 </div>
@@ -1134,20 +1182,11 @@ export default function RealtimeStudentDashboard() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={handleConnectGoogle}
+                    onClick={() => fetchAllData()}
                     className="text-xs bg-white/10 hover:bg-white/20 text-white border-white/20 gap-1.5"
                   >
-                    <RefreshCw className="h-3.5 w-3.5" /> Re-Sync Google
+                    <RefreshCw className="h-3.5 w-3.5" /> Refresh Media
                   </Button>
-                  <a
-                    href="https://classroom.google.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-colors"
-                  >
-                    <span>Classroom Stream</span>
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
                 </div>
               </div>
 
@@ -1163,7 +1202,7 @@ export default function RealtimeStudentDashboard() {
                     <div className="text-2xl font-black text-slate-900">9.4 / 10.0</div>
                     <div className="mt-1.5 space-y-1">
                       <Progress value={94} className="h-1.5" />
-                      <p className="text-[10px] text-emerald-600 font-semibold">✓ 1 Graded • 1 In-Progress</p>
+                      <p className="text-[10px] text-emerald-600 font-semibold">✓ 1 Graded • 1 In-Progress (AWS S3)</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1207,7 +1246,7 @@ export default function RealtimeStudentDashboard() {
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="text-base font-bold text-slate-900">Coursework Assignments</CardTitle>
-                        <CardDescription className="text-xs">Assignments synced with Google Classroom streams</CardDescription>
+                        <CardDescription className="text-xs">Direct file submissions stored securely in AWS S3</CardDescription>
                       </div>
                       <Badge variant="info">2 Coursework Tasks</Badge>
                     </div>
@@ -1218,8 +1257,8 @@ export default function RealtimeStudentDashboard() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Badge variant="outline" className="font-mono text-[10px]">{a.courseCode}</Badge>
-                            <Badge variant="success" className="text-[9px] gap-1">
-                              <Globe className="h-2.5 w-2.5" /> Classroom Synced
+                            <Badge variant="success" className="text-[9px] gap-1 bg-indigo-50 text-indigo-700 border-indigo-200">
+                              <UploadCloud className="h-2.5 w-2.5" /> AWS S3 Direct
                             </Badge>
                           </div>
                           <Badge variant={a.status === "GRADED" ? "success" : a.status === "SUBMITTED" ? "info" : "warning"}>
@@ -1232,15 +1271,9 @@ export default function RealtimeStudentDashboard() {
                           <span>Sessional Score: <strong className="text-slate-900">{a.obtainedMarks ? `${a.obtainedMarks} / ${a.maxMarks}` : "Pending"}</strong></span>
                         </div>
                         <div className="pt-2 flex items-center justify-between gap-2 border-t border-slate-100">
-                          <a
-                            href="https://classroom.google.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[11px] text-emerald-600 hover:text-emerald-700 font-semibold inline-flex items-center gap-1"
-                          >
-                            <span>Classroom Stream</span>
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
+                          <span className="text-[11px] text-slate-500">
+                            Storage: <code className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-indigo-600">s3://submissions/{a.courseCode}</code>
+                          </span>
 
                           {a.status === "PENDING" && (
                             <Button
@@ -1251,7 +1284,7 @@ export default function RealtimeStudentDashboard() {
                               }}
                               className="text-xs h-7 gap-1 bg-indigo-600 hover:bg-indigo-700"
                             >
-                              <UploadCloud className="h-3.5 w-3.5" /> Submit File
+                              <UploadCloud className="h-3.5 w-3.5" /> Upload to S3
                             </Button>
                           )}
                         </div>
@@ -1295,52 +1328,129 @@ export default function RealtimeStudentDashboard() {
                 </Card>
               </div>
 
-              {/* Google Classroom Active Courses & Meet Links */}
+              {/* AWS S3 Course Documents & Materials Section */}
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <BookOpen className="h-4 w-4 text-indigo-600" /> Academic Course Materials (AWS S3 Document Store)
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Official course lecture slides, syllabi, past exams, and laboratory guides
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {["ALL", "SYLLABUS", "SLIDES", "LAB_GUIDE", "PAST_PAPERS"].map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => setSelectedMaterialCategory(cat)}
+                          className={`text-[10px] font-bold px-2.5 py-1 rounded-lg transition-colors ${
+                            selectedMaterialCategory === cat
+                              ? "bg-indigo-600 text-white"
+                              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          }`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {courseMaterials
+                      .filter((m) => selectedMaterialCategory === "ALL" || m.category === selectedMaterialCategory)
+                      .map((m) => (
+                        <div
+                          key={m.id}
+                          className="p-4 rounded-xl border border-slate-200 bg-white space-y-3 flex flex-col justify-between hover:border-indigo-300 hover:shadow-md transition-all"
+                        >
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <Badge variant="outline" className="text-[10px] font-mono bg-slate-50">
+                                {m.category}
+                              </Badge>
+                              <span className="text-[10px] text-slate-400 font-mono">{m.fileSize}</span>
+                            </div>
+                            <h4 className="font-bold text-xs text-slate-900 line-clamp-2 leading-snug">{m.title}</h4>
+                            <p className="text-[11px] text-slate-500">By: {m.uploadedBy}</p>
+                          </div>
+
+                          <div className="space-y-2 pt-2 border-t border-slate-100">
+                            <div className="flex items-center justify-between text-[10px] text-slate-400">
+                              <span>Downloads: {m.downloadsCount}</span>
+                              <span>{new Date(m.uploadedAt).toLocaleDateString()}</span>
+                            </div>
+                            <a
+                              href={m.s3Url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold shadow-sm transition-colors"
+                            >
+                              <Download className="h-3 w-3" />
+                              <span>Download PDF</span>
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Cloudinary High-Definition Video Lectures Stream */}
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <Globe className="h-4 w-4 text-emerald-600" /> Active Google Classroom Streams & Live Meets
+                        <PlayCircle className="h-4 w-4 text-purple-600" /> High-Definition Video Lectures (Cloudinary CDN)
                       </CardTitle>
                       <CardDescription className="text-xs">
-                        Direct access to lecture materials, video conferences, and teacher announcements
+                        Recorded classroom lectures, lab demonstrations, and interactive playback streams
                       </CardDescription>
                     </div>
-                    <Badge variant="success">4 Synced Streams</Badge>
+                    <Badge variant="info" className="bg-purple-100 text-purple-800 border-purple-200">
+                      3 Recorded Lectures
+                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {classroomCourses.map((c) => (
-                      <div key={c.id} className="p-4 rounded-xl border border-slate-200 bg-white space-y-3 flex flex-col justify-between hover:border-indigo-200 transition-colors">
-                        <div className="space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <Badge variant="outline" className="font-mono text-[10px]">Code: {c.enrollmentCode || "apex401"}</Badge>
-                            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {videoLectures.map((v) => (
+                      <div
+                        key={v.id}
+                        className="rounded-xl border border-slate-200 bg-white overflow-hidden space-y-3 flex flex-col justify-between hover:border-purple-300 hover:shadow-lg transition-all"
+                      >
+                        <div className="relative aspect-video bg-slate-900 overflow-hidden group cursor-pointer" onClick={() => setActiveVideoModal(v)}>
+                          <img
+                            src={v.thumbnailUrl}
+                            alt={v.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-85 group-hover:opacity-100"
+                          />
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/10 transition-colors">
+                            <div className="h-12 w-12 rounded-full bg-purple-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                              <PlayCircle className="h-6 w-6" />
+                            </div>
                           </div>
-                          <h4 className="font-bold text-xs text-slate-900 leading-snug">{c.name}</h4>
-                          <p className="text-[11px] text-slate-500">{c.teacherName || "Dr. Sarah Jenkins"}</p>
+                          <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-white text-[10px] font-mono font-bold">
+                            {v.duration}
+                          </span>
                         </div>
 
-                        <div className="space-y-2 pt-2 border-t border-slate-100">
-                          <a
-                            href="https://meet.google.com/new"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full inline-flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-lg border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100/50 text-indigo-700 text-[11px] font-semibold transition-colors"
+                        <div className="p-4 pt-0 space-y-2">
+                          <h4 className="font-bold text-xs text-slate-900 line-clamp-2 leading-snug">{v.title}</h4>
+                          <div className="flex items-center justify-between text-[11px] text-slate-500">
+                            <span>Instructor: {v.instructor}</span>
+                            <span>{v.viewsCount} views</span>
+                          </div>
+                          <Button
+                            size="sm"
+                            onClick={() => setActiveVideoModal(v)}
+                            className="w-full text-xs h-7 gap-1.5 bg-purple-600 hover:bg-purple-700 text-white mt-1"
                           >
-                            <Video className="h-3.5 w-3.5" /> Join Google Meet
-                          </a>
-                          <a
-                            href={c.alternateLink || "https://classroom.google.com"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full inline-flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-sm transition-colors"
-                          >
-                            <span>Open Stream</span>
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
+                            <PlayCircle className="h-3.5 w-3.5" /> Watch Video Lecture
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -1687,6 +1797,70 @@ export default function RealtimeStudentDashboard() {
                 </Button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* CLOUDINARY VIDEO PLAYER MODAL */}
+      {activeVideoModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-slate-950 text-white rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl border border-purple-500/40">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 w-8 rounded-lg bg-purple-600/30 border border-purple-400/40 flex items-center justify-center">
+                  <PlayCircle className="h-5 w-5 text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-white line-clamp-1">{activeVideoModal.title}</h3>
+                  <p className="text-[11px] text-slate-400">
+                    Instructor: {activeVideoModal.instructor} • Streamed via Cloudinary CDN
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveVideoModal(null)}
+                className="h-7 w-7 p-0 text-slate-400 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="relative aspect-video rounded-xl overflow-hidden bg-black border border-white/10 flex items-center justify-center">
+              <img
+                src={activeVideoModal.thumbnailUrl}
+                alt={activeVideoModal.title}
+                className="w-full h-full object-cover opacity-60"
+              />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6 text-center">
+                <div className="h-16 w-16 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-xl hover:scale-105 transition-transform cursor-pointer">
+                  <PlayCircle className="h-8 w-8" />
+                </div>
+                <div className="space-y-1 mt-2">
+                  <p className="text-sm font-bold text-white">Live Cloudinary CDN Stream Ready</p>
+                  <p className="text-xs text-purple-300 font-mono">Codec: H.264 • Resolution: 1080p60 • Quality: Auto</p>
+                </div>
+              </div>
+              <span className="absolute top-3 left-3 px-2 py-1 rounded bg-purple-600/80 text-white text-[10px] font-bold">
+                HD 1080p
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+              <span>Duration: <strong className="text-white">{activeVideoModal.duration}</strong></span>
+              <span>Recorded: <strong className="text-white">{activeVideoModal.recordedDate}</strong></span>
+              <span>Views: <strong className="text-white">{activeVideoModal.viewsCount}</strong></span>
+            </div>
+
+            <div className="pt-2 flex justify-end gap-2 border-t border-white/10">
+              <Button variant="outline" size="sm" onClick={() => setActiveVideoModal(null)} className="text-xs bg-white/10 text-white border-white/20">
+                Close
+              </Button>
+              <Button size="sm" onClick={() => setActiveVideoModal(null)} className="text-xs bg-purple-600 hover:bg-purple-700 text-white gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5" /> Mark Lecture Completed
+              </Button>
+            </div>
           </div>
         </div>
       )}
