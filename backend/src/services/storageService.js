@@ -9,7 +9,7 @@ class StorageService {
     return {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID || "mock-s3-access-key",
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "mock-s3-secret",
-      region: process.env.AWS_REGION || "us-east-1",
+      region: process.env.AWS_REGION || "eu-north-1",
       bucket: process.env.AWS_S3_BUCKET || "apex-university-erp-storage",
       endpoint: process.env.AWS_S3_ENDPOINT || null,
     };
