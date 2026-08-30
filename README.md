@@ -138,19 +138,23 @@ PORT=5000
 # AWS S3 Storage (Documents & Submissions)
 AWS_ACCESS_KEY_ID="your-aws-access-key-id"
 AWS_SECRET_ACCESS_KEY="your-aws-secret-access-key"
-AWS_REGION="us-east-1"
-AWS_S3_BUCKET="apex-university-erp-storage"
+AWS_REGION="eu-north-1"
+AWS_S3_BUCKET="collage-management-erp-storage"
 
 # Cloudinary CDN (Video Lectures & Media)
-CLOUDINARY_CLOUD_NAME="apex-university-media"
+CLOUDINARY_CLOUD_NAME="itomku0j"
 CLOUDINARY_API_KEY="your-cloudinary-api-key"
 CLOUDINARY_API_SECRET="your-cloudinary-api-secret"
+CLOUDINARY_UPLOAD_PRESET="FOODPANDA"
 ```
 
-### 4. Run Database Migrations
-```bash
-npx prisma migrate dev --name init
-```
+### 4. Live Role Portals & Workstations
+* **🎓 Student Portal**: [http://localhost:3000/student/dashboard](http://localhost:3000/student/dashboard)
+* **👨‍🏫 Faculty & Teacher Portal**: [http://localhost:3000/faculty/dashboard](http://localhost:3000/faculty/dashboard)
+* **🏛️ Examination Controller Portal**: [http://localhost:3000/exam-controller/dashboard](http://localhost:3000/exam-controller/dashboard)
+* **🛡️ RBAC & IAM Admin Matrix**: [http://localhost:3000/admin/rbac](http://localhost:3000/admin/rbac)
+* **📚 Academic Programs & Curricula**: [http://localhost:3000/admin/academics](http://localhost:3000/admin/academics)
+
 
 ---
 

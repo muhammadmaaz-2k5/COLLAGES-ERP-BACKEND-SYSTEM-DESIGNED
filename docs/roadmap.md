@@ -33,12 +33,12 @@ Student Portal        Faculty Portal        Admissions & Admin    Campus Operati
 
 ---
 
-### Milestone 2: Faculty & Examination Controller Portal
-* **Phase 11**: Faculty Dashboard (Assigned course offering sections, teaching schedule).
-* **Phase 12**: Class Attendance Marking (Daily session check-in, bulk attendance submit).
-* **Phase 13**: Assessment Builder (Quiz creation, question bank, assignment rubrics & grading).
-* **Phase 14**: Examination Result Submissions (Provisional mark sheets, grade distribution preview).
-* **Phase 15**: Examination Controller Portal (Exam terms, datesheet publisher, invigilation assigning, grade lock).
+### Milestone 2: Faculty & Examination Controller Portal (Completed ✅)
+* **Phase 11**: Faculty Dashboard (Assigned course offering sections, teaching schedule, student counts) — `COMPLETED`.
+* **Phase 12**: Class Attendance Marking (Interactive session check-in, bulk attendance submit to PostgreSQL) — `COMPLETED`.
+* **Phase 13**: Assessment Builder (Quiz creation, question bank, assignment rubrics, AWS S3 attachments & Cloudinary videos) — `COMPLETED`.
+* **Phase 14**: Sessional Marks & Gradebook (Provisional mark sheets, auto grade calculator, submission to controller) — `COMPLETED`.
+* **Phase 15**: Examination Controller Portal (Exam terms, datesheet publisher, invigilation duty, immutable grade lock) — `COMPLETED`.
 
 ---
 

@@ -285,3 +285,31 @@ STUDENT PORTAL API CONTRACT
                                       GET  /api/v1/announcements
                                       GET  /api/v1/messages/inbox
 ```
+
+---
+
+## 4. Module 7: Faculty (Teacher) Portal API Mapping
+
+```
+FACULTY PORTAL API CONTRACT (/api/v1/faculty)
+├── GET  /dashboard                                  -> Aggregated teaching workload & schedule
+├── GET  /courses/:offeringId/roster                -> Enrolled student roster with attendance & marks
+├── POST /attendance/mark                            -> Bulk mark session attendance (PRESENT/ABSENT/LATE)
+├── POST /assessments/assignments                    -> Create coursework assignment
+├── GET  /assessments/assignments/:id/submissions    -> View student submissions
+├── POST /assessments/assignments/submissions/:id/grade -> Submit rubric score and feedback
+├── POST /assessments/quizzes                        -> Create timed online quiz
+└── POST /grades/submit-marks                        -> Transmit sessional marks to Exam Controller
+```
+
+---
+
+## 5. Module 7: Examination Controller Portal API Mapping
+
+```
+EXAM CONTROLLER API CONTRACT (/api/v1/exam-controller)
+├── GET  /dashboard                                  -> Exam terms, datesheets & grade submission status
+├── POST /datesheets                                 -> Publish scheduled paper slot in semester datesheet
+└── POST /grades/:offeringId/lock-approve            -> Officially approve and permanently lock final grades
+```
+
