@@ -36,7 +36,8 @@ A production-grade, enterprise-scale **University & College Management Enterpris
 | 🔄 **Business Process Workflows** | [docs/workflows/](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/workflows/README.md) — 6 End-to-End Sequence Diagrams (Registration, Admissions, Fees, Exams). |
 | 🚦 **State Machines** | [docs/state-machines.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/state-machines.md) — Visual transitions and guards for Application, Enrollment, Fee, and Leave states. |
 | 🌐 **REST API Specification** | [docs/api/api.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/api/api.md) — Complete endpoint documentation across all 12 modules. |
-| 🗺️ **Engineering Roadmap** | [docs/roadmap.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/roadmap.md) — 4 Implementation Milestones starting with the **Student Portal**. |
+| 🗺️ **Engineering Roadmap** | [docs/roadmap.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/roadmap.md) — 4 Implementation Milestones and phase release sequence. |
+| 📋 **Master TODO & Checklist** | [docs/todo.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/todo.md) — Granular feature checklist and gap analysis across all 12 modules. |
 | 🔒 **Security & Cryptography** | [docs/security.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/security.md) — JWT RS256 lifecycle, tenant isolation, and QR code verification. |
 | ⚙️ **Backend Architecture** | [docs/backend.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/backend.md) — Layered architecture, atomic `$transaction` rules, and BullMQ queues. |
 | 💻 **Frontend Architecture** | [docs/frontend.md](file:///c:/Users/RYZEN%207/Downloads/CollageManagement/docs/frontend.md) — React/TypeScript structure, React Query caching, and Zustand UI state. |
