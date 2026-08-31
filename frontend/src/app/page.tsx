@@ -243,6 +243,15 @@ const portalsList = [
     ctaLink: "/career",
     ctaText: "Launch Career & Research Portal",
   },
+  {
+    id: "bi",
+    title: "📈 Executive BI Analytics & Reports",
+    badge: "Phase 24 Live",
+    description: "Institutional intelligence, 4-year retention progression, departmental GPA analytics, revenue breakdowns, and dynamic SQL query builder.",
+    highlights: ["Executive Institutional KPIs", "Department GPA & S:F Ratios", "Dynamic Query & Projection Builder", "HEC QA & Accreditation Reports"],
+    ctaLink: "/admin/bi",
+    ctaText: "Launch Executive BI Portal",
+  },
 ];
 
 export default function UniversityLandingPage() {

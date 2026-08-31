@@ -152,7 +152,7 @@ This document provides a comprehensive, granular task breakdown and status audit
 
 ---
 
-## ⏳ Milestone 4: Campus Operations, Facilities & Advanced BI (Upcoming)
+## ✅ Milestone 4: Campus Operations, Facilities & Advanced BI (Completed)
 
 ### 📚 Phase 20: Library Circulation Automation System (Completed ✅)
 - [x] **Backend Tasks**:
@@ -198,14 +198,14 @@ This document provides a comprehensive, granular task breakdown and status audit
 
 ---
 
-### 📈 Phase 24: Dynamic BI Analytics & Custom Report Builder
-- [ ] **Backend Tasks**:
-  - [ ] Implement `biReportingService.js` (`/api/v1/reporting/*`).
-  - [ ] High-performance read queries for Institutional KPIs (Retention rates, Fee collection recovery %, Faculty teaching workload, Department GPA trends).
-  - [ ] Dynamic custom report builder with SQL projection generator and scheduled exports (PDF, Excel, CSV).
-- [ ] **Frontend Tasks**:
-  - [ ] Executive BI Executive Dashboard: `frontend/src/app/admin/bi/page.tsx`.
-  - [ ] Custom Drag-and-Drop Report Query Builder.
+### 📈 Phase 24: Dynamic BI Analytics & Custom Report Builder (Completed ✅)
+- [x] **Backend Tasks**:
+  - [x] Implement `biReportingService.js` (`/api/v1/reporting/*`).
+  - [x] High-performance read queries for Institutional KPIs (Retention rates, Fee collection recovery %, Faculty teaching workload, Department GPA trends).
+  - [x] Dynamic custom report builder with SQL projection generator and scheduled exports (PDF, Excel, CSV).
+- [x] **Frontend Tasks**:
+  - [x] Executive BI Executive Dashboard: `frontend/src/app/admin/bi/page.tsx`.
+  - [x] Custom Drag-and-Drop Report Query Builder.
 
 ---
 
