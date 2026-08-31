@@ -154,14 +154,14 @@ This document provides a comprehensive, granular task breakdown and status audit
 
 ## ⏳ Milestone 4: Campus Operations, Facilities & Advanced BI (Upcoming)
 
-### 📚 Phase 20: Library Circulation Automation System
-- [ ] **Backend Tasks**:
-  - [ ] Implement `libraryService.js` (`/api/v1/library/*`).
-  - [ ] Book cataloging with ISBN, Dewey Decimal Classification, and barcoded copy inventories.
-  - [ ] Circulation desk: Instant checkout, return, and overdue fine calculation.
-- [ ] **Frontend Tasks**:
-  - [ ] Librarian Workstation: `frontend/src/app/librarian/dashboard/page.tsx`.
-  - [ ] Student OPAC (Online Public Access Catalog) Search Interface.
+### 📚 Phase 20: Library Circulation Automation System (Completed ✅)
+- [x] **Backend Tasks**:
+  - [x] Implement `libraryService.js` (`/api/v1/library/*`).
+  - [x] Book cataloging with ISBN, Dewey Decimal Classification, and barcoded copy inventories.
+  - [x] Circulation desk: Instant checkout, return, and overdue fine calculation.
+- [x] **Frontend Tasks**:
+  - [x] Librarian Workstation: `frontend/src/app/librarian/dashboard/page.tsx`.
+  - [x] Student OPAC (Online Public Access Catalog) Search Interface.
 
 ---
 

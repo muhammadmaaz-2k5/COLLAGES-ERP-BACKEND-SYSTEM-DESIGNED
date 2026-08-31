@@ -207,6 +207,15 @@ const portalsList = [
     ctaLink: "/hr/dashboard",
     ctaText: "Launch HR Manager Portal",
   },
+  {
+    id: "library",
+    title: "📚 Library Circulation & OPAC",
+    badge: "Phase 20 Live",
+    description: "Dewey Decimal cataloging, barcoded copy inventory, instant student & faculty circulation loans, automated overdue fines, and public OPAC search.",
+    highlights: ["Master DDC & ISBN Cataloging", "Barcode Circulation Loan & Return Desk", "Automated Overdue Fines (PKR 50/day)", "Real-Time Student OPAC Search"],
+    ctaLink: "/librarian/dashboard",
+    ctaText: "Launch Library Portal",
+  },
 ];
 
 export default function UniversityLandingPage() {
