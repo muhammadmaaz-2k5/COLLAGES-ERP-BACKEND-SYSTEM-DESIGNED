@@ -121,18 +121,18 @@ This document provides a comprehensive, granular task breakdown and status audit
 
 ---
 
-### 💳 Phase 18: Finance, Billing & Double-Entry Accountant Portal
-- [ ] **Backend Tasks**:
-  - [ ] Implement `financeService.js` and `accountantController.js`.
-  - [ ] API `POST /api/v1/finance/fee-structures`: Fee structure templates (Tuition per credit hour, lab charges, library dues, admission fees).
-  - [ ] API `POST /api/v1/finance/challans/generate-batch`: Batch semester challan generator for thousands of enrolled students.
-  - [ ] API `POST /api/v1/finance/payments/reconcile-bank`: CSV bank scroll importer for automated payment reconciliation.
-  - [ ] API `GET /api/v1/finance/general-ledger`: Double-entry Chart of Accounts ledger (Assets, Liabilities, Revenue, Expenses).
-- [ ] **Frontend Tasks**:
-  - [ ] Accountant Dashboard: `frontend/src/app/accountant/dashboard/page.tsx`.
-  - [ ] Batch Challan Dispatcher & PDF Generator.
-  - [ ] Bank Scroll Reconciliation Workstation.
-  - [ ] General Ledger & Trial Balance Viewer.
+### 💳 Phase 18: Finance, Billing & Double-Entry Accountant Portal (Completed ✅)
+- [x] **Backend Tasks**:
+  - [x] Implement `financeService.js` and `accountantController.js`.
+  - [x] API `POST /api/v1/finance/fee-structures`: Fee structure templates (Tuition per credit hour, lab charges, library dues, admission fees).
+  - [x] API `POST /api/v1/finance/challans/generate-batch`: Batch semester challan generator for thousands of enrolled students.
+  - [x] API `POST /api/v1/finance/payments/reconcile-bank`: CSV bank scroll importer for automated payment reconciliation.
+  - [x] API `GET /api/v1/finance/general-ledger`: Double-entry Chart of Accounts ledger (Assets, Liabilities, Revenue, Expenses).
+- [x] **Frontend Tasks**:
+  - [x] Accountant Dashboard: `frontend/src/app/accountant/dashboard/page.tsx`.
+  - [x] Batch Challan Dispatcher & PDF Generator.
+  - [x] Bank Scroll Reconciliation Workstation.
+  - [x] General Ledger & Trial Balance Viewer.
 
 ---
 

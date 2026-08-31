@@ -192,11 +192,11 @@ const portalsList = [
   {
     id: "accountant",
     title: "💳 Finance & Accountant Portal",
-    badge: "Milestone 3",
-    description: "End-to-end billing and financial accounting platform with itemized fee templates, batch challan generator, online gateway reconciliation, and General Ledger.",
-    highlights: ["Batch Term Challan Generator", "Online & Offline Bank Receipt Reconciliation", "Need & Merit Scholarship Disbursement", "Double-Entry Chart of Accounts Ledger"],
-    ctaLink: "/login",
-    ctaText: "Login as Accountant",
+    badge: "Phase 18 Live",
+    description: "End-to-end billing and financial accounting platform with itemized fee templates, batch challan generator, bank scroll reconciliation, and GAAP General Ledger.",
+    highlights: ["Batch Semester Challan Generator", "HBL & UBL Bank Scroll Reconciliation", "Itemized Fee Structure Pricing Engine", "Double-Entry Chart of Accounts & Trial Balance"],
+    ctaLink: "/accountant/dashboard",
+    ctaText: "Launch Accountant Portal",
   },
 ];
 

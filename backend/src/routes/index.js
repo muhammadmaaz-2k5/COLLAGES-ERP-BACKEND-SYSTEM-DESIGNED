@@ -19,6 +19,7 @@ const storageRoutes = require("./storageRoutes");
 const facultyRoutes = require("./facultyRoutes");
 const examControllerRoutes = require("./examControllerRoutes");
 const admissionsRoutes = require("./admissionsRoutes");
+const financeRoutes = require("./financeRoutes");
 
 // ============================================================================
 // 2. ROUTE MOUNT TOPOLOGY
@@ -32,6 +33,7 @@ router.use("/storage", storageRoutes);
 router.use("/faculty", facultyRoutes);
 router.use("/exam-controller", examControllerRoutes);
 router.use("/admissions", admissionsRoutes);
+router.use("/finance", financeRoutes);
 
 // ============================================================================
 // 3. SYSTEM HEALTH & MONITORING ENDPOINT
@@ -50,6 +52,7 @@ router.get("/health", (req, res) => {
       module3FacultyPortal: "ENABLED",
       module4ExamControllerPortal: "ENABLED",
       module5AdmissionsPipeline: "ENABLED",
+      module6FinanceBillingLedger: "ENABLED",
       storageEngine: "AWS_S3_AND_CLOUDINARY",
     },
   });
