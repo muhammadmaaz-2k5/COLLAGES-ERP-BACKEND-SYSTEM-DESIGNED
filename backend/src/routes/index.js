@@ -26,6 +26,7 @@ const hostelRoutes = require("./hostelRoutes");
 const transportRoutes = require("./transportRoutes");
 const placementRoutes = require("./placementRoutes");
 const biReportingRoutes = require("./biReportingRoutes");
+const notificationRoutes = require("./notificationRoutes");
 
 // ============================================================================
 // 2. ROUTE MOUNT TOPOLOGY
@@ -46,6 +47,7 @@ router.use("/hostels", hostelRoutes);
 router.use("/transport", transportRoutes);
 router.use("/placements", placementRoutes);
 router.use("/reporting", biReportingRoutes);
+router.use("/notifications", notificationRoutes);
 
 // ============================================================================
 // 3. SYSTEM HEALTH & MONITORING ENDPOINT
@@ -71,6 +73,7 @@ router.get("/health", (req, res) => {
       module10TransportFleetCommuter: "ENABLED",
       module11CareerPlacementsResearch: "ENABLED",
       module12ExecutiveBIReporting: "ENABLED",
+      realTimeSSEPipeline: "ENABLED",
       storageEngine: "AWS_S3_AND_CLOUDINARY",
     },
   });

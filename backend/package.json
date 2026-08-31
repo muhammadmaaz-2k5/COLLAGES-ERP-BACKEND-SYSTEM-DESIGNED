@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "seed": "node src/seeders/rbacSeeder.js"
+    "seed": "node src/seeders/rbacSeeder.js",
+    "test": "node --test tests/unit/*.test.js tests/integration/*.test.js"
   },
   "keywords": ["erp", "rbac", "sequelize", "postgresql", "express", "jwt"],
   "author": "Apex University ERP Team",
