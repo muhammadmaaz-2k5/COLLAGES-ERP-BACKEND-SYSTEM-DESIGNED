@@ -53,7 +53,7 @@ Student Portal        Faculty Portal        Admissions & Admin    Campus Operati
 ### Milestone 4: Campus Operations, Facilities & Advanced Analytics
 * **Phase 20**: Library Automation System (Book catalog, barcode circulation desk, overdue fines, OPAC) — `COMPLETED`.
 * **Phase 21**: Hostel & Housing Management (Dormitories, room configurations, bed allocation) — `COMPLETED`.
-* **Phase 22**: Transport Fleet Management (Vehicles, driver tracking, route stops, bus subscriptions).
+* **Phase 22**: Transport Fleet Management (Vehicles, driver tracking, route stops, bus subscriptions) — `COMPLETED`.
 * **Phase 23**: Career & Placements (Job postings, student applications, interview tracking).
 * **Phase 24**: Dynamic BI & Custom Report Builder (Custom query builder, scheduled exports).
 

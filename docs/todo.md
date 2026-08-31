@@ -176,14 +176,14 @@ This document provides a comprehensive, granular task breakdown and status audit
 
 ---
 
-### 🚌 Phase 22: Transport Fleet Management & Commuter Passes
-- [ ] **Backend Tasks**:
-  - [ ] Implement `transportService.js` (`/api/v1/transport/*`).
-  - [ ] Bus fleet inventory, driver assignments, route stops, and pickup timings.
-  - [ ] Student/Staff semester transit subscriptions with digital QR bus passes.
-- [ ] **Frontend Tasks**:
-  - [ ] Fleet Manager & Driver Portal: `frontend/src/app/transport/dashboard/page.tsx`.
-  - [ ] Interactive Bus Route Map with pickup stop schedules.
+### 🚌 Phase 22: Transport Fleet Management & Commuter Passes (Completed ✅)
+- [x] **Backend Tasks**:
+  - [x] Implement `transportService.js` (`/api/v1/transport/*`).
+  - [x] Bus fleet inventory, driver assignments, route stops, and pickup timings.
+  - [x] Student/Staff semester transit subscriptions with digital QR bus passes.
+- [x] **Frontend Tasks**:
+  - [x] Fleet Manager & Driver Portal: `frontend/src/app/transport/dashboard/page.tsx`.
+  - [x] Interactive Bus Route Map with pickup stop schedules.
 
 ---
 

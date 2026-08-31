@@ -225,6 +225,15 @@ const portalsList = [
     ctaLink: "/warden/dashboard",
     ctaText: "Launch Warden Portal",
   },
+  {
+    id: "transport",
+    title: "🚌 Transport Fleet & Commuter Hub",
+    badge: "Phase 22 Live",
+    description: "Bus fleet tracking, stop route schedules with pick-up timelines, capacity utilization, driver logs, and semester digital QR bus passes.",
+    highlights: ["Gulberg & DHA Express Routes", "Sequential Stop Schedule Timelines", "Vehicle Capacity & Fuel Gauges", "Digital QR Commuter Boarding Passes"],
+    ctaLink: "/transport/dashboard",
+    ctaText: "Launch Transport Portal",
+  },
 ];
 
 export default function UniversityLandingPage() {
