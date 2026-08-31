@@ -187,14 +187,14 @@ This document provides a comprehensive, granular task breakdown and status audit
 
 ---
 
-### 💼 Phase 23: Career Placements & Research Grants
-- [ ] **Backend Tasks**:
-  - [ ] Implement `placementService.js` (`/api/v1/placements/*`) & `researchService.js` (`/api/v1/research/*`).
-  - [ ] Campus recruitment job postings, student applications, and interview schedules.
-  - [ ] Faculty research projects, grant funding allocations, and DOI publication tracking.
-- [ ] **Frontend Tasks**:
-  - [ ] Career Placement Hub: `frontend/src/app/career/page.tsx`.
-  - [ ] University Research & Publication Portal.
+### 💼 Phase 23: Career Placements & Research Grants (Completed ✅)
+- [x] **Backend Tasks**:
+  - [x] Implement `placementService.js` (`/api/v1/placements/*`) & `researchService.js` (`/api/v1/research/*`).
+  - [x] Campus recruitment job postings, student applications, and interview schedules.
+  - [x] Faculty research projects, grant funding allocations, and DOI publication tracking.
+- [x] **Frontend Tasks**:
+  - [x] Career Placement Hub: `frontend/src/app/career/page.tsx`.
+  - [x] University Research & Publication Portal.
 
 ---
 

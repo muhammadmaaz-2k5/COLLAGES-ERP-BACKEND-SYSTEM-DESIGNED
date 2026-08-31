@@ -234,6 +234,15 @@ const portalsList = [
     ctaLink: "/transport/dashboard",
     ctaText: "Launch Transport Portal",
   },
+  {
+    id: "career",
+    title: "💼 Career Placements & Research",
+    badge: "Phase 23 Live",
+    description: "Campus recruitment board, student corporate application & interview tracker, and faculty research grants registry with DOI publication links.",
+    highlights: ["Corporate Recruitment Vacancies", "Student Interview Pipeline Tracker", "HEC & Ignite Research Grants", "Peer-Reviewed DOI Publications"],
+    ctaLink: "/career",
+    ctaText: "Launch Career & Research Portal",
+  },
 ];
 
 export default function UniversityLandingPage() {
