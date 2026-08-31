@@ -22,6 +22,7 @@ const admissionsRoutes = require("./admissionsRoutes");
 const financeRoutes = require("./financeRoutes");
 const hrRoutes = require("./hrRoutes");
 const libraryRoutes = require("./libraryRoutes");
+const hostelRoutes = require("./hostelRoutes");
 
 // ============================================================================
 // 2. ROUTE MOUNT TOPOLOGY
@@ -38,6 +39,7 @@ router.use("/admissions", admissionsRoutes);
 router.use("/finance", financeRoutes);
 router.use("/hr", hrRoutes);
 router.use("/library", libraryRoutes);
+router.use("/hostels", hostelRoutes);
 
 // ============================================================================
 // 3. SYSTEM HEALTH & MONITORING ENDPOINT
@@ -59,6 +61,7 @@ router.get("/health", (req, res) => {
       module6FinanceBillingLedger: "ENABLED",
       module7HRWorkforcePayroll: "ENABLED",
       module8LibraryCirculationOPAC: "ENABLED",
+      module9HostelResidentialLife: "ENABLED",
       storageEngine: "AWS_S3_AND_CLOUDINARY",
     },
   });

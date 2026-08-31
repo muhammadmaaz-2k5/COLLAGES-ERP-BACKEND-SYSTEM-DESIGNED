@@ -216,6 +216,15 @@ const portalsList = [
     ctaLink: "/librarian/dashboard",
     ctaText: "Launch Library Portal",
   },
+  {
+    id: "warden",
+    title: "🏢 Hostel & Residential Life",
+    badge: "Phase 21 Live",
+    description: "Hostel building directories, interactive 2D/3D room and bed matrix grid, residential contract check-in desk, and room transfer approvals.",
+    highlights: ["Iqbal & Fatima Jinnah Halls", "Interactive Room & Bed Slot Grid", "Check-In Contracts & Emergency Verification", "Room Change & Departure Approvals"],
+    ctaLink: "/warden/dashboard",
+    ctaText: "Launch Warden Portal",
+  },
 ];
 
 export default function UniversityLandingPage() {

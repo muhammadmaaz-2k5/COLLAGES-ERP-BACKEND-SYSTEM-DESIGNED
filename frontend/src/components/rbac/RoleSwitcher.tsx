@@ -15,7 +15,7 @@ const ROLES_SELECT: { role: SystemRole; label: string; defaultRoute: string }[] 
   { role: "HR_MANAGER", label: "👔 HR Manager", defaultRoute: "/hr/dashboard" },
   { role: "ADMISSIONS_OFFICER", label: "📋 Admissions Officer", defaultRoute: "/admin/admissions" },
   { role: "LIBRARIAN", label: "📚 Librarian", defaultRoute: "/librarian/dashboard" },
-  { role: "WARDEN", label: "🏢 Hostel Warden", defaultRoute: "/admin/rbac" },
+  { role: "WARDEN", label: "🏢 Hostel Warden", defaultRoute: "/warden/dashboard" },
   { role: "DRIVER", label: "🚌 Driver", defaultRoute: "/admin/rbac" },
   { role: "STAFF", label: "💼 Staff", defaultRoute: "/admin/rbac" },
 ];

@@ -165,14 +165,14 @@ This document provides a comprehensive, granular task breakdown and status audit
 
 ---
 
-### 🏢 Phase 21: Hostel & Residential Life Management
-- [ ] **Backend Tasks**:
-  - [ ] Implement `hostelService.js` (`/api/v1/hostels/*`).
-  - [ ] Hostel buildings (Boys/Girls/Faculty), room tiers, and bed allocation contracts.
-  - [ ] Student check-in, check-out, and room change requests.
-- [ ] **Frontend Tasks**:
-  - [ ] Hostel Warden Portal: `frontend/src/app/warden/dashboard/page.tsx`.
-  - [ ] Interactive 3D/Grid Room & Bed Allocation Matrix.
+### 🏢 Phase 21: Hostel & Residential Life Management (Completed ✅)
+- [x] **Backend Tasks**:
+  - [x] Implement `hostelService.js` (`/api/v1/hostels/*`).
+  - [x] Hostel buildings (Boys/Girls/Faculty), room tiers, and bed allocation contracts.
+  - [x] Student check-in, check-out, and room change requests.
+- [x] **Frontend Tasks**:
+  - [x] Hostel Warden Portal: `frontend/src/app/warden/dashboard/page.tsx`.
+  - [x] Interactive 3D/Grid Room & Bed Allocation Matrix.
 
 ---
 
