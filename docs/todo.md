@@ -94,30 +94,30 @@ This document provides a comprehensive, granular task breakdown and status audit
 
 ## ⏳ Milestone 3: Admissions, Finance & HR Management (Upcoming)
 
-### 📋 Phase 16: Public Online Admissions & Applicant Intake Portal
-- [ ] **Backend Tasks**:
-  - [ ] Implement `admissionsService.js` and `admissionsController.js`.
-  - [ ] API `POST /api/v1/admissions/apply`: Public applicant intake form with document uploads (Matric/FSc/A-Levels transcripts to AWS S3).
-  - [ ] API `GET /api/v1/admissions/applications/:trackingId`: Application tracking status with real-time stage tracker (`SUBMITTED`, `UNDER_REVIEW`, `TEST_SCHEDULED`, `ACCEPTED`, `REJECTED`).
-  - [ ] API `GET /api/v1/admissions/admin/applications`: Admissions officer applicant review workstation.
-  - [ ] API `PATCH /api/v1/admissions/admin/applications/:id/status`: Stage transition with automated email/SMS dispatch.
-- [ ] **Frontend Tasks**:
-  - [ ] Public Application Portal: `frontend/src/app/admissions/apply/page.tsx` (Multi-step wizard: Personal Info, Academic History, Degree Preferences, S3 Document Dropzone, Payment Receipt).
-  - [ ] Application Status Tracker: `frontend/src/app/admissions/track/page.tsx`.
-  - [ ] Admissions Officer Workstation: `frontend/src/app/admin/admissions/page.tsx`.
+### 📋 Phase 16: Public Online Admissions & Applicant Intake Portal (Completed ✅)
+- [x] **Backend Tasks**:
+  - [x] Implement `admissionsService.js` and `admissionsController.js`.
+  - [x] API `POST /api/v1/admissions/apply`: Public applicant intake form with document uploads (Matric/FSc/A-Levels transcripts to AWS S3).
+  - [x] API `GET /api/v1/admissions/applications/:trackingId`: Application tracking status with real-time stage tracker (`SUBMITTED`, `UNDER_REVIEW`, `TEST_SCHEDULED`, `ACCEPTED`, `REJECTED`).
+  - [x] API `GET /api/v1/admissions/admin/applications`: Admissions officer applicant review workstation.
+  - [x] API `PATCH /api/v1/admissions/admin/applications/:id/status`: Stage transition with automated email/SMS dispatch.
+- [x] **Frontend Tasks**:
+  - [x] Public Application Portal: `frontend/src/app/admissions/apply/page.tsx` (Multi-step wizard: Personal Info, Academic History, Degree Preferences, S3 Document Dropzone, Payment Receipt).
+  - [x] Application Status Tracker: `frontend/src/app/admissions/track/page.tsx`.
+  - [x] Admissions Officer Workstation: `frontend/src/app/admin/admissions/page.tsx`.
 
 ---
 
-### 📊 Phase 17: Entrance Exam & 50/50 Merit Ranking Engine
-- [ ] **Backend Tasks**:
-  - [ ] Implement `meritRankingService.js` with 50/50 aggregate math:
+### 📊 Phase 17: Entrance Exam & 50/50 Merit Ranking Engine (Completed ✅)
+- [x] **Backend Tasks**:
+  - [x] Implement `meritRankingService.js` with 50/50 aggregate math:
     $$\text{Aggregate} = (0.50 \times \text{Academic Percentage}) + (0.50 \times \text{Entry Test Percentage})$$
-  - [ ] API `POST /api/v1/admissions/tests/scores`: Bulk entry test score upload (CSV / Excel parser).
-  - [ ] API `POST /api/v1/admissions/merit-lists/generate`: Automated ranking generator partitioned by program quotas.
-  - [ ] API `GET /api/v1/admissions/merit-lists/public`: Public downloadable merit list PDFs.
-- [ ] **Frontend Tasks**:
-  - [ ] Merit List Generator & Previewer in Admissions Officer Portal.
-  - [ ] Public Merit List Browser with real-time seat quota countdown.
+  - [x] API `POST /api/v1/admissions/tests/scores`: Bulk entry test score upload (CSV / Excel parser).
+  - [x] API `POST /api/v1/admissions/merit-lists/generate`: Automated ranking generator partitioned by program quotas.
+  - [x] API `GET /api/v1/admissions/merit-lists/public`: Public downloadable merit list PDFs.
+- [x] **Frontend Tasks**:
+  - [x] Merit List Generator & Previewer in Admissions Officer Portal.
+  - [x] Public Merit List Browser with real-time seat quota countdown (`/admissions/merit-lists`).
 
 ---
 

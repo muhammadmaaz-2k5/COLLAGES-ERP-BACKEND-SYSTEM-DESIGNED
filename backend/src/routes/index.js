@@ -18,6 +18,7 @@ const academicRoutes = require("./academicRoutes");
 const storageRoutes = require("./storageRoutes");
 const facultyRoutes = require("./facultyRoutes");
 const examControllerRoutes = require("./examControllerRoutes");
+const admissionsRoutes = require("./admissionsRoutes");
 
 // ============================================================================
 // 2. ROUTE MOUNT TOPOLOGY
@@ -30,6 +31,7 @@ router.use("/academics", academicRoutes);
 router.use("/storage", storageRoutes);
 router.use("/faculty", facultyRoutes);
 router.use("/exam-controller", examControllerRoutes);
+router.use("/admissions", admissionsRoutes);
 
 // ============================================================================
 // 3. SYSTEM HEALTH & MONITORING ENDPOINT
@@ -47,6 +49,7 @@ router.get("/health", (req, res) => {
       module2AcademicsCurriculum: "ENABLED",
       module3FacultyPortal: "ENABLED",
       module4ExamControllerPortal: "ENABLED",
+      module5AdmissionsPipeline: "ENABLED",
       storageEngine: "AWS_S3_AND_CLOUDINARY",
     },
   });

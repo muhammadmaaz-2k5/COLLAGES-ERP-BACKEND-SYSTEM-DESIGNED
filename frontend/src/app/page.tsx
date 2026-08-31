@@ -181,6 +181,15 @@ const portalsList = [
     ctaText: "Launch Exam Controller Portal",
   },
   {
+    id: "admissions",
+    title: "📋 Admissions & Applicant Intake",
+    badge: "Phase 16 Live",
+    description: "Public undergraduate online application wizard, multi-stage status tracker with test roll number slips, and Admissions Officer review desk.",
+    highlights: ["5-Step Interactive Application Wizard", "Real-Time Application Status Stepper", "AWS S3 Certificate Upload Dropzone", "Admissions Officer Verification Desk"],
+    ctaLink: "/admissions/apply",
+    ctaText: "Apply Online for Fall 2026",
+  },
+  {
     id: "accountant",
     title: "💳 Finance & Accountant Portal",
     badge: "Milestone 3",

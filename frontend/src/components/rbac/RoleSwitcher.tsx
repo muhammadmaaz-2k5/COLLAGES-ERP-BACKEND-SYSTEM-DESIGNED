@@ -13,7 +13,7 @@ const ROLES_SELECT: { role: SystemRole; label: string; defaultRoute: string }[] 
   { role: "EXAM_CONTROLLER", label: "📝 Exam Controller", defaultRoute: "/exam-controller/dashboard" },
   { role: "ACCOUNTANT", label: "💳 Accountant", defaultRoute: "/admin/rbac" },
   { role: "HR_MANAGER", label: "👔 HR Manager", defaultRoute: "/admin/rbac" },
-  { role: "ADMISSIONS_OFFICER", label: "📋 Admissions Officer", defaultRoute: "/admin/rbac" },
+  { role: "ADMISSIONS_OFFICER", label: "📋 Admissions Officer", defaultRoute: "/admin/admissions" },
   { role: "LIBRARIAN", label: "📚 Librarian", defaultRoute: "/admin/rbac" },
   { role: "WARDEN", label: "🏢 Hostel Warden", defaultRoute: "/admin/rbac" },
   { role: "DRIVER", label: "🚌 Driver", defaultRoute: "/admin/rbac" },
