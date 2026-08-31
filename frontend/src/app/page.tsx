@@ -198,6 +198,15 @@ const portalsList = [
     ctaLink: "/accountant/dashboard",
     ctaText: "Launch Accountant Portal",
   },
+  {
+    id: "hr",
+    title: "👔 HR & Workforce Portal",
+    badge: "Phase 19 Live",
+    description: "Unified workforce management spine for Faculty, Administrative Staff, and Transport Drivers with leave approval desks and monthly payroll engine.",
+    highlights: ["Unified Faculty & Staff Directory", "Leave Balance & Decision Workstation", "Automated Monthly Payroll Calculator", "Tax & Provident Fund Deductions"],
+    ctaLink: "/hr/dashboard",
+    ctaText: "Launch HR Manager Portal",
+  },
 ];
 
 export default function UniversityLandingPage() {

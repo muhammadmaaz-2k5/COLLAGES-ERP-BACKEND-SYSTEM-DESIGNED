@@ -42,11 +42,11 @@ Student Portal        Faculty Portal        Admissions & Admin    Campus Operati
 
 ---
 
-### Milestone 3: Admissions, Finance & HR Management
-* **Phase 16**: Public Admissions Portal (Online application, document upload).
-* **Phase 17**: Entrance Exam & Merit Ranking Engine (50/50 aggregate computation, merit list publication).
-* **Phase 18**: Accountant Portal (Fee structure configuration, batch challan generator, bank reconciliation, General Ledger).
-* **Phase 19**: HR & Workforce Portal (Employee records, leave balances & approval workflows, monthly payroll slips).
+### Milestone 3: Admissions, Finance & HR Management (Completed ✅)
+* **Phase 16**: Public Admissions Portal (5-step online application wizard, AWS S3 dropzone, tracking status) — `COMPLETED`.
+* **Phase 17**: Entrance Exam & Merit Ranking Engine (50/50 aggregate computation, public merit list browser) — `COMPLETED`.
+* **Phase 18**: Accountant Portal (Fee structure templates, batch challan generator, bank reconciliation, GAAP General Ledger) — `COMPLETED`.
+* **Phase 19**: HR & Workforce Portal (Unified employee spine, leave approval desk, monthly payroll slips) — `COMPLETED`.
 
 ---
 
